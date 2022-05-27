@@ -14,6 +14,11 @@ export default {
   re_password_placeholder: 'Re-type Password',
   phone_placeholder: 'Phone Number',
   new_user_register: 'I am a new user, ',
+  error_phone: 'Phone number must be at least 6 characters long',
+  error_phone_ext: 'Phone extension is not valid',
+  error_password: 'Password must be at least 6 characters long',
+  error_phone_not_found: 'Phone number or password incorrect',
+  error_password_not_match: 'Phone number or password incorrect',
   // screens/signup/SignUp.js
   create_account: 'Create Account',
   tnc_sign_up: 'By registering, you accepts our',

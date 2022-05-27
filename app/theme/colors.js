@@ -3,19 +3,19 @@ import config from '../config';
 
 // Color Themes
 const themes = {
-  food: {
+  main: {
     // primary color
     primaryLightColor: '#1D3A708c',
     primaryColor: '#1D3A70', //00b970//bc0021
     primaryColorDark: '#00945a',
     primaryColorLight: '#00e78c',
     onPrimaryColor: '#ffffff', //
-    customonOnPrimaryColor: '#1D3A70',
+    customOnPrimaryColor: '#1D3A70',
 
     //dark background
     //darkBackgroundColor:'#1D3A70',
     //darkScreenPrimaryText:'#ffffff',
-    //darkScreensecondaryText:'#ffffff',
+    //darkScreenSecondaryText:'#ffffff',
 
     // accent color, triad
     accentColor: '#0069b9',

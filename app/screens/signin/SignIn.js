@@ -10,15 +10,20 @@ import {
 } from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import PhoneInput from 'react-native-phone-number-input';
-
-import I18n from '../../assets/i18n/i18n';
 import {withTranslation} from 'react-i18next';
+import axios from 'axios';
+import Toast from 'react-native-toast-message';
 
+// config
+import config from '../../config';
+// components
+import I18n from '../../assets/i18n/i18n';
 import Button from '../../components/buttons/Button';
 import InputModal from '../../components/modals/InputModal';
 import UnderlinePasswordInput from '../../components/textinputs/UnderlinePasswordInput';
 import SwitchText from '../../components/toggle/switchText';
-
+// api
+import {login} from '../../api/signin';
 // import colors, layout
 import Colors from '../../theme/colors';
 import Layout from '../../theme/layout';
@@ -127,8 +132,9 @@ class SignIn extends Component {
     super(props);
 
     this.state = {
-      email: '',
-      emailFocused: false,
+      phone: '',
+      phoneExt: '',
+      phoneFocused: false,
       password: '',
       passwordFocused: false,
       secureTextEntry: true,
@@ -136,15 +142,15 @@ class SignIn extends Component {
     };
   }
 
-  emailChange = text => {
+  phoneChange = text => {
     this.setState({
-      email: text,
+      phone: text,
     });
   };
 
-  emailFocus = () => {
+  phoneFocus = () => {
     this.setState({
-      emailFocused: true,
+      phoneFocused: true,
       passwordFocused: false,
     });
   };
@@ -186,13 +192,50 @@ class SignIn extends Component {
     navigation.navigate(screen);
   };
 
-  signIn = () => {
+  resetError = () => {
+    Toast.hide();
+  };
+
+  signIn = async () => {
+    this.resetError();
+    const {password, phone} = this.state;
+    // Todo: Check if fields are too short to avoid querying API ?
+    const response = await login(phone, this.phone.getCallingCode(), password);
+    if (response.status != 200) {
+      let errMessage = '';
+      if (response.error_code === 100) {
+        if (response.error_field === 'phone') {
+          errMessage = I18n.t('error_phone');
+        }
+        if (response.error_field === 'phone_ext') {
+          errMessage = I18n.t('error_phone_ext');
+        }
+        if (response.error_field === 'password') {
+          errMessage = I18n.t('error_password');
+        }
+      }
+      if (response.error_code === 101) {
+        errMessage = I18n.t('error_phone_not_found');
+      }
+      if (response.error_code === 102) {
+        errMessage = I18n.t('error_password_not_match');
+      }
+      if (errMessage.length) {
+        Toast.show({
+          type: 'error',
+          text1: errMessage,
+          autoHide: true,
+          visibilityTime: 10 * 1e3, //10 seconds
+          onPress: () => Toast.hide(),
+        });
+      }
+    }
     this.setState(
       {
-        emailFocused: false,
+        phoneFocused: false,
         passwordFocused: false,
       },
-      this.navigateTo('HomeNavigator'),
+      // this.navigateTo('HomeNavigator'),
     );
   };
 
@@ -210,13 +253,12 @@ class SignIn extends Component {
   render() {
     const {t} = this.props;
     const {
-      email,
-      emailFocused,
+      phone,
+      phoneFocused,
       password,
       passwordFocused,
       secureTextEntry,
       inputModalVisible,
-      phone,
     } = this.state;
     return (
       <SafeAreaView style={styles.screenContainer}>
@@ -233,17 +275,16 @@ class SignIn extends Component {
             </View>
             <View style={styles.form}>
               <PhoneInput
-                ref={phone}
+                ref={r => {
+                  this.phone = r;
+                }}
                 defaultValue={phone}
                 placeholder={t('phone_placeholder')}
                 defaultCode="ID"
                 layout="first"
-                onChangeText={text => {
-                  this.phone = text;
-                }}
-                onChangeFormattedText={text => {
-                  this.phone = text;
-                }}
+                inputFocused={phoneFocused}
+                onChangeText={this.phoneChange}
+                // onChangeFormattedText={this.phoneChange}
                 containerStyle={styles.containerStyle}
                 textContainerStyle={styles.textContainerStyle}
                 textInputStyle={styles.textInputStyle}
@@ -285,7 +326,7 @@ class SignIn extends Component {
                   color={Colors.primaryColor}
                   rounded
                   borderRadius
-                  onPress={this.navigateTo('HomeNavigator')}
+                  onPress={this.signIn}
                   title={t('sign_in').toUpperCase()}
                   titleColor={Colors.onPrimaryColor}
                 />

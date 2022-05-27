@@ -42,10 +42,10 @@ class App extends React.Component {
     return (
       <View style={styles.lang}>
         <SwitchSelector
-          textColor={Colors.customonOnPrimaryColor}
+          textColor={Colors.customOnPrimaryColor}
           selectedColor={Colors.white}
-          buttonColor={Colors.customonOnPrimaryColor}
-          borderColor={Colors.customonOnPrimaryColor}
+          buttonColor={Colors.customOnPrimaryColor}
+          borderColor={Colors.customOnPrimaryColor}
           borderRadius={5}
           hasPadding
           options={options}
