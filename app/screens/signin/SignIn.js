@@ -1,5 +1,7 @@
 // import dependencies
-import React, {Component} from 'react';
+import React, {useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
+
 import {
   SafeAreaView,
   StatusBar,
@@ -131,79 +133,41 @@ const styles = StyleSheet.create({
   },
 });
 
-class SignIn extends Component {
-  constructor(props) {
-    super(props);
+const SignIn = props => {
+  const [phoneComponent, setPhoneComponent] = useState();
+  const [passwordComponent, setPasswordComponent] = useState();
+  const [phone, setPhone] = useState('');
+  const [phoneExt, setPhoneExt] = useState('');
+  const [phoneFocused, setPhoneFocused] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordFocused, setPasswordFocused] = useState('');
+  const [secureTextEntry, setSecureTextEntry] = useState('');
+  const [inputModalVisible, setInputModalVisible] = useState('');
+  const [isLoading, setIsLoading] = useState('');
+  const [screen, setScreen] = useState();
 
-    this.state = {
-      phone: '',
-      phoneExt: '',
-      phoneFocused: false,
-      password: '',
-      passwordFocused: false,
-      secureTextEntry: true,
-      inputModalVisible: false,
-      isLoading: false,
-    };
-  }
+  const navigation = useNavigation();
 
-  phoneChange = text => {
-    this.setState({
-      phone: text,
-    });
+  const {t} = props;
+
+  const passwordFocus = () => {
+    setPhoneFocused(false);
+    setPasswordFocused(true);
   };
 
-  phoneFocus = () => {
-    this.setState({
-      phoneFocused: true,
-      passwordFocused: false,
-    });
+  const onTogglePress = () => {
+    setSecureTextEntry(!secureTextEntry);
   };
 
-  passwordChange = text => {
-    this.setState({
-      password: text,
-    });
-  };
-
-  passwordFocus = () => {
-    this.setState({
-      passwordFocused: true,
-      emailFocused: false,
-    });
-  };
-
-  onTogglePress = () => {
-    const {secureTextEntry} = this.state;
-    this.setState({
-      secureTextEntry: !secureTextEntry,
-    });
-  };
-
-  focusOn = nextFiled => () => {
-    if (nextFiled) {
-      nextFiled.focus();
-    }
-  };
-
-  showInputModal = value => () => {
-    this.setState({
-      inputModalVisible: value,
-    });
-  };
-
-  navigateTo = screen => () => {
-    const {navigation} = this.props;
+  const navigateTo = screen => () => {
     navigation.navigate(screen);
   };
 
-  signIn = async () => {
-    this.setState({
-      isLoading: true,
-    });
+  const signIn = async () => {
+    setIsLoading(true);
+
     Toast.hide();
 
-    const {password, phone} = this.state;
     let errMessage = '';
     if (!password || password.length < 6) {
       errMessage = I18n.t('error_password');
@@ -215,7 +179,7 @@ class SignIn extends Component {
       if (phone && password) {
         const response = await login(
           phone,
-          this.phone.getCallingCode(),
+          phoneComponent.getCallingCode(),
           password,
         );
 
@@ -243,23 +207,15 @@ class SignIn extends Component {
           // SUCCESS LOGIN
           AsyncStorage.setItem('@access_token', response.data.access_token);
           AsyncStorage.setItem('@refresh_token', response.data.refresh_token);
-          this.setState(
-            {
-              phoneFocused: false,
-              passwordFocused: false,
-            },
-            this.navigateTo('HomeNavigator'),
-          );
+          setPasswordFocused(false);
+          setPhoneFocused(false);
+          setScreen(navigateTo('HomeNavigator'));
         }
       }
-      this.setState({
-        isLoading: false,
-      });
+      setIsLoading(false);
     } catch (e) {
       errMessage = I18n.t('error_server');
-      this.setState({
-        isLoading: false,
-      });
+      setIsLoading(false);
     }
     if (errMessage.length) {
       Toast.show({
@@ -272,154 +228,132 @@ class SignIn extends Component {
     }
   };
 
-  switchLanguage = () => {
-    const {language} = this.state;
+  return (
+    <SafeAreaView style={styles.screenContainer}>
+      <StatusBar
+        backgroundColor={Colors.statusBarColor}
+        barStyle="dark-content"
+      />
 
-    this.setState({
-      language: language == 'en' ? 'id' : 'en',
-    });
-    I18n.changeLanguage(language);
-  };
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.contentContainerStyle}>
+        <View style={styles.content}>
+          <View style={styles.lang}>
+            <SwitchText />
+          </View>
+          <View style={styles.form}>
+            <PhoneInput
+              ref={r => {
+                setPhoneComponent(r);
+              }}
+              defaultValue={phone}
+              placeholder={t('phone_placeholder')}
+              defaultCode="ID"
+              layout="first"
+              keyboardType="phone-pad"
+              inputFocused={phoneFocused}
+              onChangeText={setPhone}
+              // onChangeFormattedText={this.phoneChange}
+              containerStyle={styles.containerStyle}
+              textContainerStyle={styles.textContainerStyle}
+              textInputStyle={styles.textInputStyle}
+              codeTextStyle={styles.codeTextStyle}
+              flagButtonStyle={styles.flagButtonStyle}
+              countryPickerButtonStyle={styles.countryPickerButtonStyle}
+              autoFocus></PhoneInput>
 
-  render() {
-    const {t} = this.props;
-    const {
-      phone,
-      phoneFocused,
-      password,
-      passwordFocused,
-      secureTextEntry,
-      inputModalVisible,
-      isLoading,
-    } = this.state;
-    return (
-      <SafeAreaView style={styles.screenContainer}>
-        <StatusBar
-          backgroundColor={Colors.statusBarColor}
-          barStyle="dark-content"
-        />
+            <UnderlinePasswordInput
+              onRef={r => {
+                setPasswordComponent(r);
+              }}
+              onChangeText={setPassword}
+              onFocus={passwordFocus}
+              inputFocused={passwordFocused}
+              onSubmitEditing={signIn}
+              returnKeyType="done"
+              placeholder={t('password_placeholder')}
+              placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
+              inputTextColor={INPUT_TEXT_COLOR}
+              secureTextEntry={secureTextEntry}
+              borderColor={INPUT_BORDER_COLOR}
+              focusedBorderColor={INPUT_FOCUSED_BORDER_COLOR}
+              toggleVisible={password.length > 0}
+              toggleText={secureTextEntry ? t('show') : t('hide')}
+              onTogglePress={onTogglePress}
+            />
 
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.contentContainerStyle}>
-          <View style={styles.content}>
-            <View style={styles.lang}>
-              <SwitchText />
+            <View style={styles.forgotPassword}>
+              <Text
+                // onPress={setInputModalVisible(true)}
+                onPress={navigateTo('ForgotPassword')}
+                style={styles.forgotPasswordText}>
+                {t('forgot_password')}
+              </Text>
             </View>
-            <View style={styles.form}>
-              <PhoneInput
-                ref={r => {
-                  this.phone = r;
-                }}
-                defaultValue={phone}
-                placeholder={t('phone_placeholder')}
-                defaultCode="ID"
-                layout="first"
-                keyboardType="phone-pad"
-                inputFocused={phoneFocused}
-                onChangeText={this.phoneChange}
-                // onChangeFormattedText={this.phoneChange}
-                containerStyle={styles.containerStyle}
-                textContainerStyle={styles.textContainerStyle}
-                textInputStyle={styles.textInputStyle}
-                codeTextStyle={styles.codeTextStyle}
-                flagButtonStyle={styles.flagButtonStyle}
-                countryPickerButtonStyle={styles.countryPickerButtonStyle}
-                autoFocus></PhoneInput>
-
-              <UnderlinePasswordInput
-                onRef={r => {
-                  this.password = r;
-                }}
-                onChangeText={this.passwordChange}
-                onFocus={this.passwordFocus}
-                inputFocused={passwordFocused}
-                onSubmitEditing={this.signIn}
-                returnKeyType="done"
-                placeholder={t('password_placeholder')}
-                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-                inputTextColor={INPUT_TEXT_COLOR}
-                secureTextEntry={secureTextEntry}
-                borderColor={INPUT_BORDER_COLOR}
-                focusedBorderColor={INPUT_FOCUSED_BORDER_COLOR}
-                toggleVisible={password.length > 0}
-                toggleText={secureTextEntry ? t('show') : t('hide')}
-                onTogglePress={this.onTogglePress}
+            <View style={styles.buttonContainer}>
+              <Button
+                color={Colors.primaryColor}
+                rounded
+                borderRadius
+                disabled={isLoading}
+                onPress={signIn}
+                title={
+                  isLoading ? (
+                    <ActivityIndicator size="large" color="white" />
+                  ) : (
+                    t('sign_in').toUpperCase()
+                  )
+                }
+                titleColor={Colors.onPrimaryColor}
               />
-
-              <View style={styles.forgotPassword}>
-                <Text
-                  // onPress={this.showInputModal(true)}
-                  onPress={this.navigateTo('ForgotPassword')}
-                  style={styles.forgotPasswordText}>
-                  {t('forgot_password')}
-                </Text>
-              </View>
-              <View style={styles.buttonContainer}>
-                <Button
-                  color={Colors.primaryColor}
-                  rounded
-                  borderRadius
-                  disabled={isLoading}
-                  onPress={this.signIn}
-                  title={
-                    isLoading ? (
-                      <ActivityIndicator size="large" color="white" />
-                    ) : (
-                      t('sign_in').toUpperCase()
-                    )
-                  }
-                  titleColor={Colors.onPrimaryColor}
-                />
-              </View>
-              <View style={styles.forgotPassword}>
-                <Text
-                  // onPress={this.showInputModal(true)}
-                  onPress={this.navigateTo('SignUp')}
-                  style={styles.forgotPasswordText}>
-                  {t('new_user_register')}
-                  <Text style={[styles.footerText, styles.footerLink]}>
-                    {t('sign_up')}
-                    {/* {isLoading && (
+            </View>
+            <View style={styles.forgotPassword}>
+              <Text
+                // onPress={setInputModalVisible(true)}
+                onPress={navigateTo('SignUp')}
+                style={styles.forgotPasswordText}>
+                {t('new_user_register')}
+                <Text style={[styles.footerText, styles.footerLink]}>
+                  {t('sign_up')}
+                  {/* {isLoading && (
                       <ActivityIndicator size="large" color="yellow" />
                     )} */}
-                  </Text>
                 </Text>
+              </Text>
+            </View>
+          </View>
+          <TouchableWithoutFeedback onPress={navigateTo('TermsConditions')}>
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>{t('tnc_sign_in')}</Text>
+              <View style={styles.termsContainer}>
+                <Text style={[styles.footerText, styles.footerLink]}>
+                  {t('tnc')}
+                </Text>
+                <Text style={styles.footerText}> {t('and')} </Text>
+                <Text style={[styles.footerText, styles.footerLink]}>
+                  {t('privacy_policy')}
+                </Text>
+                <Text style={styles.footerText}>.</Text>
               </View>
             </View>
-            <TouchableWithoutFeedback
-              onPress={this.navigateTo('TermsConditions')}>
-              <View style={styles.footer}>
-                <Text style={styles.footerText}>{t('tnc_sign_in')}</Text>
-                <View style={styles.termsContainer}>
-                  <Text style={[styles.footerText, styles.footerLink]}>
-                    {t('tnc')}
-                  </Text>
-                  <Text style={styles.footerText}> {t('and')} </Text>
-                  <Text style={[styles.footerText, styles.footerLink]}>
-                    {t('privacy_policy')}
-                  </Text>
-                  <Text style={styles.footerText}>.</Text>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </KeyboardAwareScrollView>
+          </TouchableWithoutFeedback>
+        </View>
+      </KeyboardAwareScrollView>
 
-        {/* <InputModal
+      {/* <InputModal
           title={t('forgot_password')}
           message="Enter your phone number to reset password"
           inputDefaultValue={email}
           inputPlaceholder={t('phone_placeholder')}
           inputKeyboardType="email-address"
-          onRequestClose={this.showInputModal(false)}
+          onRequestClose={setInputModalVisible(false)}
           buttonTitle={'Reset password'.toUpperCase()}
-          onClosePress={this.showInputModal(false)}
+          onClosePress={setInputModalVisible(false)}
           visible={inputModalVisible}
         /> */}
-      </SafeAreaView>
-    );
-  }
-}
+    </SafeAreaView>
+  );
+};
 
 // SignIn
 export default withTranslation()(SignIn);
