@@ -106,6 +106,11 @@ function MainNavigatorA() {
           headerTitleAlign: 'center',
         }}>
         <Stack.Screen
+          name="SignIn"
+          component={SignIn}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
           name="Profile"
           component={Profile}
           options={({navigation}) => ({
@@ -160,18 +165,7 @@ function MainNavigatorA() {
           component={Verification}
           options={{headerShown: false}}
         /> */}
-        <Stack.Screen
-          name="SignIn"
-          component={SignIn}
-          options={{headerShown: false}}
-          // options={{
-          //   title: 'Sign In',
-          //   headerStyle: {
-          //     elevation: 0,
-          //     shadowOpacity: 0,
-          //   },
-          // }}
-        />
+
         <Stack.Screen
           name="ForgotPassword"
           component={ForgotPassword}

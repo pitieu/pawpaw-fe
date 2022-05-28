@@ -248,7 +248,7 @@ class SignIn extends Component {
               phoneFocused: false,
               passwordFocused: false,
             },
-            this.navigateTo('Profile'),
+            this.navigateTo('HomeNavigator'),
           );
         }
       }

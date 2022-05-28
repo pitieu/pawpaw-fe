@@ -1,5 +1,5 @@
 // import dependencies
-import React, {Component, useEffect} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {
   Alert,
   Platform,
@@ -158,40 +158,28 @@ const styles = StyleSheet.create({
   },
 });
 
-class Profile extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      username: 'Ari Cho',
-      email: 'john.doe@example.com',
-      phone: '+1 23 4567890',
-    };
-  }
+const Profile = props => {
+  const [username, setUsername] = useState('Ari Cho');
+  const [email, setEmail] = useState('john.doe@example.com');
+  const [phone, setPhone] = useState('+1 23 4567890');
 
-  componentDidUpdate = async () => {
-    console.log('Component update');
-  };
-  componentDidMount = async () => {
-    console.log('Component Called');
-    const {navigation} = this.props;
+  useEffect(() => {
+    // async function fetchData() {
+    console.log('component mounted!');
+    // const response = await getProfile()
+    // const {navigation} = props;
 
-    auth(navigation);
-  };
+    // auth(navigation);
+    // }
+    // fetchData();
+  }, []);
 
-  navigateTo = screen => () => {
-    const {navigation} = this.props;
+  const navigateTo = screen => () => {
+    const {navigation} = props;
     navigation.navigate(screen);
   };
 
-  goBack = () => {
-    const {navigation} = this.props;
-    navigation.goBack();
-  };
-
-  getProfile = async () => {
-    useEffect(() => {
-      console.log('Loaded!');
-    });
+  const getProfile = async () => {
     // const user = await AsyncStorage.getItem('@user');
     // if (!user) {
     //   const response = await getUser();
@@ -199,8 +187,8 @@ class Profile extends Component {
     // }
   };
 
-  logout = () => {
-    const {navigation} = this.props;
+  const logout = () => {
+    const {navigation} = props;
 
     Alert.alert(
       'Logout',
@@ -209,7 +197,7 @@ class Profile extends Component {
         {
           text: 'Cancel',
           onPress: () => {
-            this.navigateTo('Profile');
+            navigateTo('Profile');
           },
           style: 'cancel',
         },
@@ -226,89 +214,85 @@ class Profile extends Component {
     );
   };
 
-  render() {
-    const {t, navigation} = this.props;
-    this.getProfile();
+  const {t, navigation} = props;
+  // this.getProfile();
 
-    const {username, email, phone} = this.state;
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar
+        backgroundColor={Colors.statusBarColor}
+        barStyle="dark-content"
+      />
 
-    return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar
-          backgroundColor={Colors.statusBarColor}
-          barStyle="dark-content"
-        />
-
-        <ScrollView enableOnAndroid>
-          <View style={styles.avatarSection}>
-            <View style={styles.avatar}>
-              <Avatar
-                imageUri={require('../../assets/img/profile.jpg')}
-                rounded
-                size={AVATAR_SIZE}
-              />
-            </View>
-            <View style={styles.userInfo}>
-              <Subtitle1 style={styles.username}>{username}</Subtitle1>
-              <Subtitle1>{phone}</Subtitle1>
-              <Subtitle1>{email}</Subtitle1>
-            </View>
-          </View>
-          <View style={styles.buttonContainer}>
-            <OutlinedButton
-              iconName="person-outline"
-              buttonStyle={styles.btnOutline}
-              title={t('edit_profile')}
-              // titleColor={Colors.onPrimaryColor}
-              // iconColor={Colors.onPrimaryColor}
+      <ScrollView enableOnAndroid>
+        <View style={styles.avatarSection}>
+          <View style={styles.avatar}>
+            <Avatar
+              imageUri={require('../../assets/img/profile.jpg')}
+              rounded
+              size={AVATAR_SIZE}
             />
           </View>
-          <View style={styles.buttonContainer}>
-            <OutlinedButton
-              iconMoonName="vet"
-              buttonStyle={styles.btnOutline}
-              title={t('manage_store')}
-              // titleColor={Colors.onPrimaryColor}
-              // iconColor={Colors.onPrimaryColor}
-            />
+          <View style={styles.userInfo}>
+            <Subtitle1 style={styles.username}>{username}</Subtitle1>
+            <Subtitle1>{phone}</Subtitle1>
+            <Subtitle1>{email}</Subtitle1>
           </View>
+        </View>
+        <View style={styles.buttonContainer}>
+          <OutlinedButton
+            iconName="person-outline"
+            buttonStyle={styles.btnOutline}
+            title={t('edit_profile')}
+            // titleColor={Colors.onPrimaryColor}
+            // iconColor={Colors.onPrimaryColor}
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <OutlinedButton
+            iconMoonName="vet"
+            buttonStyle={styles.btnOutline}
+            title={t('manage_store')}
+            // titleColor={Colors.onPrimaryColor}
+            // iconColor={Colors.onPrimaryColor}
+          />
+        </View>
 
-          <View style={styles.listLinks}>
-            <Setting
-              onPress={this.navigateTo('Orders')}
-              icon={SETTINGS_ICON}
-              title="Account Settings & Privacy"
-            />
-            {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+        <View style={styles.listLinks}>
+          <Setting
+            onPress={navigateTo('Orders')}
+            icon={SETTINGS_ICON}
+            title="Account Settings & Privacy"
+          />
+          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
 
-            <Setting
-              onPress={this.navigateTo('Orders')}
-              icon={CLIPBOARD_ICON}
-              title="Transaction List"
-            />
-            {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+          <Setting
+            onPress={navigateTo('Orders')}
+            icon={CLIPBOARD_ICON}
+            title="Transaction List"
+          />
+          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
 
-            <Setting
-              onPress={this.navigateTo('Orders')}
-              icon={HEART_ICON}
-              title="Wishlist"
-            />
-            {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+          <Setting
+            onPress={navigateTo('Orders')}
+            icon={HEART_ICON}
+            title="Wishlist"
+          />
+          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
 
-            <Setting
-              onPress={this.navigateTo('Orders')}
-              icon={HELP_CENTER_ICON}
-              title="Help Center"
-            />
-            {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+          <Setting
+            onPress={navigateTo('Orders')}
+            icon={HELP_CENTER_ICON}
+            title="Help Center"
+          />
+          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
 
-            <Setting onPress={this.logout} icon={EXIT_ICON} title="Logout" />
-            {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
-}
+          <Setting onPress={logout} icon={EXIT_ICON} title="Logout" />
+          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
 
 export default withTranslation()(Profile);

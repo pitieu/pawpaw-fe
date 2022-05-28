@@ -20,6 +20,7 @@ import Cart from '../screens/cart/Cart';
 
 // import Settings screen
 import Settings from '../screens/settings/Settings';
+import Profile from '../screens/profile/Profile';
 
 // import colors
 import Colors from '../theme/colors';
@@ -32,7 +33,7 @@ const Tab = createBottomTabNavigator();
 function HomeNavigator() {
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName="Profile"
       backBehavior="initialRoute"
       screenOptions={({route}) => ({
         tabBarIcon: ({color, focused, size}) => {
@@ -41,7 +42,7 @@ function HomeNavigator() {
             iconName = 'magnify';
           } else if (route.name === 'Favorites') {
             iconName = `heart${focused ? '' : '-outline'}`;
-          } else if (route.name === 'Settings') {
+          } else if (route.name === 'Profile') {
             iconName = `account-settings${focused ? '' : '-outline'}`;
           } else if (route.name === 'Home') {
             iconName = 'home';
@@ -81,7 +82,7 @@ function HomeNavigator() {
 
       <Tab.Screen name="Graph" component={Favorites} />
 
-      <Tab.Screen name="Settings" component={Settings} />
+      <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );
 }
