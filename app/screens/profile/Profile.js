@@ -1,45 +1,107 @@
-/**
- * Foodvila - React Native Template
- *
- * @format
- * @flow
- */
-
 // import dependencies
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import {
+  Alert,
   Platform,
+  I18nManager,
   SafeAreaView,
   StatusBar,
   StyleSheet,
   View,
+  ScrollView,
 } from 'react-native';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {withTranslation} from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // import components
 import Avatar from '../../components/avatar/Avatar';
+import Divider from '../../components/divider/Divider';
 import Icon from '../../components/icon/Icon';
-import {
-  Subtitle1,
-  Subtitle2,
-  Subtitle3,
-} from '../../components/text/CustomText';
+import {Subtitle1, Subtitle2} from '../../components/text/CustomText';
 import TouchableItem from '../../components/TouchableItem';
-import UnderlineTextInput from '../../components/textinputs/UnderlineTextInput';
 import OutlinedButton from '../../components/buttons/OutlinedButton';
-import Button from '../../components/buttons/Button';
+
+// api
+import {getUser} from '../../api/Account';
+import {auth} from '../../api/Auth';
 
 // import colors
 import Colors from '../../theme/colors';
 import Layout from '../../theme/layout';
 
 // EditProfile Config
+// const isRTL = I18nManager.isRTL;
+// const ARROW_ICON = IOS
+//   ? 'ios-chevron-forward-outline'
+//   : 'md-chevron-forward-outline';
 const AVATAR_SIZE = 100;
+const DIVIDER_MARGIN_LEFT = 60;
 const IOS = Platform.OS === 'ios';
+const SETTINGS_ICON = IOS ? 'ios-settings-outline' : 'md-settings-outline';
+const EXIT_ICON = IOS ? 'ios-exit-outline' : 'md-exit-outline';
+const HEART_ICON = IOS ? 'ios-heart-outline' : 'md-heart-outline';
+const CLIPBOARD_ICON = IOS ? 'ios-receipt-outline' : 'md-receipt-outline';
+const HELP_CENTER_ICON = IOS ? 'ios-call-outline' : 'md-call-outline';
+
+// Settings Components
+const Setting = ({icon, title, onPress, extraData}) => (
+  <TouchableItem onPress={onPress}>
+    <View>
+      <View style={[styles.row, styles.setting]}>
+        <View style={styles.leftSide}>
+          {icon !== undefined && (
+            <View style={styles.iconContainer}>
+              <Icon name={icon} size={24} color={Colors.primaryText} />
+            </View>
+          )}
+          <Subtitle1 style={styles.mediumText}>{title}</Subtitle1>
+        </View>
+
+        {/* <View style={isRTL && {transform: [{scaleX: -1}]}}>
+          <Icon name={ARROW_ICON} size={16} color="rgba(0, 0, 0, 0.16)" />
+        </View> */}
+      </View>
+
+      {extraData ? (
+        <View style={styles.extraDataContainer}>{extraData}</View>
+      ) : (
+        <View />
+      )}
+    </View>
+  </TouchableItem>
+);
 
 // EditProfile Styles
 const styles = StyleSheet.create({
+  iconContainer: {
+    paddingRight: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  leftSide: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  extraDataContainer: {
+    top: -8,
+    marginLeft: DIVIDER_MARGIN_LEFT,
+    paddingBottom: 8,
+  },
+  extraData: {
+    textAlign: 'left',
+  },
+  mediumText: {
+    fontWeight: '300',
+    color: Colors.primaryText,
+  },
+  setting: {
+    height: 52,
+  },
   container: {
     flex: 1,
     backgroundColor: Colors.background,
@@ -84,8 +146,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  buttons: {
+  buttonContainer: {
     paddingHorizontal: Layout.LARGE_PADDING,
+    paddingBottom: Layout.SMALL_MARGIN,
+  },
+  btnOutline: {
+    // backgroundColor: Colors.primaryColor,
+  },
+  listLinks: {
+    paddingTop: Layout.MEDIUM_PADDING,
   },
 });
 
@@ -99,13 +168,67 @@ class Profile extends Component {
     };
   }
 
+  componentDidUpdate = async () => {
+    console.log('Component update');
+  };
+  componentDidMount = async () => {
+    console.log('Component Called');
+    const {navigation} = this.props;
+
+    auth(navigation);
+  };
+
+  navigateTo = screen => () => {
+    const {navigation} = this.props;
+    navigation.navigate(screen);
+  };
+
   goBack = () => {
     const {navigation} = this.props;
     navigation.goBack();
   };
 
+  getProfile = async () => {
+    useEffect(() => {
+      console.log('Loaded!');
+    });
+    // const user = await AsyncStorage.getItem('@user');
+    // if (!user) {
+    //   const response = await getUser();
+    //   await AsyncStorage.setItem('user', JSON.stringify(response.data));
+    // }
+  };
+
+  logout = () => {
+    const {navigation} = this.props;
+
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {
+            this.navigateTo('Profile');
+          },
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            AsyncStorage.removeItem('@access_token');
+            AsyncStorage.removeItem('@user');
+            navigation.navigate('SignIn');
+          },
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
   render() {
-    const {t} = this.props;
+    const {t, navigation} = this.props;
+    this.getProfile();
 
     const {username, email, phone} = this.state;
 
@@ -116,7 +239,7 @@ class Profile extends Component {
           barStyle="dark-content"
         />
 
-        <KeyboardAwareScrollView enableOnAndroid>
+        <ScrollView enableOnAndroid>
           <View style={styles.avatarSection}>
             <View style={styles.avatar}>
               <Avatar
@@ -131,15 +254,58 @@ class Profile extends Component {
               <Subtitle1>{email}</Subtitle1>
             </View>
           </View>
-          <View style={styles.buttons}>
-            {/* <Button small rounded outlined /> */}
+          <View style={styles.buttonContainer}>
             <OutlinedButton
-              iconMoonName="vet"
-              style={styles.btnOutline}
-              title={t('manage_store')}
+              iconName="person-outline"
+              buttonStyle={styles.btnOutline}
+              title={t('edit_profile')}
+              // titleColor={Colors.onPrimaryColor}
+              // iconColor={Colors.onPrimaryColor}
             />
           </View>
-        </KeyboardAwareScrollView>
+          <View style={styles.buttonContainer}>
+            <OutlinedButton
+              iconMoonName="vet"
+              buttonStyle={styles.btnOutline}
+              title={t('manage_store')}
+              // titleColor={Colors.onPrimaryColor}
+              // iconColor={Colors.onPrimaryColor}
+            />
+          </View>
+
+          <View style={styles.listLinks}>
+            <Setting
+              onPress={this.navigateTo('Orders')}
+              icon={SETTINGS_ICON}
+              title="Account Settings & Privacy"
+            />
+            {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+
+            <Setting
+              onPress={this.navigateTo('Orders')}
+              icon={CLIPBOARD_ICON}
+              title="Transaction List"
+            />
+            {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+
+            <Setting
+              onPress={this.navigateTo('Orders')}
+              icon={HEART_ICON}
+              title="Wishlist"
+            />
+            {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+
+            <Setting
+              onPress={this.navigateTo('Orders')}
+              icon={HELP_CENTER_ICON}
+              title="Help Center"
+            />
+            {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+
+            <Setting onPress={this.logout} icon={EXIT_ICON} title="Logout" />
+            {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }

@@ -38,4 +38,5 @@ export default {
   get_started: 'Get started',
   // screens/profile/Profile.js
   manage_store: 'Manage Store',
+  edit_profile: 'Edit Profile',
 };

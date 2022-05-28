@@ -22,7 +22,7 @@ import UnderlineTextInput from '../../components/textinputs/UnderlineTextInput';
 import SwitchText from '../../components/toggle/switchText';
 
 // api
-import {register} from '../../api/SignUp';
+import {register} from '../../api/Auth';
 
 // import colors, layout
 import Colors from '../../theme/colors';
@@ -240,8 +240,8 @@ class SignUp extends Component {
         }
       } else {
         // SUCCESS LOGIN
-        AsyncStorage.setItem('ACCESS_TOKEN', response.access_token);
-        AsyncStorage.setItem('REFRESH_TOKEN', response.refresh_token);
+        AsyncStorage.setItem('@access_token', response.data.access_token);
+        AsyncStorage.setItem('@refresh_token', response.data.refresh_token);
         this.setState(
           {
             usernameFocused: false,

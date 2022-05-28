@@ -76,6 +76,8 @@ import Orders from '../screens/orders/Orders';
 // import AboutUs screen
 import AboutUs from '../screens/about/AboutUs';
 
+import Settings from '../screens/settings/Settings';
+
 // import colors
 import Colors from '../theme/colors';
 

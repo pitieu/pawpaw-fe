@@ -26,7 +26,7 @@ import UnderlinePasswordInput from '../../components/textinputs/UnderlinePasswor
 import SwitchText from '../../components/toggle/switchText';
 
 // api
-import {login} from '../../api/SignIn';
+import {login} from '../../api/Auth';
 
 // import colors, layout
 import Colors from '../../theme/colors';
@@ -239,15 +239,16 @@ class SignIn extends Component {
             errMessage = I18n.t('error_password_not_match');
           }
         } else {
+          console.log(response.data);
           // SUCCESS LOGIN
-          AsyncStorage.setItem('ACCESS_TOKEN', response.access_token);
-          AsyncStorage.setItem('REFRESH_TOKEN', response.refresh_token);
+          AsyncStorage.setItem('@access_token', response.data.access_token);
+          AsyncStorage.setItem('@refresh_token', response.data.refresh_token);
           this.setState(
             {
               phoneFocused: false,
               passwordFocused: false,
             },
-            this.navigateTo('HomeNavigator'),
+            this.navigateTo('Profile'),
           );
         }
       }

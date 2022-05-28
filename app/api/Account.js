@@ -1,24 +1,17 @@
-// import dependencies
-import axios from 'axios';
-import I18n from '../assets/i18n/i18n';
+import {getToken} from './Auth';
 
-// config
-import config from '../config';
-
-export const login = async (phone, phoneExt, password) => {
+export const getUser = async () => {
   try {
+    const token = await getToken();
     const response = await axios({
       url: `${config.api_address}auth/login`,
       headers: {
         'Content-Type': 'application/json',
         'Accept-Language': I18n.language,
+        'auth-token': token,
       },
       method: 'get',
-      params: {
-        phone_ext: phoneExt,
-        phone: phone,
-        password: password,
-      },
+      params: {},
     });
     return response;
   } catch (error) {
