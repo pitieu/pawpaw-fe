@@ -1,5 +1,6 @@
 // import dependencies
-import React, {Component} from 'react';
+import React, {useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import {
   SafeAreaView,
   StatusBar,
@@ -132,88 +133,62 @@ const styles = StyleSheet.create({
 });
 
 // SignUp
-class SignUp extends Component {
-  constructor(props) {
-    super(props);
+const SignUp = props => {
+  const [phoneComponent, setPhoneComponent] = useState();
+  const [passwordComponent, setPasswordComponent] = useState();
+  const [usernameComponent, setUsernameComponent] = useState();
+  const [username, setUsername] = useState('marcio');
+  const [usernameFocused, setUsernameFocused] = useState(false);
+  const [phone, setPhone] = useState('85311317659');
+  const [phoneExt, setPhoneExt] = useState('62');
+  const [phoneFocused, setPhoneFocused] = useState(true);
+  const [password, setPassword] = useState('1234567');
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [screen, setScreen] = useState();
 
-    this.state = {
-      username: 'marcio',
-      usernameFocused: false,
-      phone: '85311317659',
-      phoneFocused: false,
-      password: '1234567',
-      passwordFocused: false,
-      secureTextEntry: true,
-    };
-  }
+  const navigation = useNavigation();
 
-  usernameChange = text => {
-    this.setState({
-      username: text,
-    });
+  const {t} = props;
+
+  const usernameFocus = () => {
+    setUsernameFocused(true);
+    setPhoneFocused(false);
+    setPasswordFocused(false);
   };
 
-  usernameFocus = () => {
-    this.setState({
-      usernameFocused: true,
-      phoneFocused: false,
-      passwordFocused: false,
-    });
+  const phoneFocus = () => {
+    setUsernameFocused(false);
+    setPhoneFocused(true);
+    setPasswordFocused(false);
   };
 
-  phoneChange = text => {
-    this.setState({
-      phone: text,
-    });
+  const passwordFocus = () => {
+    setUsernameFocused(false);
+    setPhoneFocused(false);
+    setPasswordFocused(true);
   };
 
-  phoneFocus = () => {
-    this.setState({
-      phoneFocused: true,
-      usernameFocused: false,
-      passwordFocused: false,
-    });
+  const onTogglePress = () => {
+    setSecureTextEntry(!secureTextEntry);
   };
 
-  passwordChange = text => {
-    this.setState({
-      password: text,
-    });
-  };
-
-  passwordFocus = () => {
-    this.setState({
-      passwordFocused: true,
-      usernameFocused: false,
-      phoneFocused: false,
-    });
-  };
-
-  onTogglePress = () => {
-    const {secureTextEntry} = this.state;
-    this.setState({
-      secureTextEntry: !secureTextEntry,
-    });
-  };
-
-  navigateTo = screen => () => {
-    const {navigation} = this.props;
+  const navigateTo = screen => () => {
     navigation.navigate(screen);
   };
 
-  createAccount = async () => {
-    this.setState({
-      isLoading: true,
-    });
+  const createAccount = async () => {
+    setIsLoading(true);
+
     Toast.hide();
 
-    const {username, phone, password} = this.state;
     let errMessage = '';
     try {
       const response = await register(
         username,
         phone,
-        this.phone.getCallingCode(),
+        phoneComponent.getCallingCode(),
         password,
       );
       if (response.status != 200) {
@@ -242,24 +217,16 @@ class SignUp extends Component {
         // SUCCESS LOGIN
         AsyncStorage.setItem('@access_token', response.data.access_token);
         AsyncStorage.setItem('@refresh_token', response.data.refresh_token);
-        this.setState(
-          {
-            usernameFocused: false,
-            phoneFocused: false,
-            passwordFocused: false,
-            rePasswordFocused: false,
-          },
-          this.navigateTo('HomeNavigator'),
-        );
+        setUsernameFocused(false);
+        setPhoneFocused(false);
+        setPasswordFocused(false);
+        setScreen(navigateTo('HomeNavigator'));
       }
     } catch (e) {
       console.log(e);
       errMessage = I18n.t('error_server');
     }
-
-    this.setState({
-      isLoading: false,
-    });
+    setIsLoading(false);
 
     if (errMessage.length) {
       Toast.show({
@@ -272,170 +239,134 @@ class SignUp extends Component {
     }
   };
 
-  focusOn = nextFiled => () => {
+  const focusOn = nextFiled => () => {
     if (nextFiled) {
       nextFiled.focus();
     }
   };
 
-  render() {
-    const {t} = this.props;
+  return (
+    <SafeAreaView style={styles.screenContainer}>
+      <StatusBar
+        backgroundColor={Colors.statusBarColor}
+        barStyle="dark-content"
+      />
 
-    const {
-      isLoading,
-      username,
-      usernameFocused,
-      phone,
-      phoneFocused,
-      password,
-      passwordFocused,
-      secureTextEntry,
-    } = this.state;
-
-    return (
-      <SafeAreaView style={styles.screenContainer}>
-        <StatusBar
-          backgroundColor={Colors.statusBarColor}
-          barStyle="dark-content"
-        />
-
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.contentContainerStyle}>
-          <View style={styles.content}>
-            <View style={styles.lang}>
-              <SwitchText />
-            </View>
-            <View style={styles.form}>
-              <PhoneInput
-                ref={r => {
-                  this.phone = r;
-                }}
-                defaultValue={phone}
-                placeholder={t('phone_placeholder')}
-                defaultCode="ID"
-                layout="first"
-                keyboardType="phone-pad"
-                inputFocused={phoneFocused}
-                onChangeText={this.phoneChange}
-                // onChangeFormattedText={this.phoneChange}
-                containerStyle={styles.containerStyle}
-                textContainerStyle={styles.textContainerStyle}
-                textInputStyle={styles.textInputStyle}
-                codeTextStyle={styles.codeTextStyle}
-                flagButtonStyle={styles.flagButtonStyle}
-                countryPickerButtonStyle={styles.countryPickerButtonStyle}
-                autoFocus></PhoneInput>
-
-              <UnderlineTextInput
-                onRef={r => {
-                  this.username = r;
-                }}
-                onChangeText={this.usernameChange}
-                onFocus={this.usernameFocus}
-                inputFocused={usernameFocused}
-                onSubmitEditing={this.focusOn(this.password)}
-                returnKeyType="next"
-                blurOnSubmit={false}
-                keyboardType="default"
-                placeholder={t('username_placeholder')}
-                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-                inputTextColor={INPUT_TEXT_COLOR}
-                borderColor={INPUT_BORDER_COLOR}
-                focusedBorderColor={INPUT_FOCUSED_BORDER_COLOR}
-                inputContainerStyle={styles.inputContainer}
-              />
-
-              <UnderlinePasswordInput
-                onRef={r => {
-                  this.password = r;
-                }}
-                onChangeText={this.passwordChange}
-                onFocus={this.passwordFocus}
-                inputFocused={passwordFocused}
-                onSubmitEditing={this.createAccount}
-                returnKeyType="done"
-                placeholder={t('password_placeholder')}
-                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-                secureTextEntry={secureTextEntry}
-                borderColor={INPUT_BORDER_COLOR}
-                focusedBorderColor={INPUT_FOCUSED_BORDER_COLOR}
-                toggleVisible={password.length > 0}
-                toggleText={secureTextEntry ? t('show') : t('hide')}
-                onTogglePress={this.onTogglePress}
-              />
-
-              {/* <UnderlinePasswordInput
-                onRef={r => {
-                  this.rePassword = r;
-                }}
-                onChangeText={this.rePasswordChange}
-                onFocus={this.rePasswordFocus}
-                inputFocused={rePasswordFocused}
-                onSubmitEditing={this.createAccount}
-                returnKeyType="done"
-                placeholder={t('re_password_placeholder')}
-                placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-                secureTextEntry={secureTextEntry}
-                borderColor={INPUT_BORDER_COLOR}
-                focusedBorderColor={INPUT_FOCUSED_BORDER_COLOR}
-                toggleVisible={password.length > 0}
-                toggleText={secureTextEntry ? 'Show' : 'Hide'}
-                onTogglePress={this.onTogglePress}
-              /> */}
-
-              <View style={styles.buttonContainer}>
-                <Button
-                  color={Colors.primaryColor}
-                  rounded
-                  borderRadius
-                  disabled={isLoading}
-                  onPress={this.createAccount}
-                  title={
-                    isLoading ? (
-                      <ActivityIndicator size="large" color="white" />
-                    ) : (
-                      t('continue').toUpperCase()
-                    )
-                  }
-                  titleColor={Colors.onPrimaryColor}
-                />
-              </View>
-
-              <View style={styles.signIn}>
-                <Text
-                  // onPress={this.showInputModal(true)}
-                  onPress={this.navigateTo('SignIn')}
-                  style={styles.signInText}>
-                  {t('already_have_account')}
-                  <Text style={[styles.footerText, styles.footerLink]}>
-                    {t('sign_in')}
-                  </Text>
-                </Text>
-              </View>
-            </View>
-
-            <TouchableWithoutFeedback
-              onPress={this.navigateTo('TermsConditions')}>
-              <View style={styles.footer}>
-                <Text style={styles.footerText}>{t('tnc_sign_up')}</Text>
-                <View style={styles.termsContainer}>
-                  <Text style={[styles.footerText, styles.footerLink]}>
-                    {t('tnc')}
-                  </Text>
-                  <Text style={styles.footerText}> {t('and')} </Text>
-                  <Text style={[styles.footerText, styles.footerLink]}>
-                    {t('privacy_policy')}
-                  </Text>
-                  <Text style={styles.footerText}>.</Text>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.contentContainerStyle}>
+        <View style={styles.content}>
+          <View style={styles.lang}>
+            <SwitchText />
           </View>
-        </KeyboardAwareScrollView>
-      </SafeAreaView>
-    );
-  }
-}
+          <View style={styles.form}>
+            <PhoneInput
+              ref={r => {
+                setPhoneComponent(r);
+              }}
+              defaultValue={phone}
+              placeholder={t('phone_placeholder')}
+              defaultCode="ID"
+              layout="first"
+              keyboardType="phone-pad"
+              inputFocused={phoneFocused}
+              onChangeText={setPhone}
+              // onChangeFormattedText={setPhone}
+              containerStyle={styles.containerStyle}
+              textContainerStyle={styles.textContainerStyle}
+              textInputStyle={styles.textInputStyle}
+              codeTextStyle={styles.codeTextStyle}
+              flagButtonStyle={styles.flagButtonStyle}
+              countryPickerButtonStyle={styles.countryPickerButtonStyle}
+              autoFocus></PhoneInput>
+
+            <UnderlineTextInput
+              onRef={r => {
+                setUsernameComponent(r);
+              }}
+              onChangeText={setUsername}
+              onFocus={usernameFocus}
+              inputFocused={usernameFocused}
+              onSubmitEditing={focusOn(passwordComponent)}
+              returnKeyType="next"
+              blurOnSubmit={false}
+              keyboardType="default"
+              placeholder={t('username_placeholder')}
+              placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
+              inputTextColor={INPUT_TEXT_COLOR}
+              borderColor={INPUT_BORDER_COLOR}
+              focusedBorderColor={INPUT_FOCUSED_BORDER_COLOR}
+              inputContainerStyle={styles.inputContainer}
+            />
+
+            <UnderlinePasswordInput
+              onRef={r => {
+                setPasswordComponent(r);
+              }}
+              onChangeText={setPassword}
+              onFocus={passwordFocus}
+              inputFocused={passwordFocused}
+              onSubmitEditing={createAccount}
+              returnKeyType="done"
+              placeholder={t('password_placeholder')}
+              placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
+              secureTextEntry={secureTextEntry}
+              borderColor={INPUT_BORDER_COLOR}
+              focusedBorderColor={INPUT_FOCUSED_BORDER_COLOR}
+              toggleVisible={password.length > 0}
+              toggleText={secureTextEntry ? t('show') : t('hide')}
+              onTogglePress={onTogglePress}
+            />
+
+            <View style={styles.buttonContainer}>
+              <Button
+                color={Colors.primaryColor}
+                rounded
+                borderRadius
+                disabled={isLoading}
+                onPress={createAccount}
+                title={
+                  isLoading ? (
+                    <ActivityIndicator size="large" color="white" />
+                  ) : (
+                    t('continue').toUpperCase()
+                  )
+                }
+                titleColor={Colors.onPrimaryColor}
+              />
+            </View>
+
+            <View style={styles.signIn}>
+              <Text
+                // onPress={setInputModalVisible(true)}
+                onPress={navigateTo('SignIn')}
+                style={styles.signInText}>
+                {t('already_have_account')}
+                <Text style={[styles.footerText, styles.footerLink]}>
+                  {t('sign_in')}
+                </Text>
+              </Text>
+            </View>
+          </View>
+
+          <TouchableWithoutFeedback onPress={navigateTo('TermsConditions')}>
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>{t('tnc_sign_up')}</Text>
+              <View style={styles.termsContainer}>
+                <Text style={[styles.footerText, styles.footerLink]}>
+                  {t('tnc')}
+                </Text>
+                <Text style={styles.footerText}> {t('and')} </Text>
+                <Text style={[styles.footerText, styles.footerLink]}>
+                  {t('privacy_policy')}
+                </Text>
+                <Text style={styles.footerText}>.</Text>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      </KeyboardAwareScrollView>
+    </SafeAreaView>
+  );
+};
 
 export default withTranslation()(SignUp);
-// export default SignUp;

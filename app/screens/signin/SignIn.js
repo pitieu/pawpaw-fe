@@ -136,14 +136,14 @@ const styles = StyleSheet.create({
 const SignIn = props => {
   const [phoneComponent, setPhoneComponent] = useState();
   const [passwordComponent, setPasswordComponent] = useState();
-  const [phone, setPhone] = useState('');
-  const [phoneExt, setPhoneExt] = useState('');
-  const [phoneFocused, setPhoneFocused] = useState('');
+  const [phone, setPhone] = useState('85311317659');
+  const [phoneExt, setPhoneExt] = useState('62');
+  const [phoneFocused, setPhoneFocused] = useState(true);
   const [password, setPassword] = useState('');
-  const [passwordFocused, setPasswordFocused] = useState('');
-  const [secureTextEntry, setSecureTextEntry] = useState('');
-  const [inputModalVisible, setInputModalVisible] = useState('');
-  const [isLoading, setIsLoading] = useState('');
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [inputModalVisible, setInputModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [screen, setScreen] = useState();
 
   const navigation = useNavigation();

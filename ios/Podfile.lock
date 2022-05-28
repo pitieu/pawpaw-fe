@@ -357,12 +357,18 @@ PODS:
     - React-perflogger (= 0.68.2)
   - RNBootSplash (4.1.5):
     - React-Core
+  - RNBottomActionSheet (2.0.2):
+    - React-Core
+    - RNImageHelper
+    - SGActionView
   - RNCAsyncStorage (1.17.5):
     - React-Core
   - RNCMaskedView (0.1.11):
     - React
-  - RNGestureHandler (1.10.3):
+  - RNGestureHandler (2.4.2):
     - React-Core
+  - RNImageHelper (0.0.3):
+    - React
   - RNReanimated (2.8.0):
     - DoubleConversion
     - FBLazyVector
@@ -396,6 +402,7 @@ PODS:
     - React-Core
   - RNVectorIcons (6.7.0):
     - React
+  - SGActionView (0.0.1)
   - SocketRocket (0.6.0)
   - toolbar-android (0.1.0-rc.2):
     - React
@@ -461,13 +468,16 @@ DEPENDENCIES:
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RNBootSplash (from `../node_modules/react-native-bootsplash`)
+  - RNBottomActionSheet (from `../node_modules/react-native-bottom-action-sheet/ios`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNImageHelper (from `../node_modules/react-native-image-helper/ios`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
+  - SGActionView (from `https://github.com/prscX/SGActionView.git`)
   - "toolbar-android (from `../node_modules/@react-native-community/toolbar-android`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -556,12 +566,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNBootSplash:
     :path: "../node_modules/react-native-bootsplash"
+  RNBottomActionSheet:
+    :path: "../node_modules/react-native-bottom-action-sheet/ios"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCMaskedView:
     :path: "../node_modules/@react-native-community/masked-view"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNImageHelper:
+    :path: "../node_modules/react-native-image-helper/ios"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -570,10 +584,17 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
+  SGActionView:
+    :git: https://github.com/prscX/SGActionView.git
   toolbar-android:
     :path: "../node_modules/@react-native-community/toolbar-android"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
+
+CHECKOUT OPTIONS:
+  SGActionView:
+    :commit: ffc6ee6ec5b0abcd19661251ab28a1f03a3f6706
+    :git: https://github.com/prscX/SGActionView.git
 
 SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
@@ -622,18 +643,21 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: b960b687d2dfef0d3761fbb187e01812ebab8b23
   ReactCommon: 095366164a276d91ea704ce53cb03825c487a3f2
   RNBootSplash: 2830c475d5793d6cf12312d1e8f5f1decb0dd3e8
+  RNBottomActionSheet: 5ec8df3efe8bd6d69f6bda4b5649589213a88f01
   RNCAsyncStorage: 81187912cc9a5c2591ddb161e03e587688afb764
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
-  RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
+  RNGestureHandler: 61628a2c859172551aa2100d3e73d1e57878392f
+  RNImageHelper: efb1e1b39f0e19a40b8873c2c1c9614c0dd150ed
   RNReanimated: 64573e25e078ae6bec03b891586d50b9ec284393
   RNScreens: f7ad633b2e0190b77b6a7aab7f914fad6f198d8d
   RNSVG: 302bfc9905bd8122f08966dc2ce2d07b7b52b9f8
   RNVectorIcons: 368d6d8b8301224e5ffb6254191f4f8876c2be0d
+  SGActionView: 7d7f2af343936932cab8302749e5345a1732c0b7
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   toolbar-android: 85f3ef4d691469f2d304e7dee4bca013aa1ba1ff
   Yoga: 99652481fcd320aefa4a7ef90095b95acd181952
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 3f11fb2e7e118ed3030a49bf2850c652e1818c78
+PODFILE CHECKSUM: 9f059002892e2e49f38000177f539519a63cc0de
 
 COCOAPODS: 1.11.3

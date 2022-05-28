@@ -13,12 +13,9 @@ export const getToken = async () => {
 
 export const auth = async navigation => {
   const token = await getToken();
-  console.log('token', token);
   if (!token) {
-    console.log('not authenticated: go to signup');
     navigation.navigate('SignIn');
   } else {
-    console.log('authenticated has access');
   }
 };
 

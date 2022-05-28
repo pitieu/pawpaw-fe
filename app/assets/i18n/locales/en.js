@@ -9,6 +9,7 @@ export default {
   hide: 'Hide',
   continue: 'Continue',
   error_server: 'Something went wrong, try again later',
+  cancel: 'Cancel',
   // screens/signin/SignIn.js
   forgot_password: 'Forgot password?',
   tnc_sign_in: 'By signing in, you accepts our',
@@ -39,4 +40,6 @@ export default {
   // screens/profile/Profile.js
   manage_store: 'Manage Store',
   edit_profile: 'Edit Profile',
+  logout: 'Logout',
+  logout_confirm: 'Are you sure you want to logout?',
 };

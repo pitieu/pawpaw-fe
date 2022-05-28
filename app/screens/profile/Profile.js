@@ -1,5 +1,6 @@
 // import dependencies
 import React, {Component, useEffect, useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import {
   Alert,
   Platform,
@@ -159,50 +160,61 @@ const styles = StyleSheet.create({
 });
 
 const Profile = props => {
-  const [username, setUsername] = useState('Ari Cho');
-  const [email, setEmail] = useState('john.doe@example.com');
-  const [phone, setPhone] = useState('+1 23 4567890');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [avatar, setAvatar] = useState('');
+
+  const navigation = useNavigation();
+
+  const {t} = props;
 
   useEffect(() => {
-    // async function fetchData() {
-    console.log('component mounted!');
-    // const response = await getProfile()
-    // const {navigation} = props;
-
-    // auth(navigation);
-    // }
-    // fetchData();
+    async function fetchData() {
+      auth(navigation);
+      try {
+        await getProfile();
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    fetchData();
   }, []);
 
   const navigateTo = screen => () => {
-    const {navigation} = props;
     navigation.navigate(screen);
   };
 
   const getProfile = async () => {
-    // const user = await AsyncStorage.getItem('@user');
-    // if (!user) {
-    //   const response = await getUser();
-    //   await AsyncStorage.setItem('user', JSON.stringify(response.data));
-    // }
+    let user = await AsyncStorage.getItem('@user');
+    if (!user) {
+      const response = await getUser();
+      if (response.data) {
+        await AsyncStorage.setItem('@user', JSON.stringify(response.data));
+      }
+      user = response.data;
+    } else {
+      user = JSON.parse(user);
+    }
+    setUsername(user.username);
+    setPhone(`+${user.phone_ext} ${user.phone}`);
+    setEmail(user.email);
+    setAvatar(user.avatar);
+    return user;
   };
 
   const logout = () => {
-    const {navigation} = props;
-
     Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
+      t('logout'),
+      t('logout_confirm'),
       [
         {
-          text: 'Cancel',
-          onPress: () => {
-            navigateTo('Profile');
-          },
+          text: t('cancel'),
+          onPress: () => {},
           style: 'cancel',
         },
         {
-          text: 'OK',
+          text: t('logout'),
           onPress: () => {
             AsyncStorage.removeItem('@access_token');
             AsyncStorage.removeItem('@user');
@@ -213,9 +225,6 @@ const Profile = props => {
       {cancelable: false},
     );
   };
-
-  const {t, navigation} = props;
-  // this.getProfile();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -228,7 +237,7 @@ const Profile = props => {
         <View style={styles.avatarSection}>
           <View style={styles.avatar}>
             <Avatar
-              imageUri={require('../../assets/img/profile.jpg')}
+              imageUri={avatar || require('../../assets/img/profile.jpg')}
               rounded
               size={AVATAR_SIZE}
             />
