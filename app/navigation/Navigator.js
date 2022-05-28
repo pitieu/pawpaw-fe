@@ -50,6 +50,7 @@ import Checkout from '../screens/checkout/Checkout';
 
 // import EditProfile screen
 import EditProfile from '../screens/profile/EditProfile';
+import Profile from '../screens/profile/Profile';
 
 // import DeliveryAddress screen
 import DeliveryAddress from '../screens/address/DeliveryAddress';
@@ -102,6 +103,34 @@ function MainNavigatorA() {
           headerTintColor: Colors.onBackground,
           headerTitleAlign: 'center',
         }}>
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
+          options={({navigation}) => ({
+            title: 'Profile',
+            headerRight: () => (
+              <HeaderIconButton
+                onPress={() => navigation.goBack()}
+                name={'menu'}
+                color={Colors.primaryColor}
+              />
+            ),
+          })}
+        />
+        {/* <Stack.Screen
+          name="EditProfile"
+          component={EditProfile}
+          options={({navigation}) => ({
+            title: 'Edit Profile',
+            headerRight: () => (
+              <HeaderIconButton
+                onPress={() => navigation.goBack()}
+                name={SAVE_ICON}
+                color={Colors.primaryColor}
+              />
+            ),
+          })}
+        /> */}
         <Stack.Screen
           name="Onboarding"
           component={Intro}
@@ -201,20 +230,7 @@ function MainNavigatorA() {
             },
           }}
         />
-        <Stack.Screen
-          name="EditProfile"
-          component={EditProfile}
-          options={({navigation}) => ({
-            title: 'Edit Profile',
-            headerRight: () => (
-              <HeaderIconButton
-                onPress={() => navigation.goBack()}
-                name={SAVE_ICON}
-                color={Colors.primaryColor}
-              />
-            ),
-          })}
-        />
+
         <Stack.Screen
           name="DeliveryAddress"
           component={DeliveryAddress}

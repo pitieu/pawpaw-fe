@@ -10,6 +10,7 @@ import React from 'react';
 import {StyleSheet, View, ViewStyle} from 'react-native';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import FAIcon from 'react-native-vector-icons/dist/FontAwesome';
+import IcoMoon from '../icon/Icomoon';
 
 // import components
 import {ButtonText} from '../text/CustomText';
@@ -75,6 +76,7 @@ type Props = {
   iconColor: string,
   iconName: string,
   socialIconName: string,
+  iconMoonName: string,
   title: string,
   titleColor: string,
   rippleColor: string,
@@ -93,6 +95,7 @@ const OutlinedButton = ({
   iconColor,
   iconName,
   socialIconName,
+  iconMoonName,
   title,
   titleColor,
   rippleColor = Colors.primaryColor,
@@ -123,11 +126,17 @@ const OutlinedButton = ({
             <Icon name={iconName} size={18} color={iconColor} />
           </View>
         )}
+        {iconMoonName && (
+          <View style={styles.iconContainer}>
+            <IcoMoon name={iconMoonName} size={18} color={iconColor} />
+          </View>
+        )}
         <ButtonText
           style={[
             styles.title,
             titleColor && {color: titleColor},
             iconName && styles.pl8,
+            iconMoonName && styles.pl8,
           ]}>
           {title !== undefined ? title.toUpperCase() : 'BUTTON'}
         </ButtonText>

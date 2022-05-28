@@ -7,16 +7,22 @@ import {
   Text,
   TouchableWithoutFeedback,
   View,
+  ActivityIndicator,
 } from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import PhoneInput from 'react-native-phone-number-input';
 import {withTranslation} from 'react-i18next';
+import Toast from 'react-native-toast-message';
 
 // import components
+import I18n from '../../assets/i18n/i18n';
 import Button from '../../components/buttons/Button';
 import UnderlinePasswordInput from '../../components/textinputs/UnderlinePasswordInput';
 import UnderlineTextInput from '../../components/textinputs/UnderlineTextInput';
 import SwitchText from '../../components/toggle/switchText';
+
+// api
+import {register} from '../../api/SignUp';
 
 // import colors, layout
 import Colors from '../../theme/colors';
@@ -131,14 +137,12 @@ class SignUp extends Component {
     super(props);
 
     this.state = {
-      username: '',
+      username: 'marcio',
       usernameFocused: false,
-      phone: '',
+      phone: '85311317659',
       phoneFocused: false,
-      password: '',
+      password: '1234567',
       passwordFocused: false,
-      rePassword: '',
-      rePasswordFocused: false,
       secureTextEntry: true,
     };
   }
@@ -154,7 +158,6 @@ class SignUp extends Component {
       usernameFocused: true,
       phoneFocused: false,
       passwordFocused: false,
-      rePasswordFocused: false,
     });
   };
 
@@ -169,7 +172,6 @@ class SignUp extends Component {
       phoneFocused: true,
       usernameFocused: false,
       passwordFocused: false,
-      rePasswordFocused: false,
     });
   };
 
@@ -181,23 +183,7 @@ class SignUp extends Component {
 
   passwordFocus = () => {
     this.setState({
-      rePasswordFocused: false,
       passwordFocused: true,
-      usernameFocused: false,
-      phoneFocused: false,
-    });
-  };
-
-  rePasswordChange = text => {
-    this.setState({
-      rePassword: text,
-    });
-  };
-
-  rePasswordFocus = () => {
-    this.setState({
-      rePasswordFocused: true,
-      passwordFocused: false,
       usernameFocused: false,
       phoneFocused: false,
     });
@@ -215,17 +201,75 @@ class SignUp extends Component {
     navigation.navigate(screen);
   };
 
-  createAccount = () => {
-    // const { username, phone, password } = this.state;
-    this.setState(
-      {
-        usernameFocused: false,
-        phoneFocused: false,
-        passwordFocused: false,
-        rePasswordFocused: false,
-      },
-      this.navigateTo('HomeNavigator '),
-    );
+  createAccount = async () => {
+    this.setState({
+      isLoading: true,
+    });
+    Toast.hide();
+
+    const {username, phone, password} = this.state;
+    let errMessage = '';
+    try {
+      const response = await register(
+        username,
+        phone,
+        this.phone.getCallingCode(),
+        password,
+      );
+      if (response.status != 200) {
+        // FAIL LOGIN
+        if (response.error_code === 100) {
+          if (response.error_field === 'phone') {
+            errMessage = I18n.t('error_phone');
+          }
+          if (response.error_field === 'phone_ext') {
+            errMessage = I18n.t('error_phone_ext');
+          }
+          if (response.error_field === 'password') {
+            errMessage = I18n.t('error_password');
+          }
+          if (response.error_field === 'username') {
+            errMessage = I18n.t('error_username');
+          }
+        }
+        if (response.error_code === 103) {
+          errMessage = I18n.t('error_phone_exists');
+        }
+        if (response.error_code === 104) {
+          errMessage = I18n.t('error_username_exists');
+        }
+      } else {
+        // SUCCESS LOGIN
+        AsyncStorage.setItem('ACCESS_TOKEN', response.access_token);
+        AsyncStorage.setItem('REFRESH_TOKEN', response.refresh_token);
+        this.setState(
+          {
+            usernameFocused: false,
+            phoneFocused: false,
+            passwordFocused: false,
+            rePasswordFocused: false,
+          },
+          this.navigateTo('HomeNavigator'),
+        );
+      }
+    } catch (e) {
+      console.log(e);
+      errMessage = I18n.t('error_server');
+    }
+
+    this.setState({
+      isLoading: false,
+    });
+
+    if (errMessage.length) {
+      Toast.show({
+        type: 'error',
+        text1: errMessage,
+        autoHide: true,
+        visibilityTime: 10 * 1e3, //10 seconds
+        onPress: () => Toast.hide(),
+      });
+    }
   };
 
   focusOn = nextFiled => () => {
@@ -238,14 +282,13 @@ class SignUp extends Component {
     const {t} = this.props;
 
     const {
+      isLoading,
       username,
       usernameFocused,
       phone,
       phoneFocused,
       password,
       passwordFocused,
-      rePassword,
-      rePasswordFocused,
       secureTextEntry,
     } = this.state;
 
@@ -262,20 +305,19 @@ class SignUp extends Component {
             <View style={styles.lang}>
               <SwitchText />
             </View>
-
             <View style={styles.form}>
               <PhoneInput
-                ref={phone}
+                ref={r => {
+                  this.phone = r;
+                }}
                 defaultValue={phone}
                 placeholder={t('phone_placeholder')}
                 defaultCode="ID"
                 layout="first"
-                onChangeText={text => {
-                  this.phone = text;
-                }}
-                onChangeFormattedText={text => {
-                  this.phone = text;
-                }}
+                keyboardType="phone-pad"
+                inputFocused={phoneFocused}
+                onChangeText={this.phoneChange}
+                // onChangeFormattedText={this.phoneChange}
                 containerStyle={styles.containerStyle}
                 textContainerStyle={styles.textContainerStyle}
                 textInputStyle={styles.textInputStyle}
@@ -294,7 +336,7 @@ class SignUp extends Component {
                 onSubmitEditing={this.focusOn(this.password)}
                 returnKeyType="next"
                 blurOnSubmit={false}
-                keyboardType="email-address"
+                keyboardType="default"
                 placeholder={t('username_placeholder')}
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
                 inputTextColor={INPUT_TEXT_COLOR}
@@ -310,7 +352,7 @@ class SignUp extends Component {
                 onChangeText={this.passwordChange}
                 onFocus={this.passwordFocus}
                 inputFocused={passwordFocused}
-                onSubmitEditing={this.focusOn(this.phone)}
+                onSubmitEditing={this.createAccount}
                 returnKeyType="done"
                 placeholder={t('password_placeholder')}
                 placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
@@ -318,11 +360,11 @@ class SignUp extends Component {
                 borderColor={INPUT_BORDER_COLOR}
                 focusedBorderColor={INPUT_FOCUSED_BORDER_COLOR}
                 toggleVisible={password.length > 0}
-                toggleText={secureTextEntry ? 'Show' : 'Hide'}
+                toggleText={secureTextEntry ? t('show') : t('hide')}
                 onTogglePress={this.onTogglePress}
               />
 
-              <UnderlinePasswordInput
+              {/* <UnderlinePasswordInput
                 onRef={r => {
                   this.rePassword = r;
                 }}
@@ -339,15 +381,22 @@ class SignUp extends Component {
                 toggleVisible={password.length > 0}
                 toggleText={secureTextEntry ? 'Show' : 'Hide'}
                 onTogglePress={this.onTogglePress}
-              />
+              /> */}
 
               <View style={styles.buttonContainer}>
                 <Button
                   color={Colors.primaryColor}
                   rounded
                   borderRadius
+                  disabled={isLoading}
                   onPress={this.createAccount}
-                  title={t('create_account').toUpperCase()}
+                  title={
+                    isLoading ? (
+                      <ActivityIndicator size="large" color="white" />
+                    ) : (
+                      t('continue').toUpperCase()
+                    )
+                  }
                   titleColor={Colors.onPrimaryColor}
                 />
               </View>

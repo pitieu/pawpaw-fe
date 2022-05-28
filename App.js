@@ -1,6 +1,5 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import {View, Text, Pressable} from 'react-native';
 
 // import {LogBox} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';

@@ -7,23 +7,27 @@ import {
   Text,
   TouchableWithoutFeedback,
   View,
+  ActivityIndicator,
 } from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import PhoneInput from 'react-native-phone-number-input';
 import {withTranslation} from 'react-i18next';
-import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // config
 import config from '../../config';
+
 // components
 import I18n from '../../assets/i18n/i18n';
 import Button from '../../components/buttons/Button';
 import InputModal from '../../components/modals/InputModal';
 import UnderlinePasswordInput from '../../components/textinputs/UnderlinePasswordInput';
 import SwitchText from '../../components/toggle/switchText';
+
 // api
-import {login} from '../../api/signin';
+import {login} from '../../api/SignIn';
+
 // import colors, layout
 import Colors from '../../theme/colors';
 import Layout from '../../theme/layout';
@@ -139,6 +143,7 @@ class SignIn extends Component {
       passwordFocused: false,
       secureTextEntry: true,
       inputModalVisible: false,
+      isLoading: false,
     };
   }
 
@@ -192,51 +197,78 @@ class SignIn extends Component {
     navigation.navigate(screen);
   };
 
-  resetError = () => {
-    Toast.hide();
-  };
-
   signIn = async () => {
-    this.resetError();
+    this.setState({
+      isLoading: true,
+    });
+    Toast.hide();
+
     const {password, phone} = this.state;
-    // Todo: Check if fields are too short to avoid querying API ?
-    const response = await login(phone, this.phone.getCallingCode(), password);
-    if (response.status != 200) {
-      let errMessage = '';
-      if (response.error_code === 100) {
-        if (response.error_field === 'phone') {
-          errMessage = I18n.t('error_phone');
-        }
-        if (response.error_field === 'phone_ext') {
-          errMessage = I18n.t('error_phone_ext');
-        }
-        if (response.error_field === 'password') {
-          errMessage = I18n.t('error_password');
-        }
-      }
-      if (response.error_code === 101) {
-        errMessage = I18n.t('error_phone_not_found');
-      }
-      if (response.error_code === 102) {
-        errMessage = I18n.t('error_password_not_match');
-      }
-      if (errMessage.length) {
-        Toast.show({
-          type: 'error',
-          text1: errMessage,
-          autoHide: true,
-          visibilityTime: 10 * 1e3, //10 seconds
-          onPress: () => Toast.hide(),
-        });
-      }
+    let errMessage = '';
+    if (!password || password.length < 6) {
+      errMessage = I18n.t('error_password');
     }
-    this.setState(
-      {
-        phoneFocused: false,
-        passwordFocused: false,
-      },
-      // this.navigateTo('HomeNavigator'),
-    );
+    if (!phone || phone.length < 6) {
+      errMessage = I18n.t('error_phone');
+    }
+    try {
+      if (phone && password) {
+        const response = await login(
+          phone,
+          this.phone.getCallingCode(),
+          password,
+        );
+
+        if (response.status != 200) {
+          // FAIL LOGIN
+          if (response.error_code === 100) {
+            if (response.error_field === 'phone') {
+              errMessage = I18n.t('error_phone');
+            }
+            if (response.error_field === 'phone_ext') {
+              errMessage = I18n.t('error_phone_ext');
+            }
+            if (response.error_field === 'password') {
+              errMessage = I18n.t('error_password');
+            }
+          }
+          if (response.error_code === 101) {
+            errMessage = I18n.t('error_phone_not_found');
+          }
+          if (response.error_code === 102) {
+            errMessage = I18n.t('error_password_not_match');
+          }
+        } else {
+          // SUCCESS LOGIN
+          AsyncStorage.setItem('ACCESS_TOKEN', response.access_token);
+          AsyncStorage.setItem('REFRESH_TOKEN', response.refresh_token);
+          this.setState(
+            {
+              phoneFocused: false,
+              passwordFocused: false,
+            },
+            this.navigateTo('HomeNavigator'),
+          );
+        }
+      }
+      this.setState({
+        isLoading: false,
+      });
+    } catch (e) {
+      errMessage = I18n.t('error_server');
+      this.setState({
+        isLoading: false,
+      });
+    }
+    if (errMessage.length) {
+      Toast.show({
+        type: 'error',
+        text1: errMessage,
+        autoHide: true,
+        visibilityTime: 10 * 1e3, //10 seconds
+        onPress: () => Toast.hide(),
+      });
+    }
   };
 
   switchLanguage = () => {
@@ -246,8 +278,6 @@ class SignIn extends Component {
       language: language == 'en' ? 'id' : 'en',
     });
     I18n.changeLanguage(language);
-    // console.log(i18n.changeLanguage(language));
-    // console.log(language);
   };
 
   render() {
@@ -259,6 +289,7 @@ class SignIn extends Component {
       passwordFocused,
       secureTextEntry,
       inputModalVisible,
+      isLoading,
     } = this.state;
     return (
       <SafeAreaView style={styles.screenContainer}>
@@ -282,6 +313,7 @@ class SignIn extends Component {
                 placeholder={t('phone_placeholder')}
                 defaultCode="ID"
                 layout="first"
+                keyboardType="phone-pad"
                 inputFocused={phoneFocused}
                 onChangeText={this.phoneChange}
                 // onChangeFormattedText={this.phoneChange}
@@ -309,7 +341,7 @@ class SignIn extends Component {
                 borderColor={INPUT_BORDER_COLOR}
                 focusedBorderColor={INPUT_FOCUSED_BORDER_COLOR}
                 toggleVisible={password.length > 0}
-                toggleText={secureTextEntry ? 'Show' : 'Hide'}
+                toggleText={secureTextEntry ? t('show') : t('hide')}
                 onTogglePress={this.onTogglePress}
               />
 
@@ -326,8 +358,15 @@ class SignIn extends Component {
                   color={Colors.primaryColor}
                   rounded
                   borderRadius
+                  disabled={isLoading}
                   onPress={this.signIn}
-                  title={t('sign_in').toUpperCase()}
+                  title={
+                    isLoading ? (
+                      <ActivityIndicator size="large" color="white" />
+                    ) : (
+                      t('sign_in').toUpperCase()
+                    )
+                  }
                   titleColor={Colors.onPrimaryColor}
                 />
               </View>
@@ -339,6 +378,9 @@ class SignIn extends Component {
                   {t('new_user_register')}
                   <Text style={[styles.footerText, styles.footerLink]}>
                     {t('sign_up')}
+                    {/* {isLoading && (
+                      <ActivityIndicator size="large" color="yellow" />
+                    )} */}
                   </Text>
                 </Text>
               </View>
