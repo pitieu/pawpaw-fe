@@ -1,6 +1,6 @@
 // import dependencies
 import React, {Component, useEffect, useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {
   Alert,
   Platform,
@@ -168,8 +168,7 @@ const Profile = props => {
   const navigation = useNavigation();
 
   const {t} = props;
-
-  useEffect(() => {
+  useFocusEffect(() => {
     async function fetchData() {
       auth(navigation);
       try {
@@ -179,7 +178,19 @@ const Profile = props => {
       }
     }
     fetchData();
-  }, []);
+  });
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     console.log('fetchData');
+  //     auth(navigation);
+  //     try {
+  //       await getProfile();
+  //     } catch (e) {
+  //       console.log(e);
+  //     }
+  //   }
+  //   fetchData();
+  // }, []);
 
   const navigateTo = screen => () => {
     navigation.navigate(screen);
@@ -196,6 +207,7 @@ const Profile = props => {
     } else {
       user = JSON.parse(user);
     }
+
     setUsername(user.username);
     setPhone(`+${user.phone_ext} ${user.phone}`);
     setEmail(user.email);

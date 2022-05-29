@@ -1,11 +1,20 @@
 // import dependencies
-import React from 'react';
+import React, {useEffect, useLayoutEffect} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createStackNavigator} from '@react-navigation/stack';
+import {
+  useNavigation,
+  useRoute,
+  getFocusedRouteNameFromRoute,
+} from '@react-navigation/native';
+
 import Icon from 'react-native-vector-icons/dist/MaterialCommunityIcons';
 import {LongPressGestureHandler, State} from 'react-native-gesture-handler';
-import {StyleSheet, Image, Text, View, Icon as Iconn} from 'react-native';
+import {StyleSheet, Image, Text, View, Platform} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // import components
+import HeaderIconButton from '../components/navigation/HeaderIconButton';
 import TabBadgeIcon from '../components/navigation/TabBadgeIcon';
 import RNBottomActionSheet from 'react-native-bottom-action-sheet';
 import BottomSheet from '../components/bottomsheet/BottomSheet';
@@ -23,22 +32,92 @@ import Favorites from '../screens/favorites/Favorites';
 import Cart from '../screens/cart/Cart';
 
 // import Settings screen
-import Settings from '../screens/settings/Settings';
 import Profile from '../screens/profile/Profile';
 
 // import colors
 import Colors from '../theme/colors';
+import Layout from '../theme/layout';
 
 // API
 import {getAccounts, selectAccount} from '../api/Account';
 
 // create bottom tab navigator
 const Tab = createBottomTabNavigator();
+const ProfileStack = createStackNavigator();
+
+let routeName = 0;
+
+const getHeaderLeft = index => {
+  switch (index) {
+    case 3:
+      return <Text style={styles.headerLeft}>Pet Services</Text>;
+    case 4:
+      return <Text style={styles.headerLeft}>Profile</Text>;
+  }
+  return <Text style={styles.headerLeft}></Text>;
+};
+
+const ProfileStackNavigator = () => (
+  <ProfileStack.Navigator>
+    <ProfileStack.Screen
+      id="profile_stack"
+      name="Profile"
+      component={Profile}
+      options={({navigation, route}) => ({
+        title: 'Profile',
+        headerLeft: () => {
+          return getHeaderLeft(navigation.getParent().getState().index);
+        },
+        headerTitle: false,
+        headerRight: () => (
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <HeaderIconButton
+              onPress={() => navigation.goBack()}
+              name={'chatbox-outline'}
+              color={Colors.primaryText}
+            />
+            <HeaderIconButton
+              onPress={() => navigation.goBack()}
+              name={'notifications-outline'}
+              color={Colors.primaryText}
+            />
+            <HeaderIconButton
+              onPress={() => navigation.goBack()}
+              name={'cart-outline'}
+              color={Colors.primaryText}
+            />
+            <HeaderIconButton
+              onPress={() => navigation.goBack()}
+              name={'menu'}
+              color={Colors.primaryText}
+            />
+          </View>
+        ),
+      })}
+    />
+  </ProfileStack.Navigator>
+);
 
 // HomeNavigator
 function HomeNavigator() {
   let loaded = false;
   let accountData;
+  const navigation = useNavigation();
+
+  const route = useRoute();
+
+  useEffect(() => {
+    routeName = getFocusedRouteNameFromRoute(route);
+    console.log('routeName', routeName);
+
+    // routeIndex = route.state?.index;
+  }, [route, navigation]);
+
+  useLayoutEffect(() => {
+    // console.log('layoutEffect', navigation.getState());
+
+    navigation.setOptions({headerTitle: getHeaderLeft(route)});
+  }, [navigation, route]);
 
   const onLongPress = event => {
     if (event.nativeEvent.state === State.ACTIVE) {
@@ -74,10 +153,18 @@ function HomeNavigator() {
           selection: selected,
           onSelection: (index, value) => {
             accountData = accountData.map(account => {
+              if (account._id === value) {
+                AsyncStorage.setItem('@user', JSON.stringify(account));
+              }
               account.selected_account = account._id === value;
               return account;
             });
+
             selectAccount(value);
+            // move quickly to home and back to profile to trigger a refresh
+            // Todo: find a better solution ?
+            navigation.navigate('Home');
+            navigation.navigate('Profile');
           },
         });
       };
@@ -139,35 +226,26 @@ function HomeNavigator() {
       tabBarOptions={{
         activeTintColor: Colors.primaryColor,
         inactiveTintColor: Colors.secondaryText,
-        showLabel: true, // hide labels
+        showLabel: true,
         style: {
           backgroundColor: Colors.surface, // TabBar background
         },
       }}>
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Explore" component={Search} />
-      <Tab.Screen
-        name="Marketplace"
-        component={Cart}
-        // options={{
-        //   tabBarIcon: props => (
-        //     <TabBadgeIcon
-        //       name={`store${props.focused ? '' : '-outline'}`}
-        //       badgeCount={5}
-        //       {...props}
-        //     />
-        //   ),
-        // }}
-      />
-
-      <Tab.Screen name="Pet Services" component={Favorites} />
-
-      <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name="Marketplace" component={Cart} />
+      <Tab.Screen name="Pet Services" component={ProfileStackNavigator} />
+      <Tab.Screen name="Profile" component={ProfileStackNavigator} />
     </Tab.Navigator>
   );
 }
 
 const styles = StyleSheet.create({
+  headerLeft: {
+    fontWeight: 'bold',
+    paddingLeft: Layout.LARGE_PADDING,
+    fontSize: 20,
+  },
   androidMenu: {
     marginBottom: 20,
     backgroundColor: Colors.primaryColor,

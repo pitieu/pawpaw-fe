@@ -37,6 +37,8 @@ import HomeNavigator from './HomeNavigator';
 
 // import Product screen
 import Product from '../screens/product/Product';
+import Cart from '../screens/cart/Cart';
+import Favorites from '../screens/favorites/Favorites';
 
 // import Categories screen
 import Categories from '../screens/categories/Categories';
@@ -77,6 +79,7 @@ import Orders from '../screens/orders/Orders';
 import AboutUs from '../screens/about/AboutUs';
 
 import Settings from '../screens/settings/Settings';
+import Search from '../screens/search/Search';
 
 // import colors
 import Colors from '../theme/colors';
@@ -105,12 +108,7 @@ function MainNavigatorA() {
           headerTintColor: Colors.onBackground,
           headerTitleAlign: 'center',
         }}>
-        <Stack.Screen
-          name="SignIn"
-          component={SignIn}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
+        {/* <Stack.Screen
           name="Profile"
           component={Profile}
           options={({navigation}) => ({
@@ -123,7 +121,26 @@ function MainNavigatorA() {
               />
             ),
           })}
+        /> */}
+        <Stack.Screen
+          name="SignIn"
+          component={SignIn}
+          options={{headerShown: false}}
         />
+        {/* <Stack.Screen
+          name="Profile"
+          component={Profile}
+          options={({navigation}) => ({
+            title: 'Profile',
+            headerRight: () => (
+              <HeaderIconButton
+                onPress={() => navigation.goBack()}
+                name={'menu'}
+                color={Colors.primaryColor}
+              />
+            ),
+          })}
+        /> */}
         {/* <Stack.Screen
           name="EditProfile"
           component={EditProfile}
@@ -139,6 +156,11 @@ function MainNavigatorA() {
           })}
         /> */}
         <Stack.Screen
+          name="Product"
+          component={Product}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
           name="Onboarding"
           component={Intro}
           options={{headerShown: false}}
@@ -152,13 +174,6 @@ function MainNavigatorA() {
           name="SignUp"
           component={SignUp}
           options={{headerShown: false}}
-          // options={{
-          //   title: 'Create Account',
-          //   headerStyle: {
-          //     elevation: 0,
-          //     shadowOpacity: 0,
-          //   },
-          // }}
         />
         {/* <Stack.Screen
           name="Verification"
@@ -203,11 +218,7 @@ function MainNavigatorA() {
             title: 'Pizza',
           }}
         />
-        <Stack.Screen
-          name="Product"
-          component={Product}
-          options={{headerShown: false}}
-        />
+
         <Stack.Screen
           name="SearchResults"
           component={SearchResults}
