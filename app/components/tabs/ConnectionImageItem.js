@@ -13,6 +13,8 @@ export const {width, height} = Dimensions.get('window');
 const ConnectionItem = ({style, connection}) => {
   const {photo, name} = connection;
 
+  const photoUri =
+    photo != '' ? {uri: photo} : require('../../assets/img/profile_2.jpeg');
   const mergedStyle = useMemo(() => [styles.container, style], [style]);
 
   const navigation = useNavigation();
@@ -34,10 +36,8 @@ const ConnectionItem = ({style, connection}) => {
     });
   };
   return (
-    <TouchableOpacity onPress={navigateTo()}>
-      <View style={mergedStyle}>
-        <Image style={styles.image} source={{uri: photo}} />
-      </View>
+    <TouchableOpacity onPress={navigateTo()} style={mergedStyle}>
+      <Image style={styles.image} source={photoUri} />
     </TouchableOpacity>
   );
 };

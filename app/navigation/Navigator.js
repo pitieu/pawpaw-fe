@@ -38,6 +38,9 @@ import HomeNavigator from './HomeNavigator';
 
 // import Product screen
 import Product from '../screens/product/Product';
+import ProductDetails from '../screens/product/ProductDetails';
+import ServiceDetails from '../screens/services/PetServiceDetails';
+
 import Cart from '../screens/cart/Cart';
 import Favorites from '../screens/favorites/Favorites';
 
@@ -108,11 +111,15 @@ function MainNavigatorA() {
           headerTintColor: Colors.onBackground,
           headerTitleAlign: 'center',
         }}>
+        <Stack.Screen name="ProductDetails" component={ProductDetails} />
+        <Stack.Screen name="PetServiceDetails" component={ServiceDetails} />
+        <Stack.Screen name="SocialFeed" component={ProductDetails} />
         <Stack.Screen
           name="SignIn"
           component={SignIn}
           options={{headerShown: false}}
         />
+
         <Stack.Screen
           name="Profile"
           component={Profile}

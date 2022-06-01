@@ -26,7 +26,7 @@ const themes = {
     onSecondaryColor: '#fff',
 
     // tertiary color, secondary color intermediately related
-    tertiaryColor: '#ffa400',
+    tertiaryColor: '#0740AC',
     onTertiaryColor: '#fff',
 
     // status bar color
@@ -55,6 +55,10 @@ const themes = {
     white: '#fff',
     lightGray: '#eee',
     gray: '#aaa',
+
+    // focus color
+    focusColor: '#E02954',
+    onFocusColor: '#fff',
   },
 };
 

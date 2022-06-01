@@ -14,6 +14,7 @@ export default {
   followers: 'Followers',
   followings: 'Followings',
   reviews: 'reviews',
+  sold: 'sold',
   // screens/signin/SignIn.js
   forgot_password: 'Forgot password?',
   tnc_sign_in: 'By signing in, you accepts our',
@@ -46,4 +47,10 @@ export default {
   edit_profile: 'Edit Profile',
   logout: 'Logout',
   logout_confirm: 'Are you sure you want to logout?',
+  // screens/product/ProductDetails.js
+  add_cart: 'Add to Cart',
+  buy_now: 'Buy Now',
+  detail_product: 'Product Details',
+  seller_information: 'Seller Information',
+  reviews: 'Reviews',
 };

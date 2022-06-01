@@ -20,59 +20,77 @@ var {width, height} = Dimensions.get('window');
 
 const SOCIAL_FEED = [
   {
-    photo: 'https://randomuser.me/api/portraits/women/2.jpg',
+    id: 1,
+    photo: '',
   },
   {
+    id: 2,
     photo: 'https://randomuser.me/api/portraits/men/2.jpg',
   },
   {
+    id: 3,
     photo: 'https://randomuser.me/api/portraits/women/3.jpg',
   },
   {
+    id: 4,
     photo: 'https://randomuser.me/api/portraits/men/3.jpg',
   },
   {
+    id: 5,
     photo: 'https://randomuser.me/api/portraits/women/4.jpg',
   },
   {
+    id: 6,
     photo: 'https://randomuser.me/api/portraits/men/4.jpg',
   },
   {
+    id: 7,
     photo: 'https://randomuser.me/api/portraits/women/5.jpg',
   },
   {
+    id: 8,
     photo: 'https://randomuser.me/api/portraits/men/5.jpg',
   },
   {
+    id: 9,
     photo: 'https://randomuser.me/api/portraits/women/6.jpg',
   },
   {
+    id: 10,
     photo: 'https://randomuser.me/api/portraits/men/6.jpg',
   },
   {
+    id: 11,
     photo: 'https://randomuser.me/api/portraits/women/7.jpg',
   },
   {
+    id: 12,
     photo: 'https://randomuser.me/api/portraits/men/7.jpg',
   },
   {
+    id: 13,
     photo: 'https://randomuser.me/api/portraits/women/8.jpg',
   },
   {
+    id: 14,
     photo: 'https://randomuser.me/api/portraits/men/8.jpg',
   },
   {
+    id: 15,
     photo: 'https://randomuser.me/api/portraits/women/5.jpg',
   },
   {
+    id: 16,
     photo: 'https://randomuser.me/api/portraits/men/5.jpg',
   },
   {
+    id: 17,
     photo: 'https://randomuser.me/api/portraits/women/6.jpg',
   },
 ];
 const PET_SERVICES = [
   {
+    id: 1,
     name: 'Charlotte Jones',
     photo: 'https://randomuser.me/api/portraits/women/2.jpg',
     price: 100000,
@@ -80,13 +98,15 @@ const PET_SERVICES = [
     ratings: 88,
   },
   {
+    id: 2,
     name: 'Oliver Brown',
-    photo: 'https://randomuser.me/api/portraits/men/2.jpg',
+    photo: '',
     price: 60000,
     rating: 3.2,
     ratings: 22,
   },
   {
+    id: 3,
     name: 'Jessica Miller',
     photo: 'https://randomuser.me/api/portraits/women/3.jpg',
     price: 120000,
@@ -94,6 +114,7 @@ const PET_SERVICES = [
     ratings: 11,
   },
   {
+    id: 4,
     name: 'Samuel Johnson',
     photo: 'https://randomuser.me/api/portraits/men/3.jpg',
     price: 100000,
@@ -101,6 +122,7 @@ const PET_SERVICES = [
     ratings: 44,
   },
   {
+    id: 5,
     name: 'Olivia Martinez',
     photo: 'https://randomuser.me/api/portraits/women/4.jpg',
     price: 30000,
@@ -108,6 +130,7 @@ const PET_SERVICES = [
     ratings: 3,
   },
   {
+    id: 6,
     name: 'Joshua Miller',
     photo: 'https://randomuser.me/api/portraits/men/4.jpg',
     price: 1000000,
@@ -115,6 +138,7 @@ const PET_SERVICES = [
     ratings: 2,
   },
   {
+    id: 7,
     name: 'Katie Williams',
     photo: 'https://randomuser.me/api/portraits/women/5.jpg',
     price: 50000,
@@ -122,6 +146,7 @@ const PET_SERVICES = [
     ratings: 0,
   },
   {
+    id: 8,
     name: 'Jack Jones',
     photo: 'https://randomuser.me/api/portraits/men/5.jpg',
     price: 50000,
@@ -129,6 +154,7 @@ const PET_SERVICES = [
     ratings: 0,
   },
   {
+    id: 9,
     name: 'Amy Johnson',
     photo: 'https://randomuser.me/api/portraits/women/6.jpg',
     price: 50000,
@@ -136,6 +162,7 @@ const PET_SERVICES = [
     ratings: 0,
   },
   {
+    id: 10,
     name: 'Thomas Williams',
     photo: 'https://randomuser.me/api/portraits/men/6.jpg',
     price: 50000,
@@ -143,6 +170,7 @@ const PET_SERVICES = [
     ratings: 0,
   },
   {
+    id: 11,
     name: 'Abigail Hernandez',
     photo: 'https://randomuser.me/api/portraits/women/7.jpg',
     price: 76000,
@@ -150,6 +178,7 @@ const PET_SERVICES = [
     ratings: 0,
   },
   {
+    id: 12,
     name: 'Matthew Taylor',
     photo: 'https://randomuser.me/api/portraits/men/7.jpg',
     price: 60000,
@@ -157,6 +186,7 @@ const PET_SERVICES = [
     ratings: 0,
   },
   {
+    id: 13,
     name: 'Poppy Jackson',
     photo: 'https://randomuser.me/api/portraits/women/8.jpg',
     price: 80000,
@@ -164,6 +194,7 @@ const PET_SERVICES = [
     ratings: 0,
   },
   {
+    id: 14,
     name: 'Mohammed Lopez',
     photo: 'https://randomuser.me/api/portraits/men/8.jpg',
     price: 50000,
@@ -171,6 +202,7 @@ const PET_SERVICES = [
     ratings: 0,
   },
   {
+    id: 15,
     name: 'Katie Williams',
     photo: 'https://randomuser.me/api/portraits/women/5.jpg',
     price: 70000,
@@ -178,6 +210,7 @@ const PET_SERVICES = [
     ratings: 0,
   },
   {
+    id: 16,
     name: 'Jack Jones',
     photo: 'https://randomuser.me/api/portraits/men/5.jpg',
     price: 10000,
@@ -185,6 +218,7 @@ const PET_SERVICES = [
     ratings: 1,
   },
   {
+    id: 17,
     name: 'Amy Johnson',
     photo: 'https://randomuser.me/api/portraits/women/6.jpg',
     price: 80000,

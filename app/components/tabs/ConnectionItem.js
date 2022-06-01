@@ -14,6 +14,9 @@ export const PHOTO_SIZE = 80;
 const ConnectionItem = ({style, connection, dataType}) => {
   const {photo, name, price, rating, ratings, id} = connection;
 
+  const photoUri =
+    photo != '' ? {uri: photo} : require('../../assets/img/profile_2.jpeg');
+
   const mergedStyle = useMemo(() => [styles.container, style], [style]);
 
   const navigation = useNavigation();
@@ -21,13 +24,13 @@ const ConnectionItem = ({style, connection, dataType}) => {
   const navigateTo = screen => () => {
     let page = '';
     if (dataType == 'marketplace') {
-      page = 'Product details';
+      page = 'ProductDetails';
     }
     if (dataType == 'pet_services') {
-      page = 'Pet service details';
+      page = 'PetServiceDetails';
     }
     if (dataType == 'pet_services') {
-      page = 'Social Feed';
+      page = 'SocialFeed';
     }
 
     navigation.navigate(page, {
@@ -38,7 +41,7 @@ const ConnectionItem = ({style, connection, dataType}) => {
   return (
     <TouchableOpacity onPress={navigateTo()}>
       <View style={mergedStyle}>
-        <Image style={styles.image} source={{uri: photo}} />
+        <Image style={styles.image} source={photoUri} />
         <View style={styles.textSection}>
           <Text style={styles.name}>{name}</Text>
           <Text style={styles.price}>{currencyFormatter(price)}</Text>

@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    minWidth: 64,
+    minWidth: 32,
     maxWidth: BUTTON_WIDTH,
     height: BUTTON_HEIGHT,
   },
@@ -56,7 +56,9 @@ const styles = StyleSheet.create({
   iconContainer: {
     marginLeft: 12,
   },
-  pl8: {paddingLeft: 8},
+  pl8: {
+    paddingLeft: 8,
+  },
   title: {
     paddingHorizontal: 16,
     color: Colors.primaryColor,
@@ -122,7 +124,11 @@ const OutlinedButton = ({
           </View>
         )}
         {iconName && (
-          <View style={styles.iconContainer}>
+          <View
+            style={[
+              styles.iconContainer,
+              title?.length ? {} : {marginRight: 6},
+            ]}>
             <Icon name={iconName} size={18} color={iconColor} />
           </View>
         )}
@@ -137,8 +143,9 @@ const OutlinedButton = ({
             titleColor && {color: titleColor},
             iconName && styles.pl8,
             iconMoonName && styles.pl8,
+            title?.length ? {} : {paddingHorizontal: 0},
           ]}>
-          {title !== undefined ? title.toUpperCase() : 'BUTTON'}
+          {title !== undefined ? title.toUpperCase() : ''}
         </ButtonText>
       </View>
     </TouchableItem>

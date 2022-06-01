@@ -1,17 +1,10 @@
-/**
- * Foodvila - React Native Template
- *
- * @format
- * @flow
- */
-
 // import dependencies
 import React from 'react';
-import type ReactElement from 'react';
 import {Platform, StyleSheet, Text as RNText} from 'react-native';
 
 // import colors
 import Colors from '../../theme/colors';
+import Layout from '../../theme/layout';
 
 // CustomText Config
 const platform = Platform.OS;
@@ -106,8 +99,9 @@ const styles = StyleSheet.create({
   title: {
     // fontWeight: '500',
     ...fonts.medium,
-    fontSize: 25,
+    fontSize: 24,
     lineHeight: 30,
+    paddingBottom: Layout.SMALL_PADDING,
     color: Colors.primaryText,
   },
   subtitle1: {
@@ -165,58 +159,58 @@ const styles = StyleSheet.create({
   },
 });
 
-export const Heading1 = ({style, ...props}: Object): ReactElement<RNText> => (
+export const Heading1 = ({style, ...props}) => (
   <RNText style={[styles.h1, style]} {...props} />
 );
 
-export const Heading2 = ({style, ...props}: Object): ReactElement<RNText> => (
+export const Heading2 = ({style, ...props}) => (
   <RNText style={[styles.h2, style]} {...props} />
 );
 
-export const Heading3 = ({style, ...props}: Object): ReactElement<RNText> => (
+export const Heading3 = ({style, ...props}) => (
   <RNText style={[styles.h3, style]} {...props} />
 );
 
-export const Heading4 = ({style, ...props}: Object): ReactElement<RNText> => (
+export const Heading4 = ({style, ...props}) => (
   <RNText style={[styles.h4, style]} {...props} />
 );
 
-export const Heading5 = ({style, ...props}: Object): ReactElement<RNText> => (
+export const Heading5 = ({style, ...props}) => (
   <RNText style={[styles.h5, style]} {...props} />
 );
 
-export const Heading6 = ({style, ...props}: Object): ReactElement<RNText> => (
+export const Heading6 = ({style, ...props}) => (
   <RNText style={[styles.h6, style]} {...props} />
 );
 
-export const Title = ({style, ...props}: Object): ReactElement<RNText> => (
+export const Title = ({style, ...props}) => (
   <RNText style={[styles.title, style]} {...props} />
 );
 
-export const Subtitle1 = ({style, ...props}: Object): ReactElement<RNText> => (
+export const Subtitle1 = ({style, ...props}) => (
   <RNText style={[styles.subtitle1, style]} {...props} />
 );
 
-export const Subtitle2 = ({style, ...props}: Object): ReactElement<RNText> => (
+export const Subtitle2 = ({style, ...props}) => (
   <RNText style={[styles.subtitle2, style]} {...props} />
 );
 
-export const Text = ({style, ...props}: Object): ReactElement<RNText> => (
+export const Text = ({style, ...props}) => (
   <RNText style={[styles.text, style]} {...props} />
 );
 
-export const Paragraph = ({style, ...props}: Object): ReactElement<RNText> => (
+export const Paragraph = ({style, ...props}) => (
   <RNText style={[styles.paragraph, style]} {...props} />
 );
 
-export const SmallText = ({style, ...props}: Object): ReactElement<RNText> => (
+export const SmallText = ({style, ...props}) => (
   <RNText style={[styles.smallText, style]} {...props} />
 );
 
-export const ButtonText = ({style, ...props}: Object): ReactElement<RNText> => (
+export const ButtonText = ({style, ...props}) => (
   <RNText style={[styles.buttonText, style]} {...props} />
 );
 
-export const Caption = ({style, ...props}: Object): ReactElement<RNText> => (
+export const Caption = ({style, ...props}) => (
   <RNText style={[styles.caption, style]} {...props} />
 );
