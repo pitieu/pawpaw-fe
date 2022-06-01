@@ -15,7 +15,6 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import PhoneInput from 'react-native-phone-number-input';
 import {withTranslation} from 'react-i18next';
 import Toast from 'react-native-toast-message';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // config
 import config from '../../config';
@@ -139,9 +138,9 @@ const SignIn = props => {
   const [phone, setPhone] = useState('85311317659');
   const [phoneExt, setPhoneExt] = useState('62');
   const [phoneFocused, setPhoneFocused] = useState(true);
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState('1234567');
   const [passwordFocused, setPasswordFocused] = useState(false);
-  const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [secureTextEntry, setSecureTextEntry] = useState(false);
   const [inputModalVisible, setInputModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [screen, setScreen] = useState();
@@ -203,10 +202,6 @@ const SignIn = props => {
             errMessage = I18n.t('error_password_not_match');
           }
         } else {
-          console.log(response.data);
-          // SUCCESS LOGIN
-          AsyncStorage.setItem('@access_token', response.data.access_token);
-          AsyncStorage.setItem('@refresh_token', response.data.refresh_token);
           setPasswordFocused(false);
           setPhoneFocused(false);
           setScreen(navigateTo('HomeNavigator'));

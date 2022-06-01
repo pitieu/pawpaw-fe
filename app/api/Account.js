@@ -8,7 +8,31 @@ import {getToken} from './Auth';
 // config
 import config from '../config';
 
+export const setUserSelectAccount = async account => {
+  let user = await getUser();
+  user.selected_account = account;
+  return await AsyncStorage.setItem('@user', JSON.stringify(user));
+};
+
+export const getAccount = async () => {
+  const account = await AsyncStorage.getItem('@account');
+  if (account) {
+    return JSON.parse(account);
+  } else {
+    return {};
+  }
+};
+
 export const getUser = async () => {
+  const user = await AsyncStorage.getItem('@user');
+  if (user) {
+    return JSON.parse(user);
+  } else {
+    return {};
+  }
+};
+
+export const fetchUser = async () => {
   try {
     const token = await getToken();
     const response = await axios({
@@ -29,7 +53,7 @@ export const getUser = async () => {
   }
 };
 
-export const getAccounts = async () => {
+export const fetchAccounts = async () => {
   try {
     const token = await getToken();
     const response = await axios({
@@ -50,11 +74,11 @@ export const getAccounts = async () => {
   }
 };
 
-export const selectAccount = async userId => {
+export const selectAccount = async accountId => {
   try {
     const token = await getToken();
     const response = await axios({
-      url: `${config.api_address}accounts/${userId}/select`,
+      url: `${config.api_address}accounts/${accountId}/select`,
       headers: {
         'Content-Type': 'application/json',
         'Accept-Language': I18n.language,
@@ -62,6 +86,7 @@ export const selectAccount = async userId => {
       },
       method: 'put',
     });
+    await setUserSelectAccount(response.data.user.selected_account);
     return response;
   } catch (error) {
     console.log(error);

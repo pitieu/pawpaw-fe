@@ -10,6 +10,10 @@ export default {
   continue: 'Continue',
   error_server: 'Something went wrong, try again later',
   cancel: 'Cancel',
+  posts: 'Posts',
+  followers: 'Followers',
+  followings: 'Followings',
+  reviews: 'reviews',
   // screens/signin/SignIn.js
   forgot_password: 'Forgot password?',
   tnc_sign_in: 'By signing in, you accepts our',

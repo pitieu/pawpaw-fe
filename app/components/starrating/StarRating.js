@@ -1,40 +1,25 @@
-/**
- * Foodvila - React Native Template
- *
- * @format
- * @flow
- */
-
 // import dependencies
-import React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import React, {memo} from 'react';
+import {Platform, StyleSheet, View} from 'react-native';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
-import type { ColorProp } from 'react-native/Libraries/StyleSheet/ColorPropType';
 
 // StarRating Config
 const IOS = Platform.OS === 'ios';
 const star = IOS ? 'ios-star' : 'md-star';
 const starHalf = IOS ? 'ios-star-half' : 'md-star-half';
 const starOutline = IOS ? 'ios-star-outline' : 'md-star-outline';
-const defaultStarColor = "#ffc06b";
+const defaultStarColor = '#ffc06b';
 
 // StarRating Styles
 const styles = StyleSheet.create({
   container: {
     left: -1,
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   starContainer: {
-    margin: 1
-  }
+    margin: 1,
+  },
 });
-
-// StarRating Props
-type Props = {
-  rating: number,
-  starSize: number,
-  starColor: ColorProp
-};
 
 // render starts function
 const renderStars = (rating, starSize, starColor) => {
@@ -51,17 +36,22 @@ const renderStars = (rating, starSize, starColor) => {
   if (decimalPart > 5) {
     stars[i] = starHalf;
   }
-
   return stars.map((item, index) => (
     <View key={index} style={styles.starContainer}>
-      <Icon name={item} size={starSize || 14} color={starColor || defaultStarColor} />
+      <Icon
+        name={item}
+        size={starSize || 14}
+        color={starColor || defaultStarColor}
+      />
     </View>
   ));
 };
 
 // StarRating
-const StarRating = ({ rating = 0, starSize, starColor }: Props) => (
-  <View style={styles.container}>{renderStars(rating, starSize, starColor)}</View>
+const StarRating = ({rating = 0, starSize, starColor}) => (
+  <View style={styles.container}>
+    {renderStars(rating, starSize, starColor)}
+  </View>
 );
 
-export default StarRating;
+export default memo(StarRating);

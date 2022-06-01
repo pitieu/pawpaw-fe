@@ -10,6 +10,7 @@ import React from 'react';
 import {Platform} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import Icon from 'react-native-vector-icons/dist/MaterialCommunityIcons';
 
 // import components
 import HeaderIconButton from '../components/navigation/HeaderIconButton';
@@ -51,7 +52,6 @@ import SearchResults from '../screens/search/SearchResults';
 import Checkout from '../screens/checkout/Checkout';
 
 // import EditProfile screen
-import EditProfile from '../screens/profile/EditProfile';
 import Profile from '../screens/profile/Profile';
 
 // import DeliveryAddress screen
@@ -108,24 +108,28 @@ function MainNavigatorA() {
           headerTintColor: Colors.onBackground,
           headerTitleAlign: 'center',
         }}>
-        {/* <Stack.Screen
-          name="Profile"
-          component={Profile}
-          options={({navigation}) => ({
-            title: 'Profile',
-            headerRight: () => (
-              <HeaderIconButton
-                onPress={() => navigation.goBack()}
-                name={'menu'}
-                color={Colors.primaryColor}
-              />
-            ),
-          })}
-        /> */}
         <Stack.Screen
           name="SignIn"
           component={SignIn}
           options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
+          options={({navigation}) => ({
+            title: 'Profile',
+            headerLeft: () => (
+              <Icon
+                onPress={() => {
+                  navigation.goBack();
+                }}
+                name={'close'}
+                size={26}
+                color={Colors.primaryText}
+                style={{paddingLeft: 18}}
+              />
+            ),
+          })}
         />
         {/* <Stack.Screen
           name="Profile"

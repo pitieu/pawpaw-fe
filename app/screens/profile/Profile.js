@@ -23,8 +23,8 @@ import TouchableItem from '../../components/TouchableItem';
 import OutlinedButton from '../../components/buttons/OutlinedButton';
 
 // api
-import {getUser} from '../../api/Account';
-import {auth} from '../../api/Auth';
+import {fetchUser} from '../../api/Account';
+import {auth, logout} from '../../api/Auth';
 
 // import colors
 import Colors from '../../theme/colors';
@@ -199,23 +199,21 @@ const Profile = props => {
   const getProfile = async () => {
     let user = await AsyncStorage.getItem('@user');
     if (!user) {
-      const response = await getUser();
+      const response = await fetchUser();
       if (response.data) {
         await AsyncStorage.setItem('@user', JSON.stringify(response.data));
       }
       user = response.data;
-    } else {
-      user = JSON.parse(user);
     }
 
-    setUsername(user.username);
+    setUsername(user.selected_account.username);
     setPhone(`+${user.phone_ext} ${user.phone}`);
     setEmail(user.email);
-    setAvatar(user.avatar);
+    setAvatar(user.selected_account.avatar);
     return user;
   };
 
-  const logout = () => {
+  const doLogout = () => {
     Alert.alert(
       t('logout'),
       t('logout_confirm'),
@@ -227,9 +225,8 @@ const Profile = props => {
         },
         {
           text: t('logout'),
-          onPress: () => {
-            AsyncStorage.removeItem('@access_token');
-            AsyncStorage.removeItem('@user');
+          onPress: async () => {
+            await logout();
             navigation.navigate('SignIn');
           },
         },
@@ -308,7 +305,7 @@ const Profile = props => {
           />
           {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
 
-          <Setting onPress={logout} icon={EXIT_ICON} title="Logout" />
+          <Setting onPress={doLogout} icon={EXIT_ICON} title="Logout" />
           {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
         </View>
       </ScrollView>

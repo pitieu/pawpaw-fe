@@ -33,26 +33,36 @@ import Cart from '../screens/cart/Cart';
 
 // import Settings screen
 import Profile from '../screens/profile/Profile';
+import MainProfile from '../screens/profile/MainProfile';
 
 // import colors
 import Colors from '../theme/colors';
 import Layout from '../theme/layout';
 
 // API
-import {getAccounts, selectAccount} from '../api/Account';
+import {
+  fetchAccounts,
+  selectAccount,
+  getAccount,
+  getUser,
+} from '../api/Account';
 
 // create bottom tab navigator
 const Tab = createBottomTabNavigator();
 const ProfileStack = createStackNavigator();
 
-let routeName = 0;
+// let routeName = '';
 
 const getHeaderLeft = index => {
   switch (index) {
     case 3:
       return <Text style={styles.headerLeft}>Pet Services</Text>;
     case 4:
-      return <Text style={styles.headerLeft}>Profile</Text>;
+      let account = getAccount().then(() => {
+        console.log(account);
+      });
+
+      return <Text style={styles.headerLeft}>{account?.username}</Text>;
   }
   return <Text style={styles.headerLeft}></Text>;
 };
@@ -60,11 +70,10 @@ const getHeaderLeft = index => {
 const ProfileStackNavigator = () => (
   <ProfileStack.Navigator>
     <ProfileStack.Screen
-      id="profile_stack"
-      name="Profile"
-      component={Profile}
-      options={({navigation, route}) => ({
-        title: 'Profile',
+      name="MainProfile"
+      component={MainProfile}
+      options={({navigation}) => ({
+        title: 'MainProfile',
         headerLeft: () => {
           return getHeaderLeft(navigation.getParent().getState().index);
         },
@@ -83,11 +92,14 @@ const ProfileStackNavigator = () => (
             />
             <HeaderIconButton
               onPress={() => navigation.goBack()}
-              name={'cart-outline'}
+              name={'add-circle-outline'}
               color={Colors.primaryText}
             />
             <HeaderIconButton
-              onPress={() => navigation.goBack()}
+              onPress={() => {
+                console.log('profile click');
+                navigation.navigate('Profile');
+              }}
               name={'menu'}
               color={Colors.primaryText}
             />
@@ -103,21 +115,16 @@ function HomeNavigator() {
   let loaded = false;
   let accountData;
   const navigation = useNavigation();
+  // const route = useRoute();
 
-  const route = useRoute();
+  // useEffect(() => {
+  //   let routeName = getFocusedRouteNameFromRoute(route);
+  //   // console.log('routeName', routeName);
+  // }, [route, navigation]);
 
-  useEffect(() => {
-    routeName = getFocusedRouteNameFromRoute(route);
-    console.log('routeName', routeName);
-
-    // routeIndex = route.state?.index;
-  }, [route, navigation]);
-
-  useLayoutEffect(() => {
-    // console.log('layoutEffect', navigation.getState());
-
-    navigation.setOptions({headerTitle: getHeaderLeft(route)});
-  }, [navigation, route]);
+  // useLayoutEffect(() => {
+  //   navigation.setOptions({headerTitle: getHeaderLeft(route)});
+  // }, [navigation, route]);
 
   const onLongPress = event => {
     if (event.nativeEvent.state === State.ACTIVE) {
@@ -125,9 +132,11 @@ function HomeNavigator() {
 
       const callSheet = accounts => {
         let selected = 0;
+        const user = getUser();
+
         // dynamically create bottom sheet items
         const items = accounts.map((account, index) => {
-          if (account.selected_account) {
+          if (user.selected_account == account._id) {
             selected = index;
           }
           return {
@@ -152,25 +161,26 @@ function HomeNavigator() {
           theme: 'light',
           selection: selected,
           onSelection: (index, value) => {
-            accountData = accountData.map(account => {
+            accountData = accountData.map(async account => {
               if (account._id === value) {
-                AsyncStorage.setItem('@user', JSON.stringify(account));
+                AsyncStorage.setItem('@account', JSON.stringify(account)).then(
+                  async () => {
+                    await selectAccount(value);
+                    // move quickly to home and back to profile to trigger a refresh
+                    // Todo: find a better solution ?
+                    navigation.navigate('Marketplace');
+                    navigation.navigate('ProfileTab');
+                  },
+                );
               }
-              account.selected_account = account._id === value;
               return account;
             });
-
-            selectAccount(value);
-            // move quickly to home and back to profile to trigger a refresh
-            // Todo: find a better solution ?
-            navigation.navigate('Home');
-            navigation.navigate('Profile');
           },
         });
       };
       // we don't need to query over and over the server for accounts
       if (!loaded) {
-        getAccounts().then(accounts => {
+        fetchAccounts().then(accounts => {
           accountData = accounts.data;
           loaded = !loaded;
           callSheet(accounts.data);
@@ -183,14 +193,14 @@ function HomeNavigator() {
 
   return (
     <Tab.Navigator
-      initialRouteName="Profile"
+      initialRouteName="ProfileTab"
       backBehavior="initialRoute"
       screenOptions={({route}) => ({
         tabBarIcon: ({color, focused, size}) => {
           let iconName;
           if (route.name === 'Explore') {
             iconName = 'magnify';
-          } else if (route.name === 'Profile') {
+          } else if (route.name === 'ProfileTab') {
             iconName = `account-settings${focused ? '' : '-outline'}`;
           } else if (route.name === 'Home') {
             iconName = `home${focused ? '' : '-outline'}`;
@@ -200,7 +210,7 @@ function HomeNavigator() {
             iconName = 'dog-service';
           }
 
-          if (route.name === 'Profile') {
+          if (route.name === 'ProfileTab') {
             return (
               <LongPressGestureHandler
                 onHandlerStateChange={onLongPress}
@@ -233,9 +243,15 @@ function HomeNavigator() {
       }}>
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Explore" component={Search} />
-      <Tab.Screen name="Marketplace" component={Cart} />
+      <Tab.Screen name="Marketplace" component={Profile} />
       <Tab.Screen name="Pet Services" component={ProfileStackNavigator} />
-      <Tab.Screen name="Profile" component={ProfileStackNavigator} />
+      <Tab.Screen
+        name="ProfileTab"
+        component={ProfileStackNavigator}
+        options={({navigation}) => ({
+          title: 'Profile',
+        })}
+      />
     </Tab.Navigator>
   );
 }

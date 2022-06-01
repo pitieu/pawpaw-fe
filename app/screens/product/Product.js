@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   },
   productTitle: {
     fontWeight: '700',
-    width:'80%',
+    width: '80%',
     //borderWidth:1
   },
   priceText: {
@@ -182,26 +182,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#efefef',
   },
   bottomArea: {flex: 0, backgroundColor: '#efefef'},
-  starContainer:{
-    flex:1,flexDirection: 'row',
+  starContainer: {
+    flex: 1,
+    flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    padding: 4
+    padding: 4,
   },
-  starText:{
-    backgroundColor:Colors.primaryColor,
-    paddingVertical:2, 
-    paddingHorizontal:4,
-    borderRadius:4, 
-    color:Colors.white
+  starText: {
+    backgroundColor: Colors.primaryColor,
+    paddingVertical: 2,
+    paddingHorizontal: 4,
+    borderRadius: 4,
+    color: Colors.white,
   },
-  categoryStarContainer:{
-    justifyContent:'flex-end', 
-    flexDirection:'row'
+  categoryStarContainer: {
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
   },
-  categoryText:{
-    color:Colors.primaryColor
-  }
+  categoryText: {
+    color: Colors.primaryColor,
+  },
 });
 
 // Product
@@ -215,7 +216,7 @@ export default class Product extends Component {
     };
   }
 
-  navigateTo = (screen) => () => {
+  navigateTo = screen => () => {
     const {navigation} = this.props;
     navigation.navigate(screen);
   };
@@ -233,7 +234,7 @@ export default class Product extends Component {
     });
   };
 
-  setExtraDish = (item) => () => {
+  setExtraDish = item => () => {
     const {product, extras} = this.state;
     const index = extras.indexOf(item);
     const picked = extras[index].picked;
@@ -351,12 +352,19 @@ export default class Product extends Component {
                 <Text style={styles.priceText}>{`$ ${price.toFixed(2)}`}</Text>
               </View>
               <View style={styles.categoryStarContainer}>
-              <View style={styles.starContainer}>
-                    <Text style={styles.starText}>{product.rating} <Icon name={RATING_ICON} size={12} color={Colors.onPrimaryColor} /></Text>
+                <View style={styles.starContainer}>
+                  <Text style={styles.starText}>
+                    {product.rating}{' '}
+                    <Icon
+                      name={RATING_ICON}
+                      size={12}
+                      color={Colors.onPrimaryColor}
+                    />
+                  </Text>
                 </View>
                 <Text style={styles.categoryText}>Soup</Text>
               </View>
-              
+
               <SmallText style={styles.shortDescription}>
                 {description}
               </SmallText>
@@ -424,7 +432,6 @@ export default class Product extends Component {
               titleColor={Colors.onPrimaryColor}
               height={44}
               color={Colors.primaryColor}
-              
               rounded
             />
           </View>
