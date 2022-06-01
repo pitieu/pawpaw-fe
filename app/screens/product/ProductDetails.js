@@ -53,7 +53,7 @@ const data = {
   avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
   title: 'Dove Shampoo Perawatan Rambut Rontok - 1400ml - Free Hair Massager',
   description: 'Description here',
-  reviews: [
+  reviewsList: [
     {
       reviewer_name: 'Edgar Carinos',
       rating: 4,
@@ -201,7 +201,7 @@ const ProductDetails = ({route, t}) => {
             chatId={data.chatId}
           />
           {/* Review Section */}
-          <ReviewCard reviews={data.reviews} />
+          <ReviewCard reviews={data.reviewsList} />
         </ScrollView>
 
         <View style={styles.bottomButtonsContainer}>
