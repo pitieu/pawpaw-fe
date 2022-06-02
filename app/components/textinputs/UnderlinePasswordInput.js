@@ -49,25 +49,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// UnderlinePasswordInput Props
-type Props = {
-  onRef: () => {},
-  onChangeText: () => {},
-  onFocus: () => {},
-  inputFocused: boolean,
-  onSubmitEditing: () => {},
-  returnKeyType: 'done' | 'go' | 'next' | 'search' | 'send',
-  placeholder: string,
-  placeholderTextColor: string,
-  inputTextColor: string,
-  secureTextEntry: boolean,
-  borderColor: string,
-  focusedBorderColor: string,
-  toggleVisible: boolean,
-  toggleText: string,
-  onTogglePress: () => {},
-};
-
 // UnderlinePasswordInput
 const UnderlinePasswordInput = ({
   onRef = () => {},
@@ -85,7 +66,7 @@ const UnderlinePasswordInput = ({
   toggleVisible,
   toggleText,
   onTogglePress,
-}: Props) => (
+}) => (
   <View
     style={[
       styles.container,

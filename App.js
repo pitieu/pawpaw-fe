@@ -2,11 +2,13 @@ import 'react-native-gesture-handler';
 import React from 'react';
 
 // import {LogBox} from 'react-native';
+import {Provider} from 'react-redux';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {enableScreens} from 'react-native-screens';
-import './app/assets/i18n/i18n';
 import Toast, {ErrorToast} from 'react-native-toast-message';
 
+import configureStore from './app/store/configureStore.js';
+import './app/assets/i18n/i18n';
 import Colors from './app/theme/colors';
 
 enableScreens();
@@ -49,10 +51,12 @@ const App = () => {
     }, 1000);
   });
   return (
-    <SafeAreaProvider>
-      <Navigator />
-      <Toast config={toastConfig} />
-    </SafeAreaProvider>
+    <Provider store={configureStore}>
+      <SafeAreaProvider>
+        <Navigator />
+        <Toast config={toastConfig} />
+      </SafeAreaProvider>
+    </Provider>
   );
 };
 

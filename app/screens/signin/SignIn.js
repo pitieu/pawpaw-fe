@@ -1,7 +1,9 @@
 // import dependencies
-import React, {useState} from 'react';
+import React, {useState, useRef, memo} from 'react';
 import {useNavigation} from '@react-navigation/native';
-
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import Toast from 'react-native-toast-message';
 import {
   SafeAreaView,
   StatusBar,
@@ -14,10 +16,6 @@ import {
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import PhoneInput from 'react-native-phone-number-input';
 import {withTranslation} from 'react-i18next';
-import Toast from 'react-native-toast-message';
-
-// config
-import config from '../../config';
 
 // components
 import I18n from '../../assets/i18n/i18n';
@@ -27,7 +25,8 @@ import UnderlinePasswordInput from '../../components/textinputs/UnderlinePasswor
 import SwitchText from '../../components/toggle/switchText';
 
 // api
-import {login} from '../../api/Auth';
+import {login} from '../../store/actions/auth';
+import {toast} from '../../store/actions/toast';
 
 // import colors, layout
 import Colors from '../../theme/colors';
@@ -133,8 +132,9 @@ const styles = StyleSheet.create({
 });
 
 const SignIn = props => {
-  const [phoneComponent, setPhoneComponent] = useState();
-  const [passwordComponent, setPasswordComponent] = useState();
+  const {t, isLoggedIn, message} = props;
+  const phoneComponent = useRef(null);
+
   const [phone, setPhone] = useState('85311317659');
   const [phoneExt, setPhoneExt] = useState('62');
   const [phoneFocused, setPhoneFocused] = useState(true);
@@ -146,9 +146,6 @@ const SignIn = props => {
   const [screen, setScreen] = useState();
 
   const navigation = useNavigation();
-
-  const {t} = props;
-
   const passwordFocus = () => {
     setPhoneFocused(false);
     setPasswordFocused(true);
@@ -164,63 +161,29 @@ const SignIn = props => {
 
   const signIn = async () => {
     setIsLoading(true);
-
     Toast.hide();
 
     let errMessage = '';
     if (!password || password.length < 6) {
-      errMessage = I18n.t('error_password');
+      props.toast(I18n.t('error_password'));
     }
     if (!phone || phone.length < 6) {
-      errMessage = I18n.t('error_phone');
+      props.toast(I18n.t('error_phone'));
     }
-    try {
-      if (phone && password) {
-        const response = await login(
-          phone,
-          phoneComponent.getCallingCode(),
-          password,
-        );
-
-        if (response.status != 200) {
-          // FAIL LOGIN
-          if (response.error_code === 100) {
-            if (response.error_field === 'phone') {
-              errMessage = I18n.t('error_phone');
-            }
-            if (response.error_field === 'phone_ext') {
-              errMessage = I18n.t('error_phone_ext');
-            }
-            if (response.error_field === 'password') {
-              errMessage = I18n.t('error_password');
-            }
-          }
-          if (response.error_code === 101) {
-            errMessage = I18n.t('error_phone_not_found');
-          }
-          if (response.error_code === 102) {
-            errMessage = I18n.t('error_password_not_match');
-          }
-        } else {
-          setPasswordFocused(false);
-          setPhoneFocused(false);
-          setScreen(navigateTo('HomeNavigator'));
-        }
-      }
-      setIsLoading(false);
-    } catch (e) {
-      errMessage = I18n.t('error_server');
-      setIsLoading(false);
+    if (errMessage != '') {
+      return;
     }
-    if (errMessage.length) {
-      Toast.show({
-        type: 'error',
-        text1: errMessage,
-        autoHide: true,
-        visibilityTime: 10 * 1e3, //10 seconds
-        onPress: () => Toast.hide(),
+    props
+      .login(phone, phoneComponent.current.getCallingCode(), password)
+      .then(() => {
+        setIsLoading(false);
+        setPasswordFocused(false);
+        setPhoneFocused(false);
+        setScreen(navigateTo('HomeNavigator'));
+      })
+      .catch(() => {
+        setIsLoading(false);
       });
-    }
   };
 
   return (
@@ -238,9 +201,7 @@ const SignIn = props => {
           </View>
           <View style={styles.form}>
             <PhoneInput
-              ref={r => {
-                setPhoneComponent(r);
-              }}
+              ref={phoneComponent}
               defaultValue={phone}
               placeholder={t('phone_placeholder')}
               defaultCode="ID"
@@ -258,9 +219,6 @@ const SignIn = props => {
               autoFocus></PhoneInput>
 
             <UnderlinePasswordInput
-              onRef={r => {
-                setPasswordComponent(r);
-              }}
               onChangeText={setPassword}
               onFocus={passwordFocus}
               inputFocused={passwordFocused}
@@ -350,6 +308,24 @@ const SignIn = props => {
   );
 };
 
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      login,
+      toast,
+    },
+    dispatch,
+  );
+
+function mapStateToProps(state) {
+  const {isLoggedIn} = state.auth;
+  const {message} = state.message;
+  return {
+    isLoggedIn,
+    message,
+  };
+}
 // SignIn
-export default withTranslation()(SignIn);
-// export default SignIn;
+export default memo(
+  connect(mapStateToProps, mapDispatchToProps)(withTranslation()(SignIn)),
+);

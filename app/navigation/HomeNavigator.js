@@ -59,7 +59,7 @@ const getHeaderLeft = index => {
       return <Text style={styles.headerLeft}>Pet Services</Text>;
     case 4:
       let account = getAccount().then(() => {
-        console.log(account);
+        // console.log(account);
       });
 
       return <Text style={styles.headerLeft}>{account?.username}</Text>;
@@ -97,7 +97,6 @@ const ProfileStackNavigator = () => (
             />
             <HeaderIconButton
               onPress={() => {
-                console.log('profile click');
                 navigation.navigate('Profile');
               }}
               name={'menu'}

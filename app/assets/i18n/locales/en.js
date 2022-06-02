@@ -15,6 +15,8 @@ export default {
   followings: 'Followings',
   reviews: 'reviews',
   sold: 'sold',
+  read_more: 'View more ...',
+  read_less: 'View less ...',
   // screens/signin/SignIn.js
   forgot_password: 'Forgot password?',
   tnc_sign_in: 'By signing in, you accepts our',

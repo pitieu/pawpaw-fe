@@ -111,15 +111,14 @@ function MainNavigatorA() {
           headerTintColor: Colors.onBackground,
           headerTitleAlign: 'center',
         }}>
-        <Stack.Screen name="ProductDetails" component={ProductDetails} />
-        <Stack.Screen name="PetServiceDetails" component={ServiceDetails} />
-        <Stack.Screen name="SocialFeed" component={ProductDetails} />
         <Stack.Screen
           name="SignIn"
           component={SignIn}
           options={{headerShown: false}}
         />
-
+        <Stack.Screen name="ProductDetails" component={ProductDetails} />
+        <Stack.Screen name="PetServiceDetails" component={ServiceDetails} />
+        <Stack.Screen name="SocialFeed" component={ProductDetails} />
         <Stack.Screen
           name="Profile"
           component={Profile}

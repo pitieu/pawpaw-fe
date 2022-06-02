@@ -223,7 +223,6 @@ const SignUp = props => {
         setScreen(navigateTo('HomeNavigator'));
       }
     } catch (e) {
-      console.log(e);
       errMessage = I18n.t('error_server');
     }
     setIsLoading(false);

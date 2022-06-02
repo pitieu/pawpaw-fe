@@ -52,7 +52,8 @@ const data = {
   name: 'Cho Store', //seller name
   avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
   title: 'Dove Shampoo Perawatan Rambut Rontok - 1400ml - Free Hair Massager',
-  description: 'Description here',
+  description:
+    'Alias id quo et sed quas voluptatem atque. Eaque cumque est tempore. Iure aut iste ipsa qui beatae perspiciatis assumenda quam. Dolorum ea molestiae dolores maxime debitis nesciunt qui ad. Neque recusandae ut adipisci doloremque omnis Alias id quo et sed quas voluptatem atque. Eaque cumque est tempore. Iure aut iste ipsa qui beatae perspiciatis assumenda quam. Dolorum ea molestiae dolores maxime debitis nesciunt qui ad. Neque recusandae ut adipisci doloremque omnis Alias id quo et sed quas voluptatem atque. Eaque cumque est tempore. Iure aut iste ipsa qui beatae perspiciatis assumenda quam. Dolorum ea molestiae dolores maxime debitis nesciunt qui ad. Neque recusandae ut adipisci doloremque omnis',
   reviewsList: [
     {
       reviewer_name: 'Edgar Carinos',
@@ -104,8 +105,6 @@ const ProductDetails = ({route, t}) => {
 
   const [activeSlide, setActiveSlide] = useState(0);
   const [liked, setLiked] = useState(0);
-
-  console.log('id', id);
 
   _renderItem = ({item, index}) => {
     return (
@@ -191,7 +190,7 @@ const ProductDetails = ({route, t}) => {
               </Text>
             </View>
           </View>
-          <ProductDetailCard title={data.description} />
+          <ProductDetailCard description={data.description} />
 
           {/* Seller Information */}
           <SellerInformationCard

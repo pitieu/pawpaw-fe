@@ -24,9 +24,9 @@ export const logout = async () => {
   await AsyncStorage.removeItem('@user');
 };
 
-export const login = async (phone, phoneExt, password) => {
+export const doLogin = async (phone, phoneExt, password) => {
   try {
-    const response = await axios({
+    return axios({
       url: `${config.api_address}auth/login`,
       headers: {
         'Content-Type': 'application/json',
@@ -39,19 +39,8 @@ export const login = async (phone, phoneExt, password) => {
         password: password,
       },
     });
-    let userInfo = response.data.user;
-    let account = response.data.user.selected_account;
-    // userInfo.selected_account = account._id;
-    AsyncStorage.setItem('@access_token', response.data.access_token);
-    AsyncStorage.setItem('@refresh_token', response.data.refresh_token);
-    AsyncStorage.setItem('@user', JSON.stringify(userInfo));
-    AsyncStorage.setItem('@account', JSON.stringify(account));
-
-    return response;
   } catch (error) {
-    // console.log(error);
-    // console.log(error.response.data);
-    return error.response.data;
+    return error;
   }
 };
 
