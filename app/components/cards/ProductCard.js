@@ -137,28 +137,29 @@ const styles = StyleSheet.create({
     height: 22,
     backgroundColor: Colors.primaryColor,
   },
-  cartContainer:{
+  cartContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     width: 30,
     height: 30,
     borderRadius: 5,
-    backgroundColor:Colors.primaryColor,
-    marginHorizontal:10,
-    borderRadius:5
+    backgroundColor: Colors.primaryColor,
+    marginHorizontal: 10,
+    borderRadius: 5,
   },
-  starContainer:{
-    flex:1,flexDirection: 'row',
+  starContainer: {
+    flex: 1,
+    flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 1,
-    backgroundColor:Colors.primaryColor, 
-    paddingHorizontal:3,
-    borderRadius:4
+    backgroundColor: Colors.primaryColor,
+    paddingHorizontal: 3,
+    borderRadius: 4,
   },
-  starText:{
-    color:Colors.white
-  }
+  starText: {
+    color: Colors.white,
+  },
 });
 
 // ProductCard State
@@ -197,7 +198,7 @@ export default class ProductCard extends Component<Props, State> {
   }
 
   onCartPress = () => {
-    const { onCartPress = () => { } } = this.props;
+    const {onCartPress = () => {}} = this.props;
     onCartPress();
   };
 
@@ -218,7 +219,7 @@ export default class ProductCard extends Component<Props, State> {
       imageUri,
       title,
       description = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry',
-      rating=4.5,
+      rating = 4.5,
       price = 0,
       quantity = 0,
       swipeoutDisabled,
@@ -246,11 +247,7 @@ export default class ProductCard extends Component<Props, State> {
             useForeground>
             <View style={styles.container}>
               <View style={styles.imageContainer}>
-                <Image
-                  defaultSource={imgHolder}
-                  source={getImgSource(imageUri)}
-                  style={[styles.image]}
-                />
+                <Image source={getImgSource(imageUri)} style={[styles.image]} />
               </View>
 
               <View style={styles.textContainer}>
@@ -258,12 +255,18 @@ export default class ProductCard extends Component<Props, State> {
                   <Subtitle1 numberOfLines={1} style={styles.title}>
                     {title}
                   </Subtitle1>
-                  
                 </View>
 
                 <View style={styles.secondLine}>
                   <View style={styles.starContainer}>
-                    <Text style={styles.starText}>{rating} <Icon name={RATING_ICON} size={12} color={Colors.onPrimaryColor} /></Text>
+                    <Text style={styles.starText}>
+                      {rating}{' '}
+                      <Icon
+                        name={RATING_ICON}
+                        size={12}
+                        color={Colors.onPrimaryColor}
+                      />
+                    </Text>
                   </View>
                   <Subtitle2 numberOfLines={2} style={styles.descriptionText}>
                     {description}

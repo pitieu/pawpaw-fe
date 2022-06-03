@@ -2,6 +2,7 @@ import 'react-native-gesture-handler';
 import React from 'react';
 
 // import {LogBox} from 'react-native';
+import {MenuProvider} from 'react-native-popup-menu';
 import {Provider} from 'react-redux';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {enableScreens} from 'react-native-screens';
@@ -52,10 +53,12 @@ const App = () => {
   });
   return (
     <Provider store={configureStore}>
-      <SafeAreaProvider>
-        <Navigator />
-        <Toast config={toastConfig} />
-      </SafeAreaProvider>
+      <MenuProvider>
+        <SafeAreaProvider>
+          <Navigator />
+          <Toast config={toastConfig} />
+        </SafeAreaProvider>
+      </MenuProvider>
     </Provider>
   );
 };

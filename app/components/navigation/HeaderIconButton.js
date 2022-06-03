@@ -1,10 +1,3 @@
-/**
- * Foodvila - React Native Template
- *
- * @format
- * @flow
- */
-
 // import dependencies
 import React from 'react';
 import {Platform, StyleSheet, View} from 'react-native';
@@ -61,7 +54,7 @@ const renderIcon = (name, size, color) => (
       color="#037aff"
     />
  */
-const HeaderIconButton = (props) => {
+const HeaderIconButton = props => {
   const {
     onPress = () => null,
     rippleColor = 'rgba(0, 0, 0, 0.32)',

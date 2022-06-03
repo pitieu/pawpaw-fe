@@ -55,4 +55,9 @@ export default {
   detail_product: 'Product Details',
   seller_information: 'Seller Information',
   reviews: 'Reviews',
+  // screens/services/AddPetService.js
+  service_name: 'Service Name',
+  service_name_placeholder: 'Dog Sitting, Pet Grooming',
+  service_description: '',
+  service_description_placeholder: '',
 };

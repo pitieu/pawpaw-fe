@@ -6731,6 +6731,11 @@
   "resolved" "https://registry.npmjs.org/react-native-popable/-/react-native-popable-0.4.3.tgz"
   "version" "0.4.3"
 
+"react-native-popup-menu@^0.15.12":
+  "integrity" "sha512-33zMqHW+7rt5m2Bgg7xM8jy1guIdUCE8qJfznYYNRlIt4+fJX/rDcwmJIrkSGrvfhlhhEaG3otW6h25uFZLFfg=="
+  "resolved" "https://registry.npmjs.org/react-native-popup-menu/-/react-native-popup-menu-0.15.12.tgz"
+  "version" "0.15.12"
+
 "react-native-ratings@^8.1.0":
   "integrity" "sha512-+QOJ4G3NjVkI1D+tk4EGx1dCvVfbD2nQdkrj9cXrcAoEiwmbep4z4bZbCKmWMpQ5h2dqbxABU8/eBnbDmvAc3g=="
   "resolved" "https://registry.npmjs.org/react-native-ratings/-/react-native-ratings-8.1.0.tgz"

@@ -148,14 +148,8 @@ export default class EditProfile extends Component {
   };
 
   render() {
-    const {
-      name,
-      nameFocused,
-      email,
-      emailFocused,
-      phone,
-      phoneFocused,
-    } = this.state;
+    const {name, nameFocused, email, emailFocused, phone, phoneFocused} =
+      this.state;
 
     return (
       <SafeAreaView style={styles.container}>

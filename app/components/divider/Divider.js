@@ -1,10 +1,3 @@
-/**
- * Foodvila - React Native Template
- *
- * @format
- * @flow
- */
-
 // import dependencies
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
@@ -13,7 +6,6 @@ import {StyleSheet, View} from 'react-native';
 const styles = StyleSheet.create({
   container: {
     height: 1,
-    
   },
   mh16: {
     marginHorizontal: 16,
@@ -23,7 +15,7 @@ const styles = StyleSheet.create({
 // Divider Props
 type Props = {
   marginLeft: number,
-  type: 'full-bleed' | 'inset' | 'middle'
+  type: 'full-bleed' | 'inset' | 'middle',
 };
 
 // Divider
@@ -33,7 +25,7 @@ const Divider = ({marginLeft, type, color}: Props) => (
       styles.container,
       type === 'inset' && {marginLeft},
       type === 'middle' && styles.mh16,
-      {backgroundColor: color? color:'#eeeeee',}
+      {backgroundColor: color ? color : '#eeeeee'},
     ]}
   />
 );

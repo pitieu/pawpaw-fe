@@ -22,13 +22,13 @@ const styles = StyleSheet.create({
 });
 
 // SafeAreaView Props
-type Prpos = {
+type Props = {
   children: React.ReactNode,
   style: ViewStyle,
 };
 
 // SafeAreaView
-const SafeAreaView = ({children, style, ...rest}: Prpos) => {
+const SafeAreaView = ({children, style, ...rest}: Props) => {
   return (
     <SafeView
       style={[

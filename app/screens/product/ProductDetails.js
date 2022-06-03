@@ -112,7 +112,7 @@ const ProductDetails = ({route, t}) => {
         <Image
           style={styles.image}
           source={{uri: item.photo}}
-          defaultSource="https://randomuser.me/api/portraits/men/5.jpg"
+          // defaultSource="https://randomuser.me/api/portraits/men/5.jpg"
         />
       </View>
     );

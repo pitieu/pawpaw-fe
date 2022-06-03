@@ -1,10 +1,9 @@
 // import dependencies
-import React, {Component, useEffect, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {
   Alert,
   Platform,
-  I18nManager,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -16,7 +15,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // import components
 import Avatar from '../../components/avatar/Avatar';
-import Divider from '../../components/divider/Divider';
 import Icon from '../../components/icon/Icon';
 import {Subtitle1, Subtitle2} from '../../components/text/CustomText';
 import TouchableItem from '../../components/TouchableItem';
@@ -313,4 +311,4 @@ const Profile = props => {
   );
 };
 
-export default withTranslation()(Profile);
+export default memo(withTranslation()(Profile));

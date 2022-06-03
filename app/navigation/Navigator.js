@@ -15,6 +15,10 @@ import Icon from 'react-native-vector-icons/dist/MaterialCommunityIcons';
 // import components
 import HeaderIconButton from '../components/navigation/HeaderIconButton';
 
+// import Navigators
+import HomeNavigator from './HomeNavigator';
+import ServiceStackNavigator from './ServiceStackNavigator';
+
 // import Introduction screen
 import Intro from '../screens/introduction/Introduction';
 
@@ -33,13 +37,11 @@ import ForgotPassword from '../screens/forgotpassword/ForgotPassword';
 // import TermsConditions screen
 import TermsConditions from '../screens/terms/TermsConditions';
 
-// import HomeNavigator
-import HomeNavigator from './HomeNavigator';
-
 // import Product screen
 import Product from '../screens/product/Product';
 import ProductDetails from '../screens/product/ProductDetails';
 import ServiceDetails from '../screens/services/PetServiceDetails';
+import AddPetService from '../screens/services/AddService/AddPetService';
 
 import Cart from '../screens/cart/Cart';
 import Favorites from '../screens/favorites/Favorites';
@@ -56,6 +58,7 @@ import Checkout from '../screens/checkout/Checkout';
 
 // import EditProfile screen
 import Profile from '../screens/profile/Profile';
+import EditProfile from '../screens/profile/EditProfile';
 
 // import DeliveryAddress screen
 import DeliveryAddress from '../screens/address/DeliveryAddress';
@@ -98,7 +101,7 @@ function MainNavigatorA() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="SignUp"
+        initialRouteName="ServiceStackNavigator"
         screenOptions={{
           cardOverlayEnabled: false,
           headerStyle: {
@@ -143,21 +146,8 @@ function MainNavigatorA() {
             ),
           })}
         />
-        {/* <Stack.Screen
-          name="Profile"
-          component={Profile}
-          options={({navigation}) => ({
-            title: 'Profile',
-            headerRight: () => (
-              <HeaderIconButton
-                onPress={() => navigation.goBack()}
-                name={'menu'}
-                color={Colors.primaryColor}
-              />
-            ),
-          })}
-        /> */}
-        {/* <Stack.Screen
+
+        <Stack.Screen
           name="EditProfile"
           component={EditProfile}
           options={({navigation}) => ({
@@ -170,7 +160,7 @@ function MainNavigatorA() {
               />
             ),
           })}
-        /> */}
+        />
         <Stack.Screen
           name="Product"
           component={Product}
@@ -186,12 +176,6 @@ function MainNavigatorA() {
           component={Welcome}
           options={{headerShown: false}}
         />
-
-        {/* <Stack.Screen
-          name="Verification"
-          component={Verification}
-          options={{headerShown: false}}
-        /> */}
 
         <Stack.Screen
           name="ForgotPassword"
@@ -210,6 +194,11 @@ function MainNavigatorA() {
           options={{
             title: 'Terms and Conditions',
           }}
+        />
+        <Stack.Screen
+          name="ServiceStackNavigator"
+          component={ServiceStackNavigator}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="HomeNavigator"
