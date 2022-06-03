@@ -132,9 +132,10 @@ const styles = StyleSheet.create({
 });
 
 const SignIn = props => {
-  const {t, isLoggedIn, message} = props;
+  const {t} = props;
   const phoneComponent = useRef(null);
 
+  const [usernameComponent, setUsernameComponent] = useState();
   const [phone, setPhone] = useState('85311317659');
   const [phoneExt, setPhoneExt] = useState('62');
   const [phoneFocused, setPhoneFocused] = useState(true);
@@ -163,27 +164,23 @@ const SignIn = props => {
     setIsLoading(true);
     Toast.hide();
 
-    let errMessage = '';
     if (!password || password.length < 6) {
       props.toast(I18n.t('error_password'));
-    }
-    if (!phone || phone.length < 6) {
+    } else if (!phone || phone.length < 6) {
       props.toast(I18n.t('error_phone'));
+    } else {
+      props
+        .login(phone, phoneComponent.current.getCallingCode(), password)
+        .then(() => {
+          setIsLoading(false);
+          setPasswordFocused(false);
+          setPhoneFocused(false);
+          setScreen(navigateTo('HomeNavigator'));
+        })
+        .catch(() => {
+          setIsLoading(false);
+        });
     }
-    if (errMessage != '') {
-      return;
-    }
-    props
-      .login(phone, phoneComponent.current.getCallingCode(), password)
-      .then(() => {
-        setIsLoading(false);
-        setPasswordFocused(false);
-        setPhoneFocused(false);
-        setScreen(navigateTo('HomeNavigator'));
-      })
-      .catch(() => {
-        setIsLoading(false);
-      });
   };
 
   return (
@@ -219,6 +216,10 @@ const SignIn = props => {
               autoFocus></PhoneInput>
 
             <UnderlinePasswordInput
+              onRef={r => {
+                setUsernameComponent(r);
+              }}
+              value={password}
               onChangeText={setPassword}
               onFocus={passwordFocus}
               inputFocused={passwordFocused}
@@ -317,15 +318,16 @@ const mapDispatchToProps = dispatch =>
     dispatch,
   );
 
-function mapStateToProps(state) {
-  const {isLoggedIn} = state.auth;
-  const {message} = state.message;
-  return {
-    isLoggedIn,
-    message,
-  };
-}
+// function mapStateToProps(state) {
+//   const {isLoggedIn} = state.auth;
+//   const {message} = state.message;
+//   return {
+//     isLoggedIn,
+//     message,
+//   };
+// }
+
 // SignIn
 export default memo(
-  connect(mapStateToProps, mapDispatchToProps)(withTranslation()(SignIn)),
+  connect(null, mapDispatchToProps)(withTranslation()(SignIn)),
 );

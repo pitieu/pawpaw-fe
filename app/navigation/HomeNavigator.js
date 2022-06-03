@@ -91,7 +91,7 @@ const ProfileStackNavigator = () => (
               color={Colors.primaryText}
             />
             <HeaderIconButton
-              onPress={() => navigation.goBack()}
+              onPress={() => {}}
               name={'add-circle-outline'}
               color={Colors.primaryText}
             />
@@ -114,16 +114,6 @@ function HomeNavigator() {
   let loaded = false;
   let accountData;
   const navigation = useNavigation();
-  // const route = useRoute();
-
-  // useEffect(() => {
-  //   let routeName = getFocusedRouteNameFromRoute(route);
-  //   // console.log('routeName', routeName);
-  // }, [route, navigation]);
-
-  // useLayoutEffect(() => {
-  //   navigation.setOptions({headerTitle: getHeaderLeft(route)});
-  // }, [navigation, route]);
 
   const onLongPress = event => {
     if (event.nativeEvent.state === State.ACTIVE) {

@@ -21,10 +21,10 @@ export const auth = async navigation => {
 
 export const logout = async () => {
   await AsyncStorage.removeItem('@access_token');
-  await AsyncStorage.removeItem('@user');
+  await AsyncStorage.removeItem('@refresh_token');
 };
 
-export const doLogin = async (phone, phoneExt, password) => {
+export const callLogin = async (phone, phoneExt, password) => {
   try {
     return axios({
       url: `${config.api_address}auth/login`,
@@ -40,13 +40,13 @@ export const doLogin = async (phone, phoneExt, password) => {
       },
     });
   } catch (error) {
-    return error;
+    return Promise.reject(error);
   }
 };
 
-export const register = async (username, phone, phoneExt, password) => {
+export const callRegister = async (username, phone, phoneExt, password) => {
   try {
-    const response = await axios({
+    return axios({
       url: `${config.api_address}auth/register`,
       headers: {
         'Content-Type': 'application/json',
@@ -60,10 +60,7 @@ export const register = async (username, phone, phoneExt, password) => {
         password: password,
       },
     });
-    return response;
   } catch (error) {
-    // console.log(error);
-    // console.log(error.response.data);
-    return error.response.data;
+    return Promise.reject(error);
   }
 };

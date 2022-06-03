@@ -6,7 +6,7 @@ import {
   LOGOUT,
 } from '../actions/types';
 
-const initialState = {isLoggedIn: false, user: null};
+const initialState = {isLoggedIn: false, user: null, account: null};
 
 export default function (state = initialState, {type, payload}) {
   switch (type) {

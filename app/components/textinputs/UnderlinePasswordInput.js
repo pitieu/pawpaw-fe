@@ -66,6 +66,7 @@ const UnderlinePasswordInput = ({
   toggleVisible,
   toggleText,
   onTogglePress,
+  value,
 }) => (
   <View
     style={[
@@ -83,6 +84,7 @@ const UnderlinePasswordInput = ({
       placeholderTextColor={placeholderTextColor}
       secureTextEntry={secureTextEntry}
       autoCapitalize="none"
+      value={value}
       style={[styles.textInput, inputTextColor && {color: inputTextColor}]}
     />
     <View style={styles.toggleContainer}>

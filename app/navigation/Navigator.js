@@ -98,6 +98,7 @@ function MainNavigatorA() {
   return (
     <NavigationContainer>
       <Stack.Navigator
+        initialRouteName="SignUp"
         screenOptions={{
           cardOverlayEnabled: false,
           headerStyle: {
@@ -114,6 +115,11 @@ function MainNavigatorA() {
         <Stack.Screen
           name="SignIn"
           component={SignIn}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="SignUp"
+          component={SignUp}
           options={{headerShown: false}}
         />
         <Stack.Screen name="ProductDetails" component={ProductDetails} />
@@ -180,11 +186,7 @@ function MainNavigatorA() {
           component={Welcome}
           options={{headerShown: false}}
         />
-        <Stack.Screen
-          name="SignUp"
-          component={SignUp}
-          options={{headerShown: false}}
-        />
+
         {/* <Stack.Screen
           name="Verification"
           component={Verification}

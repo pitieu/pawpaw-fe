@@ -1,6 +1,9 @@
 // import dependencies
-import React, {useState} from 'react';
+import React, {useState, useRef, memo} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import Toast from 'react-native-toast-message';
 import {
   SafeAreaView,
   StatusBar,
@@ -13,7 +16,6 @@ import {
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import PhoneInput from 'react-native-phone-number-input';
 import {withTranslation} from 'react-i18next';
-import Toast from 'react-native-toast-message';
 
 // import components
 import I18n from '../../assets/i18n/i18n';
@@ -23,7 +25,8 @@ import UnderlineTextInput from '../../components/textinputs/UnderlineTextInput';
 import SwitchText from '../../components/toggle/switchText';
 
 // api
-import {register} from '../../api/Auth';
+import {register, login} from '../../store/actions/auth';
+import {toast} from '../../store/actions/toast';
 
 // import colors, layout
 import Colors from '../../theme/colors';
@@ -134,9 +137,13 @@ const styles = StyleSheet.create({
 
 // SignUp
 const SignUp = props => {
-  const [phoneComponent, setPhoneComponent] = useState();
-  const [passwordComponent, setPasswordComponent] = useState();
+  const {t} = props;
+
+  const phoneComponent = useRef(null);
+  // const usernameComponent = useRef(null);
+
   const [usernameComponent, setUsernameComponent] = useState();
+  const [passwordComponent, setPasswordComponent] = useState();
   const [username, setUsername] = useState('marcio');
   const [usernameFocused, setUsernameFocused] = useState(false);
   const [phone, setPhone] = useState('85311317659');
@@ -149,8 +156,6 @@ const SignUp = props => {
   const [screen, setScreen] = useState();
 
   const navigation = useNavigation();
-
-  const {t} = props;
 
   const usernameFocus = () => {
     setUsernameFocused(true);
@@ -180,67 +185,53 @@ const SignUp = props => {
 
   const createAccount = async () => {
     setIsLoading(true);
-
     Toast.hide();
-
-    let errMessage = '';
-    try {
-      const response = await register(
-        username,
-        phone,
-        phoneComponent.getCallingCode(),
-        password,
-      );
-      if (response.status != 200) {
-        // FAIL LOGIN
-        if (response.error_code === 100) {
-          if (response.error_field === 'phone') {
-            errMessage = I18n.t('error_phone');
-          }
-          if (response.error_field === 'phone_ext') {
-            errMessage = I18n.t('error_phone_ext');
-          }
-          if (response.error_field === 'password') {
-            errMessage = I18n.t('error_password');
-          }
-          if (response.error_field === 'username') {
-            errMessage = I18n.t('error_username');
-          }
-        }
-        if (response.error_code === 103) {
-          errMessage = I18n.t('error_phone_exists');
-        }
-        if (response.error_code === 104) {
-          errMessage = I18n.t('error_username_exists');
-        }
-      } else {
-        // SUCCESS LOGIN
-        AsyncStorage.setItem('@access_token', response.data.access_token);
-        AsyncStorage.setItem('@refresh_token', response.data.refresh_token);
-        setUsernameFocused(false);
-        setPhoneFocused(false);
-        setPasswordFocused(false);
-        setScreen(navigateTo('HomeNavigator'));
-      }
-    } catch (e) {
-      errMessage = I18n.t('error_server');
-    }
-    setIsLoading(false);
-
-    if (errMessage.length) {
-      Toast.show({
-        type: 'error',
-        text1: errMessage,
-        autoHide: true,
-        visibilityTime: 10 * 1e3, //10 seconds
-        onPress: () => Toast.hide(),
-      });
+    if (!phone || phone.length < 6) {
+      props.toast(I18n.t('error_phone'));
+    } else if (!username || username.length < 6) {
+      props.toast(I18n.t('error_username'));
+    } else if (!password || password.length < 6) {
+      props.toast(I18n.t('error_password'));
+    } else {
+      props
+        .register(
+          username,
+          phone,
+          phoneComponent.current.getCallingCode(),
+          password,
+        )
+        .then(() => {
+          console.log('register');
+          props
+            .login(phone, phoneComponent.current.getCallingCode(), password)
+            .then(() => {
+              setIsLoading(false);
+              setScreen(navigateTo('HomeNavigator'));
+            })
+            .catch(() => {
+              setScreen(
+                navigateTo('SignIn', {
+                  username,
+                  phone,
+                  phoneExt: phoneComponent.current.getCallingCode(),
+                  password,
+                }),
+              );
+            });
+          setUsernameFocused(false);
+          setPhoneFocused(false);
+          setPasswordFocused(false);
+        })
+        .catch(() => {
+          setIsLoading(false);
+        });
     }
   };
 
-  const focusOn = nextFiled => () => {
-    if (nextFiled) {
-      nextFiled.focus();
+  const focusOn = nextField => () => {
+    console.log(nextField);
+    if (nextField) {
+      nextField.focus();
     }
   };
 
@@ -259,9 +250,7 @@ const SignUp = props => {
           </View>
           <View style={styles.form}>
             <PhoneInput
-              ref={r => {
-                setPhoneComponent(r);
-              }}
+              ref={phoneComponent}
               defaultValue={phone}
               placeholder={t('phone_placeholder')}
               defaultCode="ID"
@@ -282,6 +271,7 @@ const SignUp = props => {
               onRef={r => {
                 setUsernameComponent(r);
               }}
+              value={username}
               onChangeText={setUsername}
               onFocus={usernameFocus}
               inputFocused={usernameFocused}
@@ -301,6 +291,7 @@ const SignUp = props => {
               onRef={r => {
                 setPasswordComponent(r);
               }}
+              value={password}
               onChangeText={setPassword}
               onFocus={passwordFocus}
               inputFocused={passwordFocused}
@@ -367,5 +358,16 @@ const SignUp = props => {
     </SafeAreaView>
   );
 };
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      login,
+      register,
+      toast,
+    },
+    dispatch,
+  );
 
-export default withTranslation()(SignUp);
+export default memo(
+  connect(null, mapDispatchToProps)(withTranslation()(SignUp)),
+);

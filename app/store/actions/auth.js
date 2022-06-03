@@ -10,9 +10,10 @@ import {
   LOGIN_FAIL,
   LOGOUT,
   SET_MESSAGE,
+  CLEAR_MESSAGE,
 } from './types';
 
-import {doLogin} from '../../api/Auth';
+import {callLogin, callRegister} from '../../api/Auth';
 
 const getErrorString = error => {
   return (
@@ -24,10 +25,57 @@ const getErrorString = error => {
 
 export const getUser = () => {};
 
-export const register = (username, email, password) => dispatch => {};
+export const register = (username, phone, phoneExt, password) => dispatch => {
+  return callRegister(username, phone, phoneExt, password).then(
+    response => {
+      dispatch({
+        type: REGISTER_SUCCESS,
+      });
+      dispatch({
+        type: CLEAR_MESSAGE,
+      });
 
-export const login = (phone, phone_ext, password) => dispatch => {
-  return doLogin(phone, phone_ext, password).then(
+      return Promise.resolve();
+    },
+    error => {
+      const message = getErrorString(error);
+      const res = error?.response?.data;
+      let errMessage;
+      // FAIL Register
+      if (res?.error_code === 100) {
+        if (res?.error_field === 'phone') {
+          errMessage = I18n.t('error_phone');
+        }
+        if (res?.error_field === 'phone_ext') {
+          errMessage = I18n.t('error_phone_ext');
+        }
+        if (res?.error_field === 'password') {
+          errMessage = I18n.t('error_password');
+        }
+        if (res?.error_field === 'username') {
+          errMessage = I18n.t('error_username');
+        }
+      }
+      if (res?.error_code === 103) {
+        errMessage = I18n.t('error_phone_exists');
+      }
+      if (res?.error_code === 104) {
+        errMessage = I18n.t('error_username_exists');
+      }
+      dispatch({
+        type: REGISTER_FAIL,
+      });
+      dispatch({
+        type: SET_MESSAGE,
+        payload: errMessage || message,
+      });
+      return Promise.reject();
+    },
+  );
+};
+
+export const login = (phone, phoneExt, password) => dispatch => {
+  return callLogin(phone, phoneExt, password).then(
     response => {
       AsyncStorage.setItem('@access_token', response.data.access_token);
       AsyncStorage.setItem('@refresh_token', response.data.refresh_token);
