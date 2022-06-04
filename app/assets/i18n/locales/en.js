@@ -17,6 +17,7 @@ export default {
   sold: 'sold',
   read_more: 'View more ...',
   read_less: 'View less ...',
+  delete: 'Delete',
   // screens/signin/SignIn.js
   forgot_password: 'Forgot password?',
   tnc_sign_in: 'By signing in, you accepts our',
@@ -57,7 +58,11 @@ export default {
   reviews: 'Reviews',
   // screens/services/AddPetService.js
   service_name: 'Service Name',
-  service_name_placeholder: 'Dog Sitting, Pet Grooming',
-  service_description: '',
-  service_description_placeholder: '',
+  service_name_placeholder: 'Dog Sitting, Pet Grooming...',
+  service_description: 'Description',
+  service_description_placeholder: 'Description related to your service',
+  // components/image/uploadImage.js
+  add_assets: 'Add Photos or Videos',
+  set_primary_image: 'Set as primary',
+  primary: 'Primary',
 };
