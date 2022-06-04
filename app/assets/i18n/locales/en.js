@@ -65,4 +65,6 @@ export default {
   add_assets: 'Add Photos or Videos',
   set_primary_image: 'Set as primary',
   primary: 'Primary',
+  upload_image: 'Upload Images & Videos',
+  error_upload_limit: `Only {{number}} images/videos can be uploaded`,
 };

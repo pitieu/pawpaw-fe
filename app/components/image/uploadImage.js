@@ -1,4 +1,6 @@
 import React, {useEffect, memo, useState, useCallback} from 'react';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {
   View,
   Image,
@@ -8,9 +10,9 @@ import {
   Text,
   StyleSheet,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import {withTranslation} from 'react-i18next';
 import {launchImageLibrary} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 
@@ -24,6 +26,10 @@ import {
 
 // components
 import OutlinedButton from '../../components/buttons/OutlinedButton';
+import {Subtitle1, Subtitle2} from '../text/CustomText';
+
+// api
+import {toast} from '../../store/actions/toast';
 
 // import colors
 import Colors from '../../theme/colors';
@@ -36,13 +42,31 @@ export const {width, height} = Dimensions.get('window');
 
 const {SlideInMenu} = renderers;
 
-const PHOTO_LIMITS = 6;
+const PHOTOS_PER_ROW = 3;
 const VIDEO_MAX_DURATION_SECONDS = 10 * 60; //10 minutes
-const PHOTOS_PER_ROW = 4;
-const PHOTO_WIDTH = width / PHOTOS_PER_ROW;
-const PHOTO_HEIGHT = width / PHOTOS_PER_ROW; // use width to make a rectangle
+const PHOTO_LIMITS = 6;
+
+// Layout related
+const CONTAINER_PADDING = Layout.SMALL_PADDING;
+const IMAGE_CONTAINER_MARGIN = 0;
+const SPACE_PADDING = 5;
+const PHOTO_WIDTH =
+  (width -
+    2 * IMAGE_CONTAINER_MARGIN -
+    PHOTOS_PER_ROW * 3 * SPACE_PADDING -
+    2 * CONTAINER_PADDING) /
+  PHOTOS_PER_ROW;
+const PHOTO_HEIGHT =
+  (width -
+    2 * IMAGE_CONTAINER_MARGIN -
+    PHOTOS_PER_ROW * 3 * SPACE_PADDING -
+    2 * CONTAINER_PADDING) /
+  PHOTOS_PER_ROW; // use width to make a rectangle
 
 const IOS = Platform.OS === 'ios';
+// ICONS
+const TRASH_ICON = IOS ? 'ios-trash-outline' : 'md-trash-outline';
+const PRIMARY_ICON = IOS ? 'ios-ribbon' : 'md-ribbon';
 
 // TODO find a way to allow images added in order.
 // TODO FIXED but manually overwrote file. should wait for merge
@@ -136,7 +160,6 @@ const UploadImage = props => {
       let _photos = response?.assets;
       if (_photos) {
         setPhotos(photos => {
-          console.log(_photos);
           if (!photos?.length) {
             _photos[0].default = true;
           }
@@ -144,11 +167,15 @@ const UploadImage = props => {
             [...photos, ..._photos],
             'fileSize',
           );
-          console.log(res.map(item => item.fileSize));
-          return res;
+          if (res.length > PHOTO_LIMITS) {
+            props.toast(t('error_upload_limit', {number: PHOTO_LIMITS}));
+            return photos;
+          } else {
+            console.log(res.map(item => item.fileSize));
+            return res;
+          }
         });
       }
-      //   console.log(photos);
     }
   }, [photos]);
 
@@ -183,71 +210,83 @@ const UploadImage = props => {
     );
   }, []);
 
-  const imageItem = useCallback(({item}) => {
-    if (!item.uri) {
-      return (
-        <View style={[styles.addBtnContainer, styles.imageContainer]}>
-          <Icon
-            onPress={handleChoosePhoto}
-            name={'add-circle-outline'}
-            size={26}
-            color={Colors.focusColor}
-          />
-        </View>
-      );
-    }
+  const imageItem = useCallback(
+    ({item}) => {
+      if (!item.uri && photos.length < PHOTO_LIMITS) {
+        return (
+          <TouchableOpacity
+            key={item.uri}
+            style={[styles.addBtnContainer, styles.imageContainer]}
+            onPress={handleChoosePhoto}>
+            <Icon
+              name={'add-circle-outline'}
+              size={26}
+              color={Colors.focusColor}
+            />
+          </TouchableOpacity>
+        );
+      }
 
-    if (item.uri) {
-      return (
-        <View style={styles.imageContainer}>
-          <Menu renderer={SlideInMenu} style={styles.menu}>
-            <MenuTrigger>
-              <View
-                style={[
-                  styles.imageGroup,
-                  item.default ? styles.imageGroupDefault : {},
-                ]}>
-                <Image source={{uri: item.uri}} style={styles.image} />
-              </View>
-            </MenuTrigger>
-            <MenuOptions customStyles={styles.menuOptions}>
-              <MenuOption
-                value={item.fileName}
-                onSelect={setPrimaryImage}
-                style={styles.menuOption}>
-                <Icon
-                  style={styles.menuOptionIcon}
-                  name={'add-circle-outline'}
-                  size={IOS ? 26 : 24}
-                  color={Colors.primaryText}
-                />
-                <Text style={styles.menuItemText}>
-                  {t('set_primary_image').toUpperCase()}
-                </Text>
-              </MenuOption>
-              <MenuOption
-                value={item.fileName}
-                onSelect={deletePhoto}
-                style={styles.menuOption}>
-                <Icon
-                  style={styles.menuOptionIcon}
-                  name={'add-circle-outline'}
-                  size={IOS ? 26 : 24}
-                  color={Colors.primaryText}
-                />
-                <Text style={styles.menuItemText}>
-                  {t('delete').toUpperCase()}
-                </Text>
-              </MenuOption>
-            </MenuOptions>
-          </Menu>
-        </View>
-      );
-    }
-  }, []);
+      if (item.uri) {
+        return (
+          <View style={styles.imageContainer}>
+            <Menu renderer={SlideInMenu} style={styles.menu}>
+              <MenuTrigger>
+                <View
+                  style={[
+                    styles.imageGroup,
+                    item.default ? styles.imageGroupDefault : {},
+                  ]}>
+                  <Image source={{uri: item.uri}} style={styles.image} />
+                </View>
+              </MenuTrigger>
+              <MenuOptions customStyles={styles.menuOptions}>
+                <MenuOption
+                  value={item.fileName}
+                  onSelect={setPrimaryImage}
+                  style={styles.menuOption}>
+                  <Icon
+                    style={styles.menuOptionIcon}
+                    name={PRIMARY_ICON}
+                    size={IOS ? 26 : 24}
+                    color={Colors.primaryText}
+                  />
+                  <Text style={styles.menuItemText}>
+                    {t('set_primary_image').toUpperCase()}
+                  </Text>
+                </MenuOption>
+                <MenuOption
+                  value={item.fileName}
+                  onSelect={deletePhoto}
+                  style={styles.menuOption}>
+                  <Icon
+                    style={styles.menuOptionIcon}
+                    name={TRASH_ICON}
+                    size={IOS ? 26 : 24}
+                    color={Colors.primaryText}
+                  />
+                  <Text style={styles.menuItemText}>
+                    {t('delete').toUpperCase()}
+                  </Text>
+                </MenuOption>
+              </MenuOptions>
+            </Menu>
+          </View>
+        );
+      }
+      return <></>;
+    },
+    [photos],
+  );
 
   return (
     <View style={styles.container}>
+      <View style={styles.subtitleContainer}>
+        <Subtitle2>{t('upload_image')}</Subtitle2>
+        <Subtitle2>
+          &nbsp;({photos.length}/{PHOTO_LIMITS})
+        </Subtitle2>
+      </View>
       <AnimatedFlatList
         style={styles.container}
         data={[...photos, {}]}
@@ -261,8 +300,12 @@ const UploadImage = props => {
 };
 
 const styles = StyleSheet.create({
-  menu: {paddingBottom: 30},
-  menuOptions: {paddingBottom: 20},
+  subtitleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+  },
+  menu: {},
+  menuOptions: {},
   menuOption: {
     padding: 20,
     flexDirection: 'row',
@@ -283,9 +326,10 @@ const styles = StyleSheet.create({
     height: PHOTO_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
+    margin: SPACE_PADDING,
   },
   container: {
-    padding: Layout.SMALL_PADDING,
+    padding: CONTAINER_PADDING,
     // backgroundColor: 'green',
   },
   imageGroupDefault: {
@@ -293,11 +337,11 @@ const styles = StyleSheet.create({
   },
   imageGroup: {
     backgroundColor: 'transparent',
-    padding: 5,
+    padding: SPACE_PADDING,
     borderRadius: 5,
   },
   imageContainer: {
-    margin: 5,
+    // margin: IMAGE_CONTAINER_MARGIN,
   },
   image: {
     borderWidth: 5,
@@ -311,5 +355,12 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      toast,
+    },
+    dispatch,
+  );
 
-export default memo(UploadImage);
+export default memo(connect(null, mapDispatchToProps)(UploadImage));
