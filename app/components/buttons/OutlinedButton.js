@@ -66,25 +66,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// OutlinedButton Props
-type Props = {
-  onPress: () => void,
-  activeOpacity: number,
-  buttonStyle: ViewStyle,
-  height: number,
-  borderColor: string,
-  borderRadius: number,
-  color: string,
-  iconColor: string,
-  iconName: string,
-  socialIconName: string,
-  iconMoonName: string,
-  title: string,
-  titleColor: string,
-  rippleColor: string,
-  rounded: boolean,
-};
-
 // OutlinedButton
 const OutlinedButton = ({
   onPress,
@@ -102,7 +83,8 @@ const OutlinedButton = ({
   titleColor,
   rippleColor = Colors.primaryColor,
   rounded,
-}: Props) => (
+  disabled,
+}) => (
   <View
     style={[
       styles.container,
@@ -114,6 +96,7 @@ const OutlinedButton = ({
       buttonStyle,
     ]}>
     <TouchableItem
+      disabled={disabled}
       onPress={onPress}
       activeOpacity={activeOpacity}
       rippleColor={rippleColor}>

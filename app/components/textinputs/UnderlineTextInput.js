@@ -1,19 +1,6 @@
-/**
- * Foodvila - React Native Template
- *
- * @format
- * @flow
- */
-
 // import dependencies
-import React from 'react';
-import {
-  I18nManager,
-  StyleSheet,
-  TextInput,
-  View,
-  ViewStyle,
-} from 'react-native';
+import React, {useState} from 'react';
+import {I18nManager, StyleSheet, TextInput, View, Text} from 'react-native';
 
 // import colors
 import Colors from '../../theme/colors';
@@ -30,8 +17,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 8,
-    paddingVertical: 4,
-    paddingHorizontal: 4,
+    // paddingVertical: 4,
+    // paddingHorizontal: 4,
+    marginBottom: 8,
     borderBottomWidth: 1,
     borderColor: 'rgba(0, 0, 0, 0.2)',
     width: INPUT_WIDTH,
@@ -44,91 +32,137 @@ const styles = StyleSheet.create({
     color: Colors.primaryText,
     textAlign: isRTL ? 'right' : 'left',
   },
+  underlineContainer: {
+    marginTop: -4,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  underline: {
+    color: Colors.onSurface,
+  },
+  limitCount: {
+    color: Colors.onSurface,
+  },
+  overline: {
+    marginTop: 30,
+    fontWeight: 'bold',
+  },
+  decoBeforeInput: {
+    marginRight: 5,
+    fontWeight: 'bold',
+  },
+  decoAfterInput: {
+    marginLeft: 5,
+    fontWeight: 'bold',
+  },
 });
-
-// UnderlineTextInput Props
-type Props = {
-  onRef: () => {},
-  onChangeText: () => {},
-  onFocus: () => {},
-  inputFocused: boolean,
-  onSubmitEditing: () => {},
-  returnKeyType: 'done' | 'go' | 'next' | 'search' | 'send',
-  blurOnSubmit: boolean,
-  onKeyPress: () => {},
-  keyboardType:
-    | 'default'
-    | 'number-pad'
-    | 'decimal-pad'
-    | 'numeric'
-    | 'email-address'
-    | 'phone-pad',
-  autoCapitalize: 'none' | 'sentences' | 'words' | 'characters',
-  maxLength: number,
-  placeholder: string,
-  placeholderTextColor: string,
-  value: string,
-  inputTextColor: string,
-  secureTextEntry: boolean,
-  borderColor: string,
-  focusedBorderColor: string,
-  inputContainerStyle: ViewStyle,
-  inputStyle: ViewStyle,
-};
 
 // UnderlineTextInput
 const UnderlineTextInput = ({
   onRef = () => {},
   onChangeText,
-  onFocus,
-  inputFocused,
+  onFocus = () => {},
   onSubmitEditing,
-  returnKeyType,
+  returnKeyType, //'done' | 'go' | 'next' | 'search' | 'send',
   blurOnSubmit,
   onKeyPress,
-  keyboardType,
-  autoCapitalize = 'none',
-  maxLength,
+  keyboardType, // 'default' | 'number-pad' | 'decimal-pad' | 'numeric' | 'email-address' | 'phone-pad',
+  autoCapitalize = 'none', //'none' | 'sentences' | 'words' | 'characters',
+  maxLength = 60,
   placeholder,
   placeholderTextColor,
   value,
   inputTextColor,
   secureTextEntry,
   borderColor,
-  focusedBorderColor,
+  focusedBorderColor = Colors.primaryColor,
   inputContainerStyle,
   inputStyle,
-}: Props) => (
-  <View
-    style={[
-      styles.container,
-      borderColor && {borderColor},
-      inputFocused && {borderColor: focusedBorderColor},
-      inputContainerStyle && inputContainerStyle,
-    ]}>
-    <TextInput
-      ref={r => onRef(r)}
-      onChangeText={onChangeText}
-      onFocus={onFocus}
-      inputFocused={inputFocused}
-      onSubmitEditing={onSubmitEditing}
-      returnKeyType={returnKeyType}
-      blurOnSubmit={blurOnSubmit}
-      onKeyPress={onKeyPress}
-      keyboardType={keyboardType}
-      autoCapitalize={autoCapitalize}
-      maxLength={maxLength}
-      placeholder={placeholder}
-      placeholderTextColor={placeholderTextColor}
-      value={value}
-      secureTextEntry={secureTextEntry}
-      style={[
-        styles.textInput,
-        inputTextColor && {color: inputTextColor},
-        inputStyle,
-      ]}
-    />
-  </View>
-);
+  underline,
+  showMaxLength,
+  overline,
+  overlineStyle,
+  overlineColor,
+  decoBeforeInput,
+  decoBeforeInputStyle,
+  decoAfterInput,
+  decoAfterInputStyle,
+  mandatory,
+}) => {
+  const [inputFocused, setInputFocused] = useState(false);
+  const doFocus = attr => {
+    setInputFocused(true);
+    onFocus(attr);
+  };
+
+  const unFocus = attr => {
+    setInputFocused(false);
+  };
+
+  return (
+    <View>
+      {overline && (
+        <Text
+          style={[
+            styles.overline,
+            overlineStyle,
+            overlineColor && {color: overlineColor},
+          ]}>
+          {overline}&nbsp;{mandatory}
+        </Text>
+      )}
+      <View
+        style={[
+          styles.container,
+          borderColor && {borderColor},
+          inputFocused && {borderColor: focusedBorderColor},
+          inputContainerStyle && inputContainerStyle,
+        ]}>
+        <Text style={[styles.decoBeforeInput, decoBeforeInputStyle]}>
+          {decoBeforeInput}
+        </Text>
+        <TextInput
+          ref={r => onRef(r)}
+          onChangeText={onChangeText}
+          onFocus={doFocus}
+          onBlur={unFocus}
+          inputFocused={inputFocused}
+          onSubmitEditing={onSubmitEditing}
+          returnKeyType={returnKeyType}
+          blurOnSubmit={blurOnSubmit}
+          onKeyPress={onKeyPress}
+          keyboardType={keyboardType}
+          autoCapitalize={autoCapitalize}
+          maxLength={maxLength}
+          placeholder={placeholder}
+          placeholderTextColor={placeholderTextColor}
+          value={value}
+          secureTextEntry={secureTextEntry}
+          style={[
+            styles.textInput,
+            inputTextColor && {color: inputTextColor},
+            inputStyle,
+          ]}
+        />
+        <Text style={[styles.decoAfterInput, decoAfterInputStyle]}>
+          {decoAfterInput}
+        </Text>
+      </View>
+
+      <View
+        style={[
+          styles.underlineContainer,
+          !underline && {justifyContent: 'flex-end'},
+        ]}>
+        {underline && <Text style={styles.underline}>{underline}</Text>}
+        {showMaxLength && (
+          <Text style={styles.limitCount}>
+            {value.length}/{maxLength}
+          </Text>
+        )}
+      </View>
+    </View>
+  );
+};
 
 export default UnderlineTextInput;

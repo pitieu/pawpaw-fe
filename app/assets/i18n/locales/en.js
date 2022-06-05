@@ -18,6 +18,7 @@ export default {
   read_more: 'View more ...',
   read_less: 'View less ...',
   delete: 'Delete',
+  sell: 'Sell',
   // screens/signin/SignIn.js
   forgot_password: 'Forgot password?',
   tnc_sign_in: 'By signing in, you accepts our',
@@ -59,12 +60,23 @@ export default {
   // screens/services/AddPetService.js
   service_name: 'Service Name',
   service_name_placeholder: 'Dog Sitting, Pet Grooming...',
+  service_details: 'Service Details',
+  service_details_subtitle: 'Complete service information',
   service_description: 'Description',
   service_description_placeholder: 'Description related to your service',
+  service_description_subtitle: 'Write service description',
+  service_delivery: 'Service Delivery',
+  service_delivery_subtitle: 'Choose where the service takes place',
+  service_options: 'Service Options',
+  service_options_subtitle:
+    'Write the service options(e.g. weight, duration etc..) Write the service options(e.g. weight, duration etc..)',
+  service_addons: 'Add-ons',
+  service_addons_subtitle: 'Write service add-ons',
+  save_draft: 'Save Draft',
   // components/image/uploadImage.js
   add_assets: 'Add Photos or Videos',
   set_primary_image: 'Set as primary',
   primary: 'Primary',
   upload_image: 'Upload Images & Videos',
-  error_upload_limit: `Only {{number}} images/videos can be uploaded`,
+  error_upload_limit: `Only {{photo_limit}} images/videos can be uploaded`,
 };

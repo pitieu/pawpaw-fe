@@ -47,7 +47,7 @@ const VIDEO_MAX_DURATION_SECONDS = 10 * 60; //10 minutes
 const PHOTO_LIMITS = 6;
 
 // Layout related
-const CONTAINER_PADDING = Layout.SMALL_PADDING;
+const CONTAINER_PADDING = Layout.LARGE_PADDING;
 const IMAGE_CONTAINER_MARGIN = 0;
 const SPACE_PADDING = 5;
 const PHOTO_WIDTH =
@@ -168,7 +168,7 @@ const UploadImage = props => {
             'fileSize',
           );
           if (res.length > PHOTO_LIMITS) {
-            props.toast(t('error_upload_limit', {number: PHOTO_LIMITS}));
+            props.toast(t('error_upload_limit', {photo_limit: PHOTO_LIMITS}));
             return photos;
           } else {
             console.log(res.map(item => item.fileSize));
@@ -279,6 +279,7 @@ const UploadImage = props => {
     [photos],
   );
 
+  // TODO add an option to hide subtitleContainer from parent
   return (
     <View style={styles.container}>
       <View style={styles.subtitleContainer}>
@@ -288,7 +289,7 @@ const UploadImage = props => {
         </Subtitle2>
       </View>
       <AnimatedFlatList
-        style={styles.container}
+        style={styles.flatList}
         data={[...photos, {}]}
         numColumns={PHOTOS_PER_ROW}
         renderItem={photos.length ? imageItem : defaultItem}
@@ -300,14 +301,19 @@ const UploadImage = props => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    padding: CONTAINER_PADDING,
+  },
   subtitleContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
+    // marginHorizontal: Layout.LARGE_MARGIN,
+    marginBottom: Layout.SMALL_MARGIN,
   },
   menu: {},
   menuOptions: {},
   menuOption: {
-    padding: 20,
+    padding: Layout.LARGE_PADDING,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -328,10 +334,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     margin: SPACE_PADDING,
   },
-  container: {
-    padding: CONTAINER_PADDING,
-    // backgroundColor: 'green',
-  },
+
   imageGroupDefault: {
     backgroundColor: Colors.focusColor,
   },
@@ -352,7 +355,8 @@ const styles = StyleSheet.create({
   },
 
   btnOutline: {
-    width: '100%',
+    flex: 1,
+    // margin: Layout.SMALL_MARGIN,
   },
 });
 const mapDispatchToProps = dispatch =>

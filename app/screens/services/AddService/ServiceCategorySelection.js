@@ -47,11 +47,8 @@ const Setting = ({image, icon, title, onPress, extraData}) => (
           />
         </View>
         <View style={styles.textContainer}>
-          <Text style={styles.mediumText}>{title}</Text>
-          <Text
-            numberOfLines={5}
-            ellipsizeMode="tail"
-            style={styles.extraDataText}>
+          <Text style={styles.title}>{title}</Text>
+          <Text numberOfLines={5} ellipsizeMode="tail" style={styles.subtitle}>
             {extraData || ''}
           </Text>
         </View>
@@ -148,8 +145,8 @@ const styles = StyleSheet.create({
   extraData: {
     // textAlign: 'left',
   },
-  extraDataText: {},
-  mediumText: {
+  subtitle: {},
+  title: {
     fontWeight: 'bold',
     color: Colors.primaryText,
     marginBottom: 8,

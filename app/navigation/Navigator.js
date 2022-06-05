@@ -41,7 +41,6 @@ import TermsConditions from '../screens/terms/TermsConditions';
 import Product from '../screens/product/Product';
 import ProductDetails from '../screens/product/ProductDetails';
 import ServiceDetails from '../screens/services/PetServiceDetails';
-import AddPetService from '../screens/services/AddService/AddPetService';
 
 import Cart from '../screens/cart/Cart';
 import Favorites from '../screens/favorites/Favorites';
