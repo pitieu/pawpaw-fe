@@ -3,15 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import I18n from '../../assets/i18n/i18n';
 
 // action & types
-import {
-  REGISTER_SUCCESS,
-  REGISTER_FAIL,
-  LOGIN_SUCCESS,
-  LOGIN_FAIL,
-  LOGOUT,
-  SET_MESSAGE,
-  CLEAR_MESSAGE,
-} from './types';
+import {messageActionTypes} from '../reducers/message';
+import {authActionTypes} from '../reducers/auth';
 
 import {callLogin, callRegister} from '../../api/Auth';
 
@@ -29,10 +22,10 @@ export const register = (username, phone, phoneExt, password) => dispatch => {
   return callRegister(username, phone, phoneExt, password).then(
     response => {
       dispatch({
-        type: REGISTER_SUCCESS,
+        type: authActionTypes.REGISTER_SUCCESS,
       });
       dispatch({
-        type: CLEAR_MESSAGE,
+        type: messageActionTypes.CLEAR_MESSAGE,
       });
 
       return Promise.resolve();
@@ -63,10 +56,10 @@ export const register = (username, phone, phoneExt, password) => dispatch => {
         errMessage = I18n.t('error_username_exists');
       }
       dispatch({
-        type: REGISTER_FAIL,
+        type: authActionTypes.REGISTER_FAIL,
       });
       dispatch({
-        type: SET_MESSAGE,
+        type: messageActionTypes.SET_MESSAGE,
         payload: errMessage || message,
       });
       return Promise.reject();
@@ -81,11 +74,11 @@ export const login = (phone, phoneExt, password) => dispatch => {
       AsyncStorage.setItem('@refresh_token', response.data.refresh_token);
 
       dispatch({
-        type: LOGIN_SUCCESS,
+        type: authActionTypes.LOGIN_SUCCESS,
         payload: {user: response.data.user},
       });
       dispatch({
-        type: CLEAR_MESSAGE,
+        type: messageActionTypes.CLEAR_MESSAGE,
       });
 
       return Promise.resolve();
@@ -116,7 +109,7 @@ export const login = (phone, phoneExt, password) => dispatch => {
         type: LOGIN_FAIL,
       });
       dispatch({
-        type: SET_MESSAGE,
+        type: messageActionTypes.SET_MESSAGE,
         payload: errMessage || message,
       });
       return Promise.reject();

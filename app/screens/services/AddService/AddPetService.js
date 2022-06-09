@@ -30,8 +30,8 @@ const AddPetService = props => {
     setPhotos(_photos);
   };
 
-  const navigateTo = screen => {
-    navigation.navigate(screen);
+  const navigateTo = (screen, options) => {
+    navigation.navigate(screen, options);
   };
 
   return (
@@ -46,12 +46,26 @@ const AddPetService = props => {
               actionIconColor="green"
               // icon="add"
               // disabled={!photos.length}
-              onPress={() => navigateTo('AddServiceDetail')}
+              onPress={() => navigateTo('AddServiceDetails')}
               title={t('service_details')}
               extraData={t('service_details_subtitle')}
             />
             <Divider type="inset" />
             <ListItem
+              onPress={() =>
+                navigateTo('Test', {
+                  pH: 300,
+                  pW: 300,
+                  pX: 200,
+                  pY: 200,
+                  oH: 200,
+                  oW: 200,
+                  pScale: 100,
+                  uri: 'https://www.statnews.com/wp-content/uploads/2019/05/GettyImages-484960237-645x645.jpg',
+                  borderRadius: false,
+                  unScaled: true,
+                })
+              }
               actionIcon="chevron-forward"
               title={t('service_delivery')}
               extraData={t('service_delivery_subtitle')}

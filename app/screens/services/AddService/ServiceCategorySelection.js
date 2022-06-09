@@ -78,7 +78,7 @@ const ServiceCategorySelection = () => {
         <Divider marginLeft={DIVIDER_MARGIN_LEFT} />
         <Setting
           onPress={() => {
-            navigation.navigate('AddPetService', {service: 'pet_sitting'});
+            navigation.navigate('FullscreenInput', {service: 'pet_sitting'});
           }}
           image="sa"
           title="Pet Sitting"

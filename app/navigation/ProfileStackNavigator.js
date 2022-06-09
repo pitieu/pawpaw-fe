@@ -97,7 +97,7 @@ const ProfileStackNavigator = () => {
                   </MenuOption>
                   <MenuOption
                     onSelect={() => {
-                      navigation.navigate('AddPetService');
+                      navigation.navigate('ServiceStackNavigator');
                     }}
                     style={styles.menuOption}>
                     <Icon
