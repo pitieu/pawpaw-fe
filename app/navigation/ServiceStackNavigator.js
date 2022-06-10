@@ -12,6 +12,7 @@ import AddServiceOptions from '../screens/services/AddService/AddServiceOptions'
 import AddServiceAddons from '../screens/services/AddService/AddServiceAddons';
 import FullscreenInput from '../screens/services/AddService/FullscreenInput';
 import Test from '../screens/services/AddService/Test';
+import Test2 from '../screens/services/AddService/Test2';
 
 // import utils
 import Colors from '../theme/colors';
@@ -112,6 +113,15 @@ const ServiceStackNavigator = ({navigation}) => {
       <ServiceStack.Screen
         name="Test"
         component={Test}
+        options={({navigation}) => ({
+          headerLeft: false,
+          headerRight: false,
+          headerShown: false,
+        })}
+      />
+      <ServiceStack.Screen
+        name="Test2"
+        component={Test2}
         options={({navigation}) => ({
           headerLeft: false,
           headerRight: false,

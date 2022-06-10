@@ -53,7 +53,7 @@ const AddPetService = props => {
             <Divider type="inset" />
             <ListItem
               onPress={() =>
-                navigateTo('Test', {
+                navigateTo('Test2', {
                   pH: 300,
                   pW: 300,
                   pX: 200,

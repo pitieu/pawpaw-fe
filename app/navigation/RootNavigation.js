@@ -18,6 +18,7 @@ export function push(name, params) {
 export function goBack() {
   navigationRef.current?.goBack();
 }
+
 export const navigation = {
   navigate,
   dispatch,
