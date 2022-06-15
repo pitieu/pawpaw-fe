@@ -60,54 +60,42 @@ const ServiceStackNavigator = ({navigation}) => {
         name="AddPetService"
         component={AddPetService}
         options={({navigation}) => ({
-          title: 'Sell Pet Service',
-          headerTitleAlign: 'left',
-          headerLeft: backButton,
+          headerShown: false,
         })}
       />
       <ServiceStack.Screen
         name="AddServiceDetails"
         component={AddServiceDetails}
         options={({navigation}) => ({
-          title: 'Add Service Details',
-          headerTitleAlign: 'left',
-          headerLeft: backButton,
+          headerShown: false,
         })}
       />
       <ServiceStack.Screen
         name="AddServiceDelivery"
         component={AddServiceDelivery}
         options={({navigation}) => ({
-          title: 'Add Service Delivery',
-          headerTitleAlign: 'left',
-          headerLeft: backButton,
+          headerShown: false,
         })}
       />
       <ServiceStack.Screen
         name="AddServiceOptions"
         component={AddServiceOptions}
         options={({navigation}) => ({
-          title: 'Add Service Options',
-          headerTitleAlign: 'left',
-          headerLeft: backButton,
+          headerShown: false,
         })}
       />
       <ServiceStack.Screen
         name="AddServiceAddons"
         component={AddServiceAddons}
         options={({navigation}) => ({
-          title: 'Add Service Addons',
-          headerTitleAlign: 'left',
-          headerLeft: backButton,
+          headerShown: false,
         })}
       />
       <ServiceStack.Screen
         name="FullscreenInput"
         component={FullscreenInput}
         options={({navigation}) => ({
-          title: 'Service Description',
-          headerTitleAlign: 'left',
-          headerLeft: backButton,
+          headerShown: false,
         })}
       />
       <ServiceStack.Screen

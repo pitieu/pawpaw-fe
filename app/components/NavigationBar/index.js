@@ -1,36 +1,43 @@
 import React from 'react';
 import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useNavigation} from '@react-navigation/native';
 
 import Colors from '../../theme/colors';
 import {CHEVRON_BACK_ICON} from '../../constants/icons';
 
 const NavigationBar = ({
-  callback,
   onPressBack,
   title,
-  buttonText,
+  buttonNextText,
   onPressNext,
   buttonCustom,
   titleCustom,
   navigationStyle = {},
 }) => {
-  const _onCallBack = () => {
+  const navigation = useNavigation();
+
+  const backPressed = () => {
     if (onPressBack) {
       onPressBack();
-    } else if (callback) callback();
+    } else {
+      navigation.goBack();
+    }
   };
   return (
     <View style={[styles.navigationBar, navigationStyle]}>
-      <TouchableOpacity onPress={_onCallBack} style={styles.btnBack}>
+      <TouchableOpacity onPress={backPressed} style={styles.btnBack}>
         <Icon name={CHEVRON_BACK_ICON} size={26} />
       </TouchableOpacity>
       {!titleCustom && <Text style={styles.title}>{title}</Text>}
       {titleCustom}
-      {!buttonCustom && (
+      {!buttonCustom && buttonNextText && (
         <TouchableOpacity onPress={onPressNext}>
-          <Text style={styles.btnNext}>{buttonText}</Text>
+          <Text style={styles.btnNext}>{buttonNextText}</Text>
         </TouchableOpacity>
+      )}
+      {!buttonCustom && !buttonNextText && (
+        <View style={styles.placeholderView}></View>
       )}
       {buttonCustom}
     </View>
@@ -52,7 +59,7 @@ const styles = StyleSheet.create({
   },
   btnBack: {
     height: 44,
-    width: 44,
+    marginLeft: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -64,5 +71,10 @@ const styles = StyleSheet.create({
     color: Colors.focusColor,
     fontWeight: 'bold',
     fontSize: 16,
+    marginRight: 16,
+  },
+  placeholderView: {
+    width: 44,
+    marginRight: 16,
   },
 });

@@ -1,18 +1,19 @@
 // import dependencies
-import React, {useState, memo} from 'react';
+import React, {useState, memo, useEffect} from 'react';
 import {
   Platform,
   SafeAreaView,
   StatusBar,
   StyleSheet,
   View,
+  TouchableOpacity,
 } from 'react-native';
 import {withTranslation} from 'react-i18next';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {Subtitle2} from '../../../components/text/CustomText';
 
 // import components
 import UnderlineTextInput from '../../../components/textinputs/UnderlineTextInput';
+import NavigationBar from '../../../components/NavigationBar';
 
 // import colors
 import Colors from '../../../theme/colors';
@@ -22,12 +23,16 @@ const IOS = Platform.OS === 'ios';
 // const INPUT_FOCUSED_BORDER_COLOR = Colors.primaryColor;
 
 const AddServiceDetails = props => {
-  const {t} = props;
+  const {t, navigation, route} = props;
 
-  const [name, setName] = useState('');
+  const [name, setName] = useState(route.params.name);
   const [nameComponent, setNameComponent] = useState();
-  const [description, setDescription] = useState('');
-  const [descriptionComponent, setDescriptionComponent] = useState();
+  const [price, setPrice] = useState(route.params.price);
+  const [priceComponent, setPriceComponent] = useState();
+
+  useEffect(() => {
+    if (nameComponent) nameComponent.focus();
+  }, [nameComponent]);
 
   focusOn = nextField => () => {
     if (nextField) {
@@ -35,9 +40,24 @@ const AddServiceDetails = props => {
     }
   };
 
+  const navigateTo = (screen, options) => {
+    navigation.navigate(screen, options);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={Colors.statusBarColor} />
+      {/* <StatusBar backgroundColor={Colors.statusBarColor} /> */}
+      <NavigationBar
+        title={t('add_service_details_title')}
+        // onPressBack={navigation.goBack}
+        buttonNextText={t('btnNext')}
+        onPressNext={() =>
+          navigateTo('AddPetService', {
+            name: name,
+            price: price,
+          })
+        }
+      />
       <KeyboardAwareScrollView enableOnAndroid>
         <View style={styles.editForm}>
           <UnderlineTextInput
@@ -49,7 +69,7 @@ const AddServiceDetails = props => {
             value={name}
             // underline="Tips: Service Name + Region"
             onChangeText={setName}
-            onSubmitEditing={focusOn(descriptionComponent)}
+            onSubmitEditing={focusOn(priceComponent)}
             returnKeyType="next"
             mandatory={'*'}
             // focusedBorderColor={INPUT_FOCUSED_BORDER_COLOR}
@@ -63,15 +83,23 @@ const AddServiceDetails = props => {
           />
           <UnderlineTextInput
             onRef={r => {
-              setNameComponent(r);
+              setPriceComponent(r);
             }}
-            overline={t('service_description')}
-            placeholder={t('service_description_placeholder')}
-            value={description}
+            overline={t('service_price')}
+            placeholder={t('service_price_placeholder')}
+            value={price}
             // underline="Tips: Service Name + Region"
-            onChangeText={setDescription}
-            onSubmitEditing={focusOn(descriptionComponent)}
-            returnKeyType="next"
+            inputType="currency"
+            onChangeText={setPrice}
+            keyboardType={'numeric'}
+            decoBeforeInput={'Rp.'}
+            onSubmitEditing={() =>
+              navigateTo('AddPetService', {
+                name: name,
+                price: price,
+              })
+            }
+            returnKeyType="done"
             mandatory={'*'}
             // focusedBorderColor={INPUT_FOCUSED_BORDER_COLOR}
             // inputContainerStyle={styles.inputContainerStyle}

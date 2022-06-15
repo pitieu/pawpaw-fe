@@ -1,4 +1,12 @@
-import React, {useEffect, memo, useState, useCallback} from 'react';
+import React, {
+  useEffect,
+  memo,
+  useState,
+  useCallback,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {
@@ -23,6 +31,7 @@ import {
   MenuTrigger,
   renderers,
 } from 'react-native-popup-menu';
+import {t} from 'i18next';
 
 // components
 import OutlinedButton from '../../components/buttons/OutlinedButton';
@@ -31,10 +40,10 @@ import {Subtitle1, Subtitle2} from '../text/CustomText';
 // api
 import {toast} from '../../store/actions/toast';
 
-// import colors
+// import utils
 import Colors from '../../theme/colors';
 import Layout from '../../theme/layout';
-import {t} from 'i18next';
+import {removeDuplicateObjectFromArray} from '../../utils';
 
 export const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -91,16 +100,14 @@ export const createFormData = (photos, body = {}) => {
 
   return data;
 };
-function removeDuplicateObjectFromArray(array, key) {
-  var check = new Set();
-  return array.filter(obj => {
-    return !check.has(obj[key]) && check.add(obj[key]);
-  });
-}
 
-const UploadImage = props => {
-  //   const {t} = props;
+const UploadImage = (props, ref) => {
+  const {uploadType, addPhoto} = props;
   const [photos, setPhotos] = useState([]);
+
+  useImperativeHandle(ref, () => ({
+    updatePhotos,
+  }));
 
   useEffect(() => {
     if (props.onChange) {
@@ -145,39 +152,70 @@ const UploadImage = props => {
   }, []);
 
   const handleChoosePhoto = useCallback(async () => {
-    // For more options
-    // https://github.com/react-native-image-picker/react-native-image-picker
-    response = await launchImageLibrary({
-      noData: true,
-      selectionLimit: PHOTO_LIMITS,
-      durationLimit: VIDEO_MAX_DURATION_SECONDS,
-      quality: 1, // 0 to 1
-      videoQuality: 'high', // low or high
-      mediaType: 'mixed', // allows photos and videos to be uploaded
-    });
+    if (uploadType == 'camera') {
+      addPhoto();
+    } else {
+      // For more options
+      // https://github.com/react-native-image-picker/react-native-image-picker
+      response = await launchImageLibrary({
+        noData: true,
+        selectionLimit: PHOTO_LIMITS,
+        durationLimit: VIDEO_MAX_DURATION_SECONDS,
+        quality: 1, // 0 to 1
+        videoQuality: 'high', // low or high
+        mediaType: 'mixed', // allows photos and videos to be uploaded
+      });
 
-    if (response) {
-      let _photos = response?.assets;
-      if (_photos) {
-        setPhotos(photos => {
-          if (!photos?.length) {
-            _photos[0].default = true;
-          }
-          const res = removeDuplicateObjectFromArray(
-            [...photos, ..._photos],
-            'fileSize',
-          );
-          if (res.length > PHOTO_LIMITS) {
-            props.toast(t('error_upload_limit', {photo_limit: PHOTO_LIMITS}));
-            return photos;
-          } else {
-            console.log(res.map(item => item.fileSize));
-            return res;
-          }
-        });
+      if (response) {
+        let _photos = response?.assets;
+        if (_photos) {
+          // console.log(_photos);
+          updatePhotos(_photos);
+        }
       }
     }
   }, [photos]);
+
+  const updatePhotos = _photos => {
+    // console.log('updatePhotos', _photos);
+
+    if (
+      _photos[0]?.uri &&
+      _photos[0]?.fileName &&
+      _photos[0]?.fileSize &&
+      _photos[0]?.height &&
+      _photos[0]?.width &&
+      _photos[0]?.type
+    ) {
+      setPhotos(photos => {
+        if (!photos?.length) {
+          _photos[0].default = true;
+        }
+        let res = removeDuplicateObjectFromArray(
+          [...photos, ..._photos],
+          'fileSize',
+        );
+        if (uploadType == 'camera') {
+          res = _photos.map(_p => {
+            const p = photos.find(p => _p.fileSize === p.fileSize);
+            return p || _p;
+          });
+
+          if (!res.some(item => item.default)) {
+            res[0].default = true;
+          }
+        }
+
+        if (res.length > PHOTO_LIMITS) {
+          props.toast(t('error_upload_limit', {photo_limit: PHOTO_LIMITS}));
+          return photos;
+        } else {
+          // console.log(res.map(item => item.fileSize));
+          return res;
+        }
+      });
+    }
+  };
 
   const handleUploadPhoto = () => {
     fetch(`${SERVER_URL}/api/upload`, {
@@ -227,7 +265,7 @@ const UploadImage = props => {
         );
       }
 
-      if (item.uri) {
+      if (item.uri && !uploadType) {
         return (
           <View style={styles.imageContainer}>
             <Menu renderer={SlideInMenu} style={styles.menu}>
@@ -274,6 +312,41 @@ const UploadImage = props => {
           </View>
         );
       }
+
+      if (item.uri && uploadType === 'camera') {
+        return (
+          <View style={styles.imageContainer}>
+            <Menu renderer={SlideInMenu} style={styles.menu}>
+              <MenuTrigger>
+                <View
+                  style={[
+                    styles.imageGroup,
+                    item.default ? styles.imageGroupDefault : {},
+                  ]}>
+                  <Image source={{uri: item.uri}} style={styles.image} />
+                </View>
+              </MenuTrigger>
+              <MenuOptions customStyles={styles.menuOptions}>
+                <MenuOption
+                  value={item.fileName}
+                  onSelect={setPrimaryImage}
+                  style={styles.menuOption}>
+                  <Icon
+                    style={styles.menuOptionIcon}
+                    name={PRIMARY_ICON}
+                    size={IOS ? 26 : 24}
+                    color={Colors.primaryText}
+                  />
+                  <Text style={styles.menuItemText}>
+                    {t('set_primary_image').toUpperCase()}
+                  </Text>
+                </MenuOption>
+              </MenuOptions>
+            </Menu>
+          </View>
+        );
+      }
+
       return <></>;
     },
     [photos],
@@ -281,7 +354,7 @@ const UploadImage = props => {
 
   // TODO add an option to hide subtitleContainer from parent
   return (
-    <View style={styles.container}>
+    <View ref={ref} style={styles.container}>
       <View style={styles.subtitleContainer}>
         <Subtitle2>{t('upload_image')}</Subtitle2>
         <Subtitle2>
@@ -367,4 +440,6 @@ const mapDispatchToProps = dispatch =>
     dispatch,
   );
 
-export default memo(connect(null, mapDispatchToProps)(UploadImage));
+export default connect(null, mapDispatchToProps, null, {forwardRef: true})(
+  forwardRef(UploadImage),
+);

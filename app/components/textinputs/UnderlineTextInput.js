@@ -4,6 +4,7 @@ import {I18nManager, StyleSheet, TextInput, View, Text} from 'react-native';
 
 // import colors
 import Colors from '../../theme/colors';
+import {currencyPunctuation} from '../../utils/currency';
 
 // UnderlineTextInput Config
 const isRTL = I18nManager.isRTL;
@@ -88,6 +89,7 @@ const UnderlineTextInput = ({
   decoAfterInput,
   decoAfterInputStyle,
   mandatory,
+  inputType, // currency, ??
 }) => {
   const [inputFocused, setInputFocused] = useState(false);
   const doFocus = attr => {
@@ -97,6 +99,13 @@ const UnderlineTextInput = ({
 
   const unFocus = attr => {
     setInputFocused(false);
+  };
+  const changedText = text => {
+    if (inputType == 'currency') {
+      onChangeText(currencyPunctuation(text));
+    } else {
+      onChangeText(text);
+    }
   };
 
   return (
@@ -123,7 +132,7 @@ const UnderlineTextInput = ({
         </Text>
         <TextInput
           ref={r => onRef(r)}
-          onChangeText={onChangeText}
+          onChangeText={changedText}
           onFocus={doFocus}
           onBlur={unFocus}
           inputFocused={inputFocused}

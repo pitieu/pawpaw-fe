@@ -1,10 +1,3 @@
-/**
- * Foodvila - React Native Template
- *
- * @format
- * @flow
- */
-
 // import dependencies
 import React from 'react';
 import {StyleSheet, ViewStyle} from 'react-native';

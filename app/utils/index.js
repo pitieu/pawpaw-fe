@@ -1,6 +1,13 @@
 const MAPBOX_ACCESS_TOKEN =
   'pk.eyJ1IjoidnVjbXMwMjAyIiwiYSI6ImNrYzd3YXN5YjB0bzQyeWxqaHk3cndkZWUifQ.Rrt9iMYACnqGK-rCblD0Ag';
 
+export const removeDuplicateObjectFromArray = (array, key) => {
+  var check = new Set();
+  return array.filter(obj => {
+    return !check.has(obj[key]) && check.add(obj[key]);
+  });
+};
+
 export const timestampToString = (create_at, suffix) => {
   let diffTime = (new Date().getTime() - (create_at || 0)) / 1000;
   if (diffTime < 60) diffTime = 'Just now';
@@ -68,5 +75,6 @@ export const searchLocation = query => {
 };
 
 export function capitalizeFirstLetter(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  return str.replace(/^\w/, c => c.toUpperCase());
+  // return str.charAt(0).toUpperCase() + str.slice(1);
 }
