@@ -7,3 +7,4 @@ export const FLASH_OFF_ICON = IOS ? 'ios-flash-off' : 'md-flash-off';
 export const CAMERA_RETAKE_ICON = IOS
   ? 'ios-camera-reverse'
   : 'md-camera-reverse';
+export const ADD_ICON = IOS ? 'ios-add' : 'md-add';

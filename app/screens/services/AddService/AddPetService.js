@@ -1,4 +1,5 @@
 // import dependencies
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {
   useState,
   memo,
@@ -8,7 +9,7 @@ import React, {
   useEffect,
 } from 'react';
 import {View, Text, SafeAreaView, StyleSheet, Animated} from 'react-native';
-
+import {useIsFocused} from '@react-navigation/native';
 import {t} from 'i18next';
 
 // components
@@ -25,6 +26,8 @@ import Colors from '../../../theme/colors';
 import Layout from '../../../theme/layout';
 
 const AddPetService = props => {
+  const isFocused = useIsFocused();
+
   const {navigation, route} = props;
   // camera and upload image
   const uploadImageComponent = useRef();
@@ -35,6 +38,8 @@ const AddPetService = props => {
   const [name, setName] = useState(route.params.name);
   const [price, setPrice] = useState(route.params.price);
   const [description, setDescription] = useState(route.params.description);
+  const [services, setServices] = useState(route.params.services);
+  const [addons, setAddons] = useState(route.params.addons);
   //service delivery
   const [deliveryLocation, setDeliveryLocation] = useState(
     route.params.deliveryLocation,
@@ -42,7 +47,7 @@ const AddPetService = props => {
   const [deliveryFee, setDeliveryFee] = useState(route.params.deliveryFee);
 
   useEffect(() => {
-    // console.log('set route', route.params);
+    console.log('set route', route.params);
 
     // service details
     setName(() => route.params.name);
@@ -52,6 +57,24 @@ const AddPetService = props => {
     setDeliveryLocation(() => route.params.deliveryLocation);
     setDeliveryFee(() => route.params.deliveryFee);
   }, [route]);
+
+  useEffect(() => {
+    async function refresh() {
+      let services = await AsyncStorage.getItem('@services');
+      if (services !== null && services !== '') {
+        services = JSON.parse(services);
+        setServices(services);
+        await AsyncStorage.setItem('@services', '');
+      }
+      let addons = await AsyncStorage.getItem('@addons');
+      if (addons !== null && addons !== '') {
+        addons = JSON.parse(addons);
+        setAddons(addons);
+        await AsyncStorage.setItem('@addons', '');
+      }
+    }
+    refresh();
+  }, [isFocused]);
 
   const navigateTo = (screen, options) => {
     navigation.navigate(screen, options);
@@ -99,32 +122,90 @@ const AddPetService = props => {
               />
               <Divider type="inset" />
               <ListItem
-                actionIcon="chevron-forward"
-                actionIconColor="green"
+                actionIcon={name ? 'checkmark' : 'chevron-forward'}
+                actionIconColor={name ? 'green' : 'black'}
                 // icon="add"
                 // disabled={!photos.length}
                 onPress={() =>
                   navigateTo('AddServiceDetails', {
                     name: name,
                     price: price,
+                    services: services,
+                    addons: addons,
+                    service: route.params.service,
                   })
                 }
                 title={t('service_details')}
-                extraData={t('service_details_subtitle')}
+                // extraData={t('service_details_subtitle')}
               />
-              <Text>Name {name}</Text>
-              <Text>Price {price}</Text>
+              {name && <Text style={styles.textDisplay}>{name}</Text>}
               <Divider type="inset" />
               <ListItem
-                actionIcon="chevron-forward"
-                actionIconColor="green"
+                actionIcon={description ? 'checkmark' : 'chevron-forward'}
+                actionIconColor={description ? 'green' : 'black'}
                 // icon="add"
                 // disabled={!photos.length}
                 onPress={() =>
                   navigateTo('FullscreenInput', {description: description})
                 }
                 title={t('service_description')}
-                extraData={t('service_description_subtitle')}
+                extraData={
+                  description ? null : t('service_description_subtitle')
+                }
+              />
+              {description && (
+                <Text
+                  style={styles.textDisplay}
+                  numberOfLines={2}
+                  ellipsizeMode="tail">
+                  {description}
+                </Text>
+              )}
+              <Divider type="inset" />
+              <ListItem
+                actionIcon={
+                  services?.length > 0 ? 'checkmark' : 'chevron-forward'
+                }
+                actionIconColor={services?.length > 0 ? 'green' : 'black'}
+                title={`${t('service_options')} ${
+                  services?.length ? '(' + services?.length + ')' : ''
+                }`}
+                extraData={
+                  services?.length ? null : t('service_options_subtitle')
+                }
+                onPress={() =>
+                  navigateTo('AddServiceOptions', {
+                    service: route.params.service,
+                    services: services,
+                  })
+                }
+              />
+              {/* <View style={styles.textDisplay}>
+                {services && services.length && (
+                  <Text>
+                    {services[0].name} {services[0].price}
+                  </Text>
+                )}
+                {services && services.length > 1 && (
+                  <Text>{services[1].name}</Text>
+                )}
+                {services && services.length > 2 && (
+                  <Text>{services[2].name}</Text>
+                )}
+              </View> */}
+              <Divider type="inset" />
+
+              <ListItem
+                actionIcon="chevron-forward"
+                title={t('service_addons')}
+                extraData={t('service_addons_subtitle')}
+                onPress={() =>
+                  navigateTo('AddServiceAddons', {
+                    service: route.params.service,
+                    addons: addons,
+                    // setAddons: data => setAddons(data),
+                  })
+                }
               />
               <Divider type="inset" />
               <ListItem
@@ -137,18 +218,6 @@ const AddPetService = props => {
                 actionIcon="chevron-forward"
                 title={t('service_delivery')}
                 extraData={t('service_delivery_subtitle')}
-              />
-              <Divider type="inset" />
-              <ListItem
-                actionIcon="chevron-forward"
-                title={t('service_options')}
-                extraData={t('service_options_subtitle')}
-              />
-              <Divider type="inset" />
-              <ListItem
-                actionIcon="chevron-forward"
-                title={t('service_addons')}
-                extraData={t('service_addons_subtitle')}
               />
               <Divider type="inset" />
             </View>
@@ -191,6 +260,12 @@ const AddPetService = props => {
 };
 
 const styles = StyleSheet.create({
+  textDisplay: {
+    paddingLeft: 20,
+    paddingBottom: 30,
+    marginTop: -15,
+    color: Colors.primaryColor,
+  },
   bottomButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

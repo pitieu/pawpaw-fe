@@ -14,6 +14,8 @@ const NavigationBar = ({
   buttonCustom,
   titleCustom,
   navigationStyle = {},
+  buttonRightIcon,
+  onPressButtonRight,
 }) => {
   const navigation = useNavigation();
 
@@ -31,14 +33,26 @@ const NavigationBar = ({
       </TouchableOpacity>
       {!titleCustom && <Text style={styles.title}>{title}</Text>}
       {titleCustom}
-      {!buttonCustom && buttonNextText && (
-        <TouchableOpacity onPress={onPressNext}>
-          <Text style={styles.btnNext}>{buttonNextText}</Text>
-        </TouchableOpacity>
-      )}
-      {!buttonCustom && !buttonNextText && (
-        <View style={styles.placeholderView}></View>
-      )}
+      <View
+        style={{
+          justifyContent: 'flex-end',
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+        {buttonRightIcon && (
+          <TouchableOpacity onPress={onPressButtonRight} style={styles.btnBack}>
+            <Icon name={buttonRightIcon} size={26} />
+          </TouchableOpacity>
+        )}
+        {!buttonCustom && buttonNextText && (
+          <TouchableOpacity onPress={onPressNext}>
+            <Text style={styles.btnNext}>{buttonNextText}</Text>
+          </TouchableOpacity>
+        )}
+        {!buttonCustom && !buttonNextText && !buttonRightIcon && (
+          <View style={styles.placeholderView}></View>
+        )}
+      </View>
       {buttonCustom}
     </View>
   );
@@ -55,11 +69,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottomColor: '#ddd',
-    // borderBottomWidth: 1,
   },
   btnBack: {
     height: 44,
     marginLeft: 16,
+    marginRight: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },

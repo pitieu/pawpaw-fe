@@ -16,7 +16,7 @@ export default function (state = initialState, action) {
         type: 'error',
         text1: payload,
         autoHide: true,
-        visibilityTime: 10 * 1e3, //10 seconds
+        visibilityTime: 5 * 1e3, //5 seconds
         onPress: () => Toast.hide(),
       });
       return {message: payload};

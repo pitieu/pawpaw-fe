@@ -100,7 +100,7 @@ function MainNavigatorA() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="ServiceStackNavigator"
+        initialRouteName="ServiceStackNavigator" //"SignIn"
         screenOptions={{
           cardOverlayEnabled: false,
           headerStyle: {

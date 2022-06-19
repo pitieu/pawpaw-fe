@@ -1,9 +1,7 @@
 // import dependencies
 import React, {useState, memo} from 'react';
 import {
-  Platform,
   SafeAreaView,
-  StatusBar,
   StyleSheet,
   View,
   Text,
@@ -11,17 +9,17 @@ import {
 } from 'react-native';
 import {withTranslation} from 'react-i18next';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {ButtonGroup, CheckBox} from '@rneui/themed';
+import {CheckBox} from '@rneui/themed';
 // import components
 import UnderlineTextInput from '../../../components/textinputs/UnderlineTextInput';
 import NavigationBar from '../../../components/NavigationBar';
+import Divider from '../../../components/divider/Divider';
 
 // import colors
 import Colors from '../../../theme/colors';
 import Layout from '../../../theme/layout';
 
-const IOS = Platform.OS === 'ios';
-// const INPUT_FOCUSED_BORDER_COLOR = Colors.primaryColor;
+const BG_CHECKBOX = '#F8F8F8';
 
 const AddServiceDelivery = props => {
   const {t, navigation, route} = props;
@@ -33,6 +31,9 @@ const AddServiceDelivery = props => {
   const [deliveryFeeComponent, setDeliveryFeeComponent] = useState();
   const [deliveryLocationStore, setDeliveryLocationStore] = useState(
     route.params.deliveryLocationStore,
+  );
+  const [deliveryLocationHome, setDeliveryLocationHome] = useState(
+    route.params.deliveryLocationHome,
   );
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -48,80 +49,122 @@ const AddServiceDelivery = props => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* <StatusBar backgroundColor={Colors.statusBarColor} /> */}
-      <NavigationBar
-        title={t('add_service_delivery_title')}
-        // onPressBack={navigation.goBack}
-        buttonNextText={t('btnNext')}
-        onPressNext={() =>
-          navigateTo('AddPetService', {
-            deliveryFee: deliveryFee,
-          })
-        }
-      />
-      <KeyboardAwareScrollView enableOnAndroid>
-        <View style={styles.editForm}>
+    <SafeAreaView style={styles.wrapper}>
+      <View style={styles.container}>
+        {/* <StatusBar backgroundColor={Colors.statusBarColor} /> */}
+        <NavigationBar
+          title={t('add_service_delivery_title')}
+          // onPressBack={navigation.goBack}
+          buttonNextText={t('btnNext')}
+          onPressNext={() =>
+            navigateTo('AddPetService', {
+              deliveryFee: deliveryFee,
+            })
+          }
+        />
+        <KeyboardAwareScrollView enableOnAndroid>
           <Text style={styles.overline}>
-            {t('service_delivery_location')}&nbsp;*
+            {t('service_delivery_location')}&nbsp;
           </Text>
-          <CheckBox
-            center
-            title="At the store"
-            wrapperStyle={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}
-            iconRight={true}
-            right={true}
-            checked={deliveryLocationStore}
-            onPress={() => setDeliveryLocationStore(!deliveryLocationStore)}
+          <Text style={{paddingHorizontal: 20, paddingBottom: 20}}>
+            Select location where this service can be performed.
+          </Text>
+          <Divider type="inset" />
+          <View
+            style={[
+              styles.mainCheckboxWrapper,
+              {
+                backgroundColor: deliveryLocationStore
+                  ? BG_CHECKBOX
+                  : 'transparent',
+              },
+            ]}>
+            <CheckBox
+              title="At your store"
+              containerStyle={styles.checkBoxContainer}
+              wrapperStyle={styles.checkBoxWrapper}
+              textStyle={styles.checkBoxText}
+              checkedColor={Colors.focusColor}
+              iconType="ionicon"
+              checkedIcon="checkbox"
+              uncheckedIcon="square-outline"
+              iconRight={true}
+              right={true}
+              checked={deliveryLocationStore}
+              onPress={() => setDeliveryLocationStore(!deliveryLocationStore)}
+            />
+          </View>
+          <Divider
+            type="inset"
+            color={
+              deliveryLocationHome && deliveryLocationStore ? '#FFF' : '#eeeeee'
+            }
           />
-          <ButtonGroup
-            buttons={[
-              t('service_delivery_location_option1'),
-              t('service_delivery_location_option2'),
-            ]}
-            selectedIndex={selectedIndex}
-            onPress={value => {
-              setSelectedIndex(value);
-            }}
-          />
-          <Text>{t('service_delivery_location_tips')}</Text>
-          <UnderlineTextInput
-            onRef={r => {
-              setDeliveryFeeComponent(r);
-            }}
-            overline={t('service_delivery_fee')}
-            placeholder={t('service_delivery_fee_placeholder')}
-            value={deliveryFee}
-            underline={t('service_delivery_fee_tips')}
-            onChangeText={setDeliveryFee}
-            // onSubmitEditing={focusOn(priceComponent)}
-            inputType="currency"
-            keyboardType={'numeric'}
-            returnKeyType="next"
-            // mandatory={'*'}
-            // focusedBorderColor={INPUT_FOCUSED_BORDER_COLOR}
-            // inputContainerStyle={styles.inputContainerStyle}
-            // showMaxLength={true}
-            // maxLength={70}
-            decoBeforeInput={'Rp.'}
-            // decoBeforeInputStyle={{}}
-            // decoAfterInput={'Hello'}
-            // decoAfterInputStyle={{color: 'red'}}
-          />
-        </View>
-      </KeyboardAwareScrollView>
+
+          <View
+            style={[
+              styles.mainCheckboxWrapper,
+              {
+                backgroundColor: deliveryLocationHome
+                  ? BG_CHECKBOX
+                  : 'transparent',
+              },
+            ]}>
+            <CheckBox
+              title="At customer's home"
+              containerStyle={styles.checkBoxContainer}
+              wrapperStyle={styles.checkBoxWrapper}
+              textStyle={styles.checkBoxText}
+              iconType="ionicon"
+              checkedIcon="checkbox"
+              uncheckedIcon="square-outline"
+              checkedColor={Colors.focusColor}
+              iconRight={true}
+              right={true}
+              checked={deliveryLocationHome}
+              onPress={() => setDeliveryLocationHome(!deliveryLocationHome)}
+            />
+            {deliveryLocationHome && <Divider type="inset" color={'#eee'} />}
+            {deliveryLocationHome && (
+              <UnderlineTextInput
+                onRef={r => {
+                  setDeliveryFeeComponent(r);
+                }}
+                wrapperStyle={{paddingBottom: 10}}
+                overlineStyle={{marginTop: 20}}
+                overline={t('service_delivery_fee')}
+                placeholder={t('service_delivery_fee_placeholder')}
+                value={deliveryFee}
+                underline={t('service_delivery_fee_tips')}
+                onChangeText={setDeliveryFee}
+                // onSubmitEditing={focusOn(priceComponent)}
+                inputType="currency"
+                keyboardType={'numeric'}
+                returnKeyType="next"
+                // mandatory={'*'}
+                // focusedBorderColor={INPUT_FOCUSED_BORDER_COLOR}
+                // inputContainerStyle={styles.inputContainerStyle}
+                // showMaxLength={true}
+                // maxLength={70}
+                decoBeforeInput={'Rp.'}
+                // decoBeforeInputStyle={{}}
+                decoAfterInput={'per km'}
+                // decoAfterInputStyle={{color: 'red'}}
+              />
+            )}
+          </View>
+          <Divider type="inset" />
+        </KeyboardAwareScrollView>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  editForm: {
-    padding: Layout.LARGE_MARGIN,
-  },
   container: {
+    flex: 1,
+  },
+  wrapper: {
     flex: 1,
     backgroundColor: Colors.background,
   },
@@ -129,6 +172,29 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginBottom: 20,
     fontWeight: 'bold',
+    paddingHorizontal: Layout.LARGE_MARGIN,
+  },
+  checkBoxText: {
+    margin: 0,
+    marginLeft: 0,
+    fontWeight: '500',
+  },
+  checkBoxWrapper: {
+    padding: 0,
+    margin: 0,
+    justifyContent: 'space-between',
+    backgroundColor: 'transparent',
+  },
+  checkBoxContainer: {
+    padding: 0,
+    paddingVertical: 10,
+    // margin: 0,
+    marginLeft: 0,
+    marginRight: 0,
+    backgroundColor: 'transparent',
+  },
+  mainCheckboxWrapper: {
+    paddingHorizontal: Layout.LARGE_MARGIN,
   },
 });
 

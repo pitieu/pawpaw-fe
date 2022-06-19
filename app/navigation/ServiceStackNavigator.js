@@ -9,7 +9,9 @@ import AddPetService from '../screens/services/AddService/AddPetService';
 import AddServiceDelivery from '../screens/services/AddService/AddServiceDelivery';
 import AddServiceDetails from '../screens/services/AddService/AddServiceDetails';
 import AddServiceOptions from '../screens/services/AddService/AddServiceOptions';
+import AddServiceOption from '../screens/services/AddService/AddServiceOption';
 import AddServiceAddons from '../screens/services/AddService/AddServiceAddons';
+import AddServiceAddon from '../screens/services/AddService/AddServiceAddon';
 import FullscreenInput from '../screens/services/AddService/FullscreenInput';
 import Test from '../screens/services/AddService/Test';
 import Test2 from '../screens/services/AddService/Test2';
@@ -45,7 +47,7 @@ const ServiceStackNavigator = ({navigation}) => {
     />
   );
   return (
-    <ServiceStack.Navigator>
+    <ServiceStack.Navigator initialRouteName="ServiceCategorySelection">
       <ServiceStack.Screen
         name="ServiceCategorySelection"
         options={({navigation}) => ({
@@ -85,8 +87,22 @@ const ServiceStackNavigator = ({navigation}) => {
         })}
       />
       <ServiceStack.Screen
+        name="AddServiceOption"
+        component={AddServiceOption}
+        options={({navigation}) => ({
+          headerShown: false,
+        })}
+      />
+      <ServiceStack.Screen
         name="AddServiceAddons"
         component={AddServiceAddons}
+        options={({navigation}) => ({
+          headerShown: false,
+        })}
+      />
+      <ServiceStack.Screen
+        name="AddServiceAddon"
+        component={AddServiceAddon}
         options={({navigation}) => ({
           headerShown: false,
         })}

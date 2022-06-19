@@ -90,6 +90,7 @@ const UnderlineTextInput = ({
   decoAfterInputStyle,
   mandatory,
   inputType, // currency, ??
+  wrapperStyle,
 }) => {
   const [inputFocused, setInputFocused] = useState(false);
   const doFocus = attr => {
@@ -109,7 +110,7 @@ const UnderlineTextInput = ({
   };
 
   return (
-    <View>
+    <View style={wrapperStyle}>
       {overline && (
         <Text
           style={[
@@ -145,7 +146,7 @@ const UnderlineTextInput = ({
           maxLength={maxLength}
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
-          value={value}
+          value={inputType == 'currency' ? currencyPunctuation(value) : value}
           secureTextEntry={secureTextEntry}
           style={[
             styles.textInput,

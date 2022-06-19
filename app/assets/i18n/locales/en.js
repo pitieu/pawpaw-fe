@@ -20,6 +20,10 @@ export default {
   read_less: 'View less ...',
   delete: 'Delete',
   sell: 'Sell',
+  save: 'Save',
+  confirm_delete: 'Confirm Delete',
+  deleting_service_alert: 'Deleting this service CANNOT be undone!',
+  deleting_addon_alert: 'Deleting this addon CANNOT be undone!',
   // screens/signin/SignIn.js
   forgot_password: 'Forgot password?',
   tnc_sign_in: 'By signing in, you accepts our',
@@ -60,17 +64,16 @@ export default {
   reviews: 'Reviews',
   // screens/services/AddPetService.js
   service_add_pet_service: 'Sell Pet Service',
-  service_details: 'Service Details',
-  service_details_subtitle: 'Complete service information',
-  service_description: 'Description',
+  service_details: 'Service Name',
+  service_details_subtitle: '',
+  service_description: 'Description (optional)',
   service_description_placeholder: 'Description related to your service',
   service_description_subtitle: 'Write service description',
   service_delivery: 'Delivery Settings',
   service_delivery_subtitle: 'Choose where the service takes place',
   service_options: 'Service Options',
-  service_options_subtitle:
-    'Write the service options(e.g. weight, duration etc..)',
-  service_addons: 'Add-ons',
+  service_options_subtitle: 'Add options(e.g. weight, duration etc..)',
+  service_addons: 'Add-ons (optional)',
   service_addons_subtitle: 'Write service add-ons',
   save_draft: 'Save Draft',
   // components/image/uploadImage.js
@@ -82,9 +85,15 @@ export default {
   // screens/services/AddService/AddServiceDetails.js
   service_name: 'Service Name',
   service_name_placeholder: 'Dog Sitting, Pet Grooming...',
-  service_price: 'Base Price',
+  name_min_required: 'You need to use at least {{chars}} characters.',
+  service_select_addons: 'Add-ons',
+  service_select_price: 'Pricing',
+  service_price: 'Price',
   service_price_placeholder: '100.000',
+  service_price_tips: '',
   add_service_details_title: 'Service Details',
+  service_price_by_weight: 'Price by weight',
+  service_price_by_time: 'Price by time',
   // screens/services/AddService/AddServiceDelivery.js
   add_service_delivery_title: 'Service Delivery',
   service_delivery_fee: 'Delivery fee',
@@ -95,5 +104,23 @@ export default {
   service_delivery_location_option2: 'At home',
   service_delivery_location_tips: 'Where the service will take place',
   // screens/services/AddService/FullscreenInput.js
-  service_description_title: 'Service Details',
+  service_description_title: 'Service Description',
+  description_min_required: 'You need to use at least {{chars}} characters.',
+  // screens/services/AddService/AddServiceOptions.js
+  add_service_options_title: 'Service Options',
+  service_option_name: 'Option title',
+  service_option_name_placeholder: 'Small, Medium <30kg, etc...',
+  add_service_option: 'Save',
+  // screens/services/AddService/AddServiceAddons.js
+  add_service_addons_title: 'Service addons',
+  // screens/services/AddService/AddServiceAddon.js
+  add_service_addon_title: 'Service addon',
+  add_service_addon: 'Save',
+  service_addon_name: 'Name',
+  service_addon_name_placeholder: 'Shampoo treatment, Tick removal ...',
+  service_addon_price: 'Price',
+  service_addon_price_placeholder: '100.000',
+  service_addon_description: 'Description',
+  service_addon_description_placeholder: 'Description about addon',
+  service_addon_description_subtitle: '',
 };
