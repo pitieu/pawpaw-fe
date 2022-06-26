@@ -26,44 +26,12 @@ import Layout from '../../../theme/layout';
 import {ADD_ICON} from '../../../constants/icons';
 
 const AddServiceAddons = props => {
-  const isFocused = useIsFocused();
+  const {t, navigation, route} = props;
+  const [addons, setAddons] = useState(route?.params?.addons);
 
   useEffect(() => {
-    async function refresh() {
-      let addons = await AsyncStorage.getItem('@addons');
-      if (addons !== null && addons !== '') {
-        addons = JSON.parse(addons);
-        setAddons(addons);
-        await AsyncStorage.setItem('@addons', '');
-      }
-    }
-    refresh();
-  }, [isFocused]);
-
-  const {t, navigation, route} = props;
-  const [selectedId, setSelectedId] = useState(null);
-  const [addons, setAddons] = useState(
-    route?.params?.addons || [
-      {
-        id: 1,
-        name: 'Small',
-        description: 'Dogs up to 10kg',
-        price: '80000',
-      },
-      {
-        id: 2,
-        name: 'Medium',
-        description: 'Dogs from 11kg to 20kg',
-        price: '100000',
-      },
-      {
-        id: 3,
-        name: 'Big',
-        description: 'Dogs from 21kg and above',
-        price: '120000',
-      },
-    ],
-  );
+    setAddons(() => route?.params?.addons);
+  }, [route]);
 
   const navigateTo = (screen, options) => {
     navigation.navigate(screen, options);
@@ -76,7 +44,7 @@ const AddServiceAddons = props => {
         <ListService
           title={item.name}
           price={item.price}
-          extraData={item.description}
+          extraData={item.description || ' '}
           actionIcon="chevron-forward"
           onPress={() =>
             navigateTo('AddServiceAddon', {
@@ -89,10 +57,17 @@ const AddServiceAddons = props => {
     );
   };
 
+  const goBack = () => {
+    navigation.navigate('AddPetService', {
+      addons,
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <NavigationBar
         title={t('add_service_addons_title')}
+        onPressBack={goBack}
         onPressButtonRight={() =>
           navigateTo('AddServiceAddon', {
             new: true,

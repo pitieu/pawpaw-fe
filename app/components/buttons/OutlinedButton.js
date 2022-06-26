@@ -84,55 +84,57 @@ const OutlinedButton = ({
   rippleColor = Colors.primaryColor,
   rounded,
   disabled,
-}) => (
-  <View
-    style={[
-      styles.container,
-      color && {backgroundColor: color},
-      borderColor && {borderColor},
-      borderRadius && {borderRadius},
-      rounded && styles.rounded,
-      height && rounded && {borderRadius: height / 2},
-      buttonStyle,
-    ]}>
-    <TouchableItem
-      disabled={disabled}
-      onPress={onPress}
-      activeOpacity={activeOpacity}
-      rippleColor={rippleColor}>
-      <View style={[styles.outlinedButton, height && {height}]}>
-        {socialIconName && (
-          <View style={styles.socialIconContainer}>
-            <FAIcon name={socialIconName} size={20} color={iconColor} />
-          </View>
-        )}
-        {iconName && (
-          <View
+}) => {
+  return (
+    <View
+      style={[
+        styles.container,
+        color && {backgroundColor: color},
+        borderColor && {borderColor},
+        borderRadius && {borderRadius},
+        rounded && styles.rounded,
+        height && rounded && {borderRadius: height / 2},
+        buttonStyle,
+      ]}>
+      <TouchableItem
+        disabled={disabled}
+        onPress={onPress}
+        activeOpacity={activeOpacity}
+        rippleColor={rippleColor}>
+        <View style={[styles.outlinedButton, height && {height}]}>
+          {socialIconName && (
+            <View style={styles.socialIconContainer}>
+              <FAIcon name={socialIconName} size={20} color={iconColor} />
+            </View>
+          )}
+          {iconName && (
+            <View
+              style={[
+                styles.iconContainer,
+                title?.length ? {} : {marginRight: 6},
+              ]}>
+              <Icon name={iconName} size={18} color={iconColor} />
+            </View>
+          )}
+          {iconMoonName && (
+            <View style={styles.iconContainer}>
+              <IcoMoon name={iconMoonName} size={18} color={iconColor} />
+            </View>
+          )}
+          <ButtonText
             style={[
-              styles.iconContainer,
-              title?.length ? {} : {marginRight: 6},
+              styles.title,
+              titleColor && {color: titleColor},
+              iconName && styles.pl8,
+              iconMoonName && styles.pl8,
+              title?.length ? {} : {paddingHorizontal: 0},
             ]}>
-            <Icon name={iconName} size={18} color={iconColor} />
-          </View>
-        )}
-        {iconMoonName && (
-          <View style={styles.iconContainer}>
-            <IcoMoon name={iconMoonName} size={18} color={iconColor} />
-          </View>
-        )}
-        <ButtonText
-          style={[
-            styles.title,
-            titleColor && {color: titleColor},
-            iconName && styles.pl8,
-            iconMoonName && styles.pl8,
-            title?.length ? {} : {paddingHorizontal: 0},
-          ]}>
-          {title !== undefined ? title.toUpperCase() : ''}
-        </ButtonText>
-      </View>
-    </TouchableItem>
-  </View>
-);
+            {title !== undefined ? title.toUpperCase() : ''}
+          </ButtonText>
+        </View>
+      </TouchableItem>
+    </View>
+  );
+};
 
 export default OutlinedButton;

@@ -35,7 +35,7 @@ import {t} from 'i18next';
 
 // components
 import OutlinedButton from '../../components/buttons/OutlinedButton';
-import {Subtitle1, Subtitle2} from '../text/CustomText';
+import {Subtitle2} from '../text/CustomText';
 
 // api
 import {toast} from '../../store/actions/toast';
@@ -44,6 +44,8 @@ import {toast} from '../../store/actions/toast';
 import Colors from '../../theme/colors';
 import Layout from '../../theme/layout';
 import {removeDuplicateObjectFromArray} from '../../utils';
+import {TRASH_OUTLINE_ICON, RIBBON_ICON} from '../../constants/icons';
+import {IOS} from '../../constants/';
 
 export const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -51,9 +53,8 @@ export const {width, height} = Dimensions.get('window');
 
 const {SlideInMenu} = renderers;
 
-const PHOTOS_PER_ROW = 3;
+const PHOTOS_PER_ROW = 4;
 const VIDEO_MAX_DURATION_SECONDS = 10 * 60; //10 minutes
-const PHOTO_LIMITS = 6;
 
 // Layout related
 const CONTAINER_PADDING = Layout.LARGE_PADDING;
@@ -71,11 +72,6 @@ const PHOTO_HEIGHT =
     PHOTOS_PER_ROW * 3 * SPACE_PADDING -
     2 * CONTAINER_PADDING) /
   PHOTOS_PER_ROW; // use width to make a rectangle
-
-const IOS = Platform.OS === 'ios';
-// ICONS
-const TRASH_ICON = IOS ? 'ios-trash-outline' : 'md-trash-outline';
-const PRIMARY_ICON = IOS ? 'ios-ribbon' : 'md-ribbon';
 
 // TODO find a way to allow images added in order.
 // TODO FIXED but manually overwrote file. should wait for merge
@@ -102,7 +98,7 @@ export const createFormData = (photos, body = {}) => {
 };
 
 const UploadImage = (props, ref) => {
-  const {uploadType, addPhoto} = props;
+  const {uploadType, addPhoto, photoLimit = 6, titleColor} = props;
   const [photos, setPhotos] = useState([]);
 
   useImperativeHandle(ref, () => ({
@@ -152,6 +148,7 @@ const UploadImage = (props, ref) => {
   }, []);
 
   const handleChoosePhoto = useCallback(async () => {
+    console.log(uploadType);
     if (uploadType == 'camera') {
       addPhoto();
     } else {
@@ -159,7 +156,7 @@ const UploadImage = (props, ref) => {
       // https://github.com/react-native-image-picker/react-native-image-picker
       response = await launchImageLibrary({
         noData: true,
-        selectionLimit: PHOTO_LIMITS,
+        selectionLimit: photoLimit,
         durationLimit: VIDEO_MAX_DURATION_SECONDS,
         quality: 1, // 0 to 1
         videoQuality: 'high', // low or high
@@ -206,8 +203,8 @@ const UploadImage = (props, ref) => {
           }
         }
 
-        if (res.length > PHOTO_LIMITS) {
-          props.toast(t('error_upload_limit', {photo_limit: PHOTO_LIMITS}));
+        if (res.length > photoLimit) {
+          props.toast(t('error_upload_limit', {photo_limit: photoLimit}));
           return photos;
         } else {
           // console.log(res.map(item => item.fileSize));
@@ -250,7 +247,7 @@ const UploadImage = (props, ref) => {
 
   const imageItem = useCallback(
     ({item}) => {
-      if (!item.uri && photos.length < PHOTO_LIMITS) {
+      if (!item.uri && photos.length < photoLimit) {
         return (
           <TouchableOpacity
             key={item.uri}
@@ -285,7 +282,7 @@ const UploadImage = (props, ref) => {
                   style={styles.menuOption}>
                   <Icon
                     style={styles.menuOptionIcon}
-                    name={PRIMARY_ICON}
+                    name={RIBBON_ICON}
                     size={IOS ? 26 : 24}
                     color={Colors.primaryText}
                   />
@@ -299,7 +296,7 @@ const UploadImage = (props, ref) => {
                   style={styles.menuOption}>
                   <Icon
                     style={styles.menuOptionIcon}
-                    name={TRASH_ICON}
+                    name={TRASH_OUTLINE_ICON}
                     size={IOS ? 26 : 24}
                     color={Colors.primaryText}
                   />
@@ -333,7 +330,7 @@ const UploadImage = (props, ref) => {
                   style={styles.menuOption}>
                   <Icon
                     style={styles.menuOptionIcon}
-                    name={PRIMARY_ICON}
+                    name={RIBBON_ICON}
                     size={IOS ? 26 : 24}
                     color={Colors.primaryText}
                   />
@@ -356,11 +353,14 @@ const UploadImage = (props, ref) => {
   return (
     <View ref={ref} style={styles.container}>
       <View style={styles.subtitleContainer}>
-        <Subtitle2>{t('upload_image')}</Subtitle2>
-        <Subtitle2>
-          &nbsp;({photos.length}/{PHOTO_LIMITS})
+        <Subtitle2 style={{color: titleColor || Colors.secondaryText}}>
+          {t('upload_image')}
+        </Subtitle2>
+        <Subtitle2 style={{color: titleColor || Colors.secondaryText}}>
+          &nbsp;({photos.length}/{photoLimit})
         </Subtitle2>
       </View>
+
       <AnimatedFlatList
         style={styles.flatList}
         data={[...photos, {}]}

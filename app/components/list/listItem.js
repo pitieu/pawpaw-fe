@@ -25,10 +25,16 @@ const ListItem = props => {
     actionIconColor,
     actionIcon,
     disabled,
+    titleColor,
+    titleStyle,
   } = props;
 
-  const titleStyle = useMemo(
-    () => [styles.title, {color: disabled ? Colors.gray : Colors.primaryText}],
+  const _titleStyle = useMemo(
+    () => [
+      styles.title,
+      {color: disabled ? Colors.gray : Colors.primaryText},
+      titleStyle,
+    ],
     [disabled],
   );
   const subtitleStyle = useMemo(
@@ -51,7 +57,9 @@ const ListItem = props => {
               </View>
             )}
             <View style={styles.textContainer}>
-              <Subtitle1 style={titleStyle}>{title}</Subtitle1>
+              <Subtitle1 style={[_titleStyle, {color: titleColor}]}>
+                {title}
+              </Subtitle1>
               {extraData && (
                 <Subtitle2
                   numberOfLines={1}

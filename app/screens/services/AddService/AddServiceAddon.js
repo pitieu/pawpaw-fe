@@ -27,7 +27,11 @@ import Colors from '../../../theme/colors';
 import Layout from '../../../theme/layout';
 import {ADD_ICON} from '../../../constants/icons';
 
+const MIN_PRICE = 10000;
+const MIN_NAME_CHARS = 6;
+
 const AddServiceOptions = props => {
+  // Todo add alert when error
   const {t, navigation, route} = props;
 
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +44,10 @@ const AddServiceOptions = props => {
     route?.params?.description || '',
   );
   const [price, setPrice] = useState(route?.params?.price || '');
+
+  // error vars
+  const [nameError, setNameError] = useState(false);
+  const [priceError, setPriceError] = useState(false);
 
   const navigateTo = (screen, options) => {
     navigation.navigate(screen, options);
@@ -59,35 +67,88 @@ const AddServiceOptions = props => {
       {
         text: t('delete').toUpperCase(),
         onPress: () => {
-          AsyncStorage.setItem('@addons', JSON.stringify(addons));
-          navigation.goBack();
+          if (!route?.params?.addons?.length) {
+            navigation.pop();
+          }
+          navigation.navigate('AddServiceAddons', {
+            addons,
+          });
         },
         style: 'destructive',
       },
     ]);
   };
 
+  const checkName = currName => {
+    setName(currName);
+    if (!currName?.length || currName?.length < MIN_NAME_CHARS) {
+      setNameError(t('error_name', {chars: MIN_NAME_CHARS}));
+      return true;
+    } else {
+      setNameError(false);
+    }
+    return false;
+  };
+
+  const checkPrice = currPrice => {
+    setPrice(currPrice);
+    const _price = parseInt(currPrice.replaceAll(/\./g, ''));
+    if (!_price || _price < MIN_PRICE) {
+      setPriceError(t('error_price_min', {price: MIN_PRICE}));
+      return true;
+    } else {
+      setPriceError(false);
+    }
+    return false;
+  };
+
+  const validateFields = () => {
+    const _name = checkName(name);
+    const _price = checkPrice(price);
+
+    return _name || _price;
+  };
+
   const addAddon = () => {
     let found = false;
-    let addons = route?.params?.addons.map(addon => {
-      if (addon.id === route?.params?.id) {
-        addon.name = name;
-        addon.description = description;
-        addon.price = price.replaceAll(/\./g, '');
-        found = true;
-      }
-      return addon;
-    });
+
+    if (validateFields()) return;
+
+    let addons = [];
+    if (route?.params?.addons?.length) {
+      addons = route?.params?.addons?.map(addon => {
+        if (addon.id === route?.params?.id) {
+          addon.name = name;
+          addon.description = description;
+          addon.price = price.replaceAll(/\./g, '');
+          found = true;
+        }
+        return addon;
+      });
+    }
     if (!found) {
+      // todo add addon with API and get returned id
       addons.push({
+        id: new Date().getTime(),
         name,
         description,
         price: price.replaceAll(/\./g, ''),
       });
     }
+    if (!route?.params?.addons?.length) {
+      navigation.pop();
+    }
+    navigation.navigate('AddServiceAddons', {
+      addons,
+    });
+  };
 
-    AsyncStorage.setItem('@addons', JSON.stringify(addons));
-    navigation.goBack();
+  const goBack = () => {
+    if (route?.params?.addons?.length) {
+      navigation.navigate('AddServiceAddons');
+    } else {
+      navigation.goBack();
+    }
   };
 
   return (
@@ -95,6 +156,7 @@ const AddServiceOptions = props => {
       <SafeAreaView style={styles.wrapper}>
         <NavigationBar
           title={t('add_service_addon_title')}
+          onPressBack={goBack}
           buttonNextText={route?.params?.id ? t('Delete') : null}
           onPressNext={
             route?.params?.id ? () => deleteAddon(route?.params?.id) : null
@@ -103,12 +165,15 @@ const AddServiceOptions = props => {
         <View style={styles.container}>
           <UnderlineTextInput
             overline={t('service_addon_name')}
+            overlineColor={nameError ? Colors.error : null}
             placeholder={t('service_addon_name_placeholder')}
             value={name}
-            onChangeText={setName}
+            onChangeText={checkName}
             onSubmitEditing={focusOn(descriptionComponent)}
             returnKeyType="next"
             mandatory={'*'}
+            underline={nameError}
+            underlineColor={nameError ? Colors.error : null}
           />
           <UnderlineTextInput
             onRef={r => {
@@ -126,15 +191,19 @@ const AddServiceOptions = props => {
               setPriceComponent(r);
             }}
             overline={t('service_addon_price')}
+            overlineColor={priceError ? Colors.error : null}
             placeholder={t('service_addon_price_placeholder')}
             value={price}
             inputType="currency"
-            onChangeText={setPrice}
-            keyboardType={'numeric'}
+            onChangeText={checkPrice}
+            keyboardType={'number-pad'}
             decoBeforeInput={'Rp.'}
+            underline={priceError}
+            underlineColor={priceError ? Colors.error : null}
             // underline={t('service_price_tips')}
             // returnKeyType="done"
             mandatory={'*'}
+            returnKeyType="done"
           />
         </View>
       </SafeAreaView>

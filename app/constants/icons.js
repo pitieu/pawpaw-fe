@@ -8,3 +8,8 @@ export const CAMERA_RETAKE_ICON = IOS
   ? 'ios-camera-reverse'
   : 'md-camera-reverse';
 export const ADD_ICON = IOS ? 'ios-add' : 'md-add';
+export const TRASH_OUTLINE_ICON = IOS
+  ? 'ios-trash-outline'
+  : 'md-trash-outline';
+
+export const RIBBON_ICON = IOS ? 'ios-ribbon' : 'md-ribbon';

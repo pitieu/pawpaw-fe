@@ -9,71 +9,29 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {withTranslation} from 'react-i18next';
-// import {FlatList} from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {useIsFocused} from '@react-navigation/native';
 
 // import components
 import NavigationBar from '../../../components/NavigationBar';
 import ListService from '../../../components/list/listService';
 import Divider from '../../../components/divider/Divider';
+import {Subtitle1} from '../../../components/text/CustomText';
 
 // import colors
 import Colors from '../../../theme/colors';
 import Layout from '../../../theme/layout';
-import {ADD_ICON} from '../../../constants/icons';
 
 const AddServiceOptions = props => {
-  const isFocused = useIsFocused();
-
   const {t, navigation, route} = props;
 
-  const [selectedId, setSelectedId] = useState(null);
-  const [services, setServices] = useState(
-    route.params.services || [
-      {
-        id: 1,
-        name: 'Small',
-        description: 'Dogs up to 10kg',
-        price: '80000',
-        priceType: 'weight',
-        weightStart: '0',
-        weightEnd: '10',
-      },
-      {
-        id: 2,
-        name: 'Medium',
-        description: 'Dogs from 11kg to 20kg',
-        price: '100000',
-        priceType: 'weight',
-        weightStart: '11',
-        weightEnd: '20',
-      },
-      {
-        id: 3,
-        name: 'Big',
-        description: 'Dogs from 21kg and above',
-        price: '120000',
-        priceType: 'weight',
-        weightStart: '21',
-        weightEnd: '999',
-      },
-    ],
-  );
+  const [services, setServices] = useState(route?.params?.services);
 
   useEffect(() => {
-    async function refresh() {
-      let services = await AsyncStorage.getItem('@services');
-      if (services !== null && services !== '') {
-        services = JSON.parse(services);
-        setServices(services);
-        await AsyncStorage.setItem('@services', '');
-      }
-    }
-    refresh();
-  }, [isFocused]);
+    console.log(route?.params?.services);
+    setServices(() => route?.params?.services);
+  }, [route]);
 
   const navigateTo = (screen, options) => {
     navigation.navigate(screen, options);
@@ -83,11 +41,10 @@ const AddServiceOptions = props => {
     return (
       <>
         <Divider type="inset" />
-
         <ListService
           title={item.name}
           price={item.price}
-          extraData={item.description}
+          extraData={item.description || ' '}
           actionIcon="chevron-forward"
           onPress={() => navigateTo('AddServiceOption', {...item, services})}
         />
@@ -96,8 +53,9 @@ const AddServiceOptions = props => {
   };
 
   const goBack = () => {
-    AsyncStorage.setItem('@services', JSON.stringify(services));
-    navigation.goBack();
+    navigation.navigate('AddPetService', {
+      services,
+    });
   };
 
   return (
@@ -127,6 +85,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  variantContainer: {
+    padding: Layout.LARGE_PADDING,
+    borderColor: '#F0F0F0',
+    borderBottomWidth: 3,
+    // borderTopWidth: 1,
+  },
+  chip: {
+    paddingVertical: 7,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: Colors.primaryColor,
+    backgroundColor: Colors.primaryColor,
+    marginRight: 10,
+  },
+  chipUnselected: {
+    backgroundColor: '#FFF',
+  },
+  chipText: {
+    color: '#FFF',
+  },
+  chipTextUnselected: {
+    color: Colors.primaryColor,
   },
 });
 

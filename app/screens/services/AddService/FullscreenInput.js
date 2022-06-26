@@ -1,14 +1,25 @@
 // import dependencies
 import {t} from 'i18next';
-import React, {memo, useState, useRef} from 'react';
+import React, {memo, useState, useRef, Fragment} from 'react';
 
-import {SafeAreaView, StyleSheet, Text, TextInput, View} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+  Keyboard,
+  Pressable,
+} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
 // import components
 import NavigationBar from '../../../components/NavigationBar';
+import Button from '../../../components/buttons/Button';
 
 // api
 import {toast} from '../../../store/actions/toast';
@@ -21,6 +32,8 @@ const FullscreenInput = props => {
   const {navigation, maxLength = 1600, route} = props;
   const [inputText, setInputText] = useState(route.params.description || '');
   const textInput = useRef();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigateTo = (screen, options) => {
     navigation.navigate(screen, options);
@@ -41,22 +54,37 @@ const FullscreenInput = props => {
     <SafeAreaView style={styles.container}>
       <NavigationBar
         title={t('service_description_title')}
-        buttonNextText={t('save')}
+        // buttonNextText={`${inputText.length}/${maxLength}`}
+        buttonNextText={t('save').toUpperCase()}
         onPressNext={save}
       />
       <View style={styles.wrapper}>
-        <Text style={{alignSelf: 'flex-end'}}>
-          {inputText.length}/{maxLength}
-        </Text>
-        <TextInput
-          ref={textInput}
-          multiline={true}
-          onChangeText={setInputText}
-          value={inputText}
-          numberOfLines={99}
-          autoFocus={true}
-          style={styles.input}
-        />
+        <TouchableOpacity
+          onPress={() => Keyboard.dismiss()}
+          style={{alignSelf: 'flex-end'}}>
+          <Text style={{alignSelf: 'flex-end'}}>
+            {inputText.length}/{maxLength}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => textInput.focus()}
+          style={styles.input}>
+          <TextInput
+            ref={textInput}
+            multiline={true}
+            onChangeText={setInputText}
+            value={inputText}
+            numberOfLines={99}
+            autoFocus={true}
+            style={styles.input}
+            keyboardType={'default'}
+            returnKeyType="done"
+            returnKeyLabel="finished"
+            enablesReturnKeyAutomatically={true}
+            // onSubmitEditing={Keyboard.dismiss}
+          />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -76,6 +104,20 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignSelf: 'flex-start',
     textAlignVertical: 'top',
+    height: '100%',
+    width: '100%',
+    // backgroundColor: 'green',
+  },
+  bottomButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    padding: 16,
+    paddingBottom: 0,
+    backgroundColor: '#fff',
+    borderTopColor: Colors.lightGray,
+    borderTopWidth: 1,
   },
 });
 const mapDispatchToProps = dispatch =>

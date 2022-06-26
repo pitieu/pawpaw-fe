@@ -65,10 +65,10 @@ export default {
   // screens/services/AddPetService.js
   service_add_pet_service: 'Sell Pet Service',
   service_details: 'Service Name',
-  service_details_subtitle: '',
+  service_details_subtitle: 'Write down service name',
   service_description: 'Description (optional)',
   service_description_placeholder: 'Description related to your service',
-  service_description_subtitle: 'Write service description',
+  service_description_subtitle: 'Describe your service as much as you need',
   service_delivery: 'Delivery Settings',
   service_delivery_subtitle: 'Choose where the service takes place',
   service_options: 'Service Options',
@@ -98,11 +98,15 @@ export default {
   add_service_delivery_title: 'Service Delivery',
   service_delivery_fee: 'Delivery fee',
   service_delivery_fee_placeholder: '0',
-  service_delivery_fee_tips: 'The fee will be calculated per Km ',
+  service_delivery_fee_tips:
+    'Delivery fee will be calculated per km based on your store location',
   service_delivery_location: 'Service Location',
-  service_delivery_location_option1: 'At the store',
-  service_delivery_location_option2: 'At home',
+  service_delivery_location_option1: 'At your store',
+  service_delivery_location_option2: "At customer's home",
   service_delivery_location_tips: 'Where the service will take place',
+  service_delivery_location_info:
+    'Select location where this service can be performed',
+  error_location_required: 'Select at least one location',
   // screens/services/AddService/FullscreenInput.js
   service_description_title: 'Service Description',
   description_min_required: 'You need to use at least {{chars}} characters.',
@@ -111,6 +115,21 @@ export default {
   service_option_name: 'Option title',
   service_option_name_placeholder: 'Small, Medium <30kg, etc...',
   add_service_option: 'Save',
+  add_sample: 'Add sample',
+  option_by_weight: 'Weight',
+  option_by_time: 'Time',
+  // screens/services/AddService/AddServiceOption.js
+  error_price_min: 'Price should be at least {{price}} rupiah',
+  error_name: 'Name needs at least {{chars}} characters',
+  price_by_time_info: 'Price will be charged for this duration',
+  price_by_weight_info:
+    "This service will match customer's pets within this weight range",
+  error_weight_start: 'Start range needs to be <{{weight}} kg.',
+  error_weight_start_min: 'Weight needs to be at least 0 kg',
+  error_weight_end_min: 'Weight needs to be at least 1 kg',
+  service_time_placeholder: '30',
+  service_select_timeframe: 'Select time',
+  error_time: 'Select time from the dropdown list',
   // screens/services/AddService/AddServiceAddons.js
   add_service_addons_title: 'Service addons',
   // screens/services/AddService/AddServiceAddon.js
@@ -120,7 +139,7 @@ export default {
   service_addon_name_placeholder: 'Shampoo treatment, Tick removal ...',
   service_addon_price: 'Price',
   service_addon_price_placeholder: '100.000',
-  service_addon_description: 'Description',
+  service_addon_description: 'Description (optional)',
   service_addon_description_placeholder: 'Description about addon',
   service_addon_description_subtitle: '',
 };

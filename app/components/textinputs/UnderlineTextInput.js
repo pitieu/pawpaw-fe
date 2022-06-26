@@ -80,6 +80,7 @@ const UnderlineTextInput = ({
   inputContainerStyle,
   inputStyle,
   underline,
+  underlineColor,
   showMaxLength,
   overline,
   overlineStyle,
@@ -164,7 +165,15 @@ const UnderlineTextInput = ({
           styles.underlineContainer,
           !underline && {justifyContent: 'flex-end'},
         ]}>
-        {underline && <Text style={styles.underline}>{underline}</Text>}
+        {underline && (
+          <Text
+            style={[
+              styles.underline,
+              underlineColor && {color: underlineColor},
+            ]}>
+            {underline}
+          </Text>
+        )}
         {showMaxLength && (
           <Text style={styles.limitCount}>
             {value.length}/{maxLength}
