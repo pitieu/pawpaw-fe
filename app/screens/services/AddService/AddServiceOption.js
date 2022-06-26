@@ -136,7 +136,6 @@ const AddServiceOptions = props => {
   };
 
   const checkWeightStart = currWeight => {
-    console.log(selectedIndexes);
     setWeightStart(currWeight);
 
     const _weightStart = parseInt(currWeight);
@@ -230,6 +229,8 @@ const AddServiceOptions = props => {
         time,
         weightStart,
         weightEnd,
+        weightSelected: selectedIndexes.indexOf(0) > -1,
+        timeSelected: selectedIndexes.indexOf(1) > -1,
       });
     }
 
