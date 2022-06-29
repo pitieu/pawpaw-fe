@@ -23,6 +23,8 @@ import Layout from '../../../theme/layout';
 const MIN_NAME_CHARS = 6;
 
 const AddServiceDetails = props => {
+  // Todo add service opening hours
+  // Todo add service enabled on publish
   const {navigation, route} = props;
 
   const [isLoading, setIsLoading] = useState(false);

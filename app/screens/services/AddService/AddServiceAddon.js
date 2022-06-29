@@ -32,6 +32,8 @@ const MIN_NAME_CHARS = 6;
 
 const AddServiceOptions = props => {
   // Todo add alert when error
+  // Todo add selectable option
+
   const {t, navigation, route} = props;
 
   const [isLoading, setIsLoading] = useState(false);

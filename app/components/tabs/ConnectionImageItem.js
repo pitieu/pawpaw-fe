@@ -11,10 +11,11 @@ import {
 export const {width, height} = Dimensions.get('window');
 
 const ConnectionItem = ({style, connection}) => {
-  const {photo, name} = connection;
+  const {photo, name, photos} = connection;
 
   const photoUri =
     photo != '' ? {uri: photo} : require('../../assets/img/profile_2.jpeg');
+
   const mergedStyle = useMemo(() => [styles.container, style], [style]);
 
   const navigation = useNavigation();

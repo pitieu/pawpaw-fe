@@ -1,5 +1,12 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import React, {memo, useCallback, useMemo, useRef, useState} from 'react';
+import React, {
+  memo,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useEffect,
+} from 'react';
 import {StyleSheet, View, useWindowDimensions, Dimensions} from 'react-native';
 import Animated, {
   interpolate,
@@ -11,10 +18,16 @@ import Animated, {
 import TabBar from './TabBar';
 import ConnectionList from './ConnectionList';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+
+// api
+import {listServices} from '../../store/actions/service';
 
 // import colors
 import Colors from '../../theme/colors';
 import Layout from '../../theme/layout';
+import config from '../../config';
 
 var {width, height} = Dimensions.get('window');
 
@@ -88,144 +101,6 @@ const SOCIAL_FEED = [
     photo: 'https://randomuser.me/api/portraits/women/6.jpg',
   },
 ];
-const PET_SERVICES = [
-  {
-    id: 1,
-    name: 'Charlotte Jones',
-    photo: 'https://randomuser.me/api/portraits/women/2.jpg',
-    price: 100000,
-    rating: 4.2,
-    ratings: 88,
-  },
-  {
-    id: 2,
-    name: 'Oliver Brown',
-    photo: '',
-    price: 60000,
-    rating: 3.2,
-    ratings: 22,
-  },
-  {
-    id: 3,
-    name: 'Jessica Miller',
-    photo: 'https://randomuser.me/api/portraits/women/3.jpg',
-    price: 120000,
-    rating: 4.5,
-    ratings: 11,
-  },
-  {
-    id: 4,
-    name: 'Samuel Johnson',
-    photo: 'https://randomuser.me/api/portraits/men/3.jpg',
-    price: 100000,
-    rating: 4.3,
-    ratings: 44,
-  },
-  {
-    id: 5,
-    name: 'Olivia Martinez',
-    photo: 'https://randomuser.me/api/portraits/women/4.jpg',
-    price: 30000,
-    rating: 4.8,
-    ratings: 3,
-  },
-  {
-    id: 6,
-    name: 'Joshua Miller',
-    photo: 'https://randomuser.me/api/portraits/men/4.jpg',
-    price: 1000000,
-    rating: 5,
-    ratings: 2,
-  },
-  {
-    id: 7,
-    name: 'Katie Williams',
-    photo: 'https://randomuser.me/api/portraits/women/5.jpg',
-    price: 50000,
-    rating: 0,
-    ratings: 0,
-  },
-  {
-    id: 8,
-    name: 'Jack Jones',
-    photo: 'https://randomuser.me/api/portraits/men/5.jpg',
-    price: 50000,
-    rating: 0,
-    ratings: 0,
-  },
-  {
-    id: 9,
-    name: 'Amy Johnson',
-    photo: 'https://randomuser.me/api/portraits/women/6.jpg',
-    price: 50000,
-    rating: 0,
-    ratings: 0,
-  },
-  {
-    id: 10,
-    name: 'Thomas Williams',
-    photo: 'https://randomuser.me/api/portraits/men/6.jpg',
-    price: 50000,
-    rating: 0,
-    ratings: 0,
-  },
-  {
-    id: 11,
-    name: 'Abigail Hernandez',
-    photo: 'https://randomuser.me/api/portraits/women/7.jpg',
-    price: 76000,
-    rating: 0,
-    ratings: 0,
-  },
-  {
-    id: 12,
-    name: 'Matthew Taylor',
-    photo: 'https://randomuser.me/api/portraits/men/7.jpg',
-    price: 60000,
-    rating: 0,
-    ratings: 0,
-  },
-  {
-    id: 13,
-    name: 'Poppy Jackson',
-    photo: 'https://randomuser.me/api/portraits/women/8.jpg',
-    price: 80000,
-    rating: 0,
-    ratings: 0,
-  },
-  {
-    id: 14,
-    name: 'Mohammed Lopez',
-    photo: 'https://randomuser.me/api/portraits/men/8.jpg',
-    price: 50000,
-    rating: 0,
-    ratings: 0,
-  },
-  {
-    id: 15,
-    name: 'Katie Williams',
-    photo: 'https://randomuser.me/api/portraits/women/5.jpg',
-    price: 70000,
-    rating: 0,
-    ratings: 0,
-  },
-  {
-    id: 16,
-    name: 'Jack Jones',
-    photo: 'https://randomuser.me/api/portraits/men/5.jpg',
-    price: 10000,
-    rating: 3,
-    ratings: 1,
-  },
-  {
-    id: 17,
-    name: 'Amy Johnson',
-    photo: 'https://randomuser.me/api/portraits/women/6.jpg',
-    price: 80000,
-    rating: 0,
-    ratings: 0,
-  },
-];
 
 const TAB_BAR_HEIGHT = 48;
 const HEADER_HEIGHT = 0;
@@ -234,7 +109,8 @@ const OVERLAY_VISIBILITY_OFFSET = 0;
 
 const Tab = createMaterialTopTabNavigator();
 
-const Profile = ({Header, Overlay}) => {
+const Profile = props => {
+  const {Header, Overlay, route} = props;
   const {bottom} = useSafeAreaInsets();
   const top = 0;
   //   console.log(top);
@@ -244,6 +120,7 @@ const Profile = ({Header, Overlay}) => {
   const petServicesRef = useRef(null);
   const socialFeedRef = useRef(null);
 
+  const [petServices, setPetServices] = useState([]);
   const [tabIndex, setTabIndex] = useState(0);
 
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -257,6 +134,34 @@ const Profile = ({Header, Overlay}) => {
     }),
     [defaultHeaderHeight, headerHeight],
   );
+
+  useEffect(() => {
+    if (tabIndex === 2) {
+      //load pet services
+      props.listServices().then(services => {
+        const serv = [];
+        services.forEach(service => {
+          const primaryPhoto = service.photos?.find(
+            photo => photo.primary === true,
+          );
+          console.log(
+            config.api_address + 'services/images/' + primaryPhoto?.filename,
+          );
+          serv.push({
+            id: service._id,
+            name: service.name,
+            photo: primaryPhoto?.filename
+              ? config.api_address + 'services/images/' + primaryPhoto?.filename
+              : '',
+            price: service.products[0].price,
+          });
+        });
+        // console.log('services', JSON.stringify(services));
+        setPetServices(serv);
+      });
+    }
+    // console.log('tabIndex', tabIndex);
+  }, [tabIndex, route]);
 
   const {heightCollapsed, heightExpanded} = headerConfig;
 
@@ -373,7 +278,7 @@ const Profile = ({Header, Overlay}) => {
     () => (
       <ConnectionList
         ref={marketplaceRef}
-        data={PET_SERVICES}
+        data={petServices}
         dataType="marketplace"
         onScroll={marketplaceScrollHandler}
         {...sharedProps}
@@ -400,7 +305,7 @@ const Profile = ({Header, Overlay}) => {
     () => (
       <ConnectionList
         ref={petServicesRef}
-        data={PET_SERVICES}
+        data={petServices}
         dataType="pet_services"
         onScroll={petServicesScrollHandler}
         {...sharedProps}
@@ -508,4 +413,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(Profile);
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      listServices,
+    },
+    dispatch,
+  );
+
+export default memo(connect(null, mapDispatchToProps)(Profile));

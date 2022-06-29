@@ -67,7 +67,9 @@ const AddServiceDelivery = props => {
     } else {
       setLocationError(false);
       navigateTo('AddPetService', {
-        deliveryFee,
+        deliveryFee: deliveryFee
+          ? deliveryFee.replaceAll(/\./g, '')
+          : deliveryFee,
         deliveryLocationStore,
         deliveryLocationHome,
       });

@@ -1,4 +1,4 @@
-import React, {memo, useState, useRef, Fragment} from 'react';
+import React, {memo, useState, useRef, Fragment, useEffect} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
   StyleSheet,
@@ -11,8 +11,10 @@ import {
   Platform,
   TouchableOpacity,
 } from 'react-native';
-import {withTranslation} from 'react-i18next';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {t} from 'i18next';
 
 // components
 import Icon from '../../components/icon/Icon';
@@ -22,15 +24,17 @@ import OutlinedButton from '../../components/buttons/OutlinedButton';
 import Avatar from '../../components/avatar/Avatar';
 import SellerInformationCard from '../../components/cards/SellerInformationCard';
 import ProductDetailCard from '../../components/cards/ProductDetailCard';
+import ReviewCard from '../../components/cards/ReviewCard';
+import {Heading6, Title} from '../../components/text/CustomText';
 
-// utils
+// api
+import {fetchService, setServices} from '../../store/actions/service';
+
+// import configs
 import {currencyFormatter} from '../../utils/currency';
-
-// import colors
 import Colors from '../../theme/colors';
 import Layout from '../../theme/layout';
-import {Heading6, Title} from '../../components/text/CustomText';
-import ReviewCard from '../../components/cards/ReviewCard';
+import config from '../../config';
 
 const IOS = Platform.OS === 'ios';
 const HEART_OUTLINE_ICON = IOS ? 'ios-heart-outline' : 'md-heart-outline';
@@ -97,21 +101,32 @@ const images = [
   },
 ];
 
-const ProductDetails = ({route, t}) => {
+const ProductDetails = props => {
+  const {route} = props;
   // TODO Add View more in Description
   //   const {id} = route.params;
   const id = 2;
   const carouselRef = useRef(null);
+  const [service, setService] = useState(null);
+
+  // useEffect(() => {
+  //   props.fetchService('62bc63b1aac5ba31feec4455').then(_service => {
+  //     console.log(_service);
+  //     setServices(_service);
+  //   });
+  // }, []);
 
   const [activeSlide, setActiveSlide] = useState(0);
   const [liked, setLiked] = useState(0);
 
-  _renderItem = ({item, index}) => {
+  _renderCarouselItem = ({item, index}) => {
     return (
       <View style={styles.slide}>
         <Image
           style={styles.image}
-          source={{uri: item.photo}}
+          source={{
+            uri: config.api_address + 'services/images/' + item.filename,
+          }}
           // defaultSource="https://randomuser.me/api/portraits/men/5.jpg"
         />
       </View>
@@ -121,7 +136,7 @@ const ProductDetails = ({route, t}) => {
   const pagination = () => {
     return (
       <Pagination
-        dotsLength={images.length}
+        dotsLength={service.photos.length}
         activeDotIndex={activeSlide}
         containerStyle={styles.paginationContainer}
         dotStyle={styles.paginationDot}
@@ -140,94 +155,96 @@ const ProductDetails = ({route, t}) => {
   return (
     <Fragment>
       <SafeAreaView style={styles.topArea} />
-      <View style={styles.screenContainer}>
-        <ScrollView>
-          <Carousel
-            ref={carouselRef}
-            data={images}
-            renderItem={this._renderItem}
-            sliderWidth={width}
-            itemWidth={width}
-            onSnapToItem={setActiveSlide}
-          />
-          {pagination()}
-          <View style={styles.productSection}>
-            {/* Pricing Section */}
-            <View style={styles.belowImageContainer}>
-              <View style={styles.priceContainer}>
-                <Text style={styles.price}>
-                  {currencyFormatter(data.price)}
-                </Text>
+      {service && (
+        <View style={styles.screenContainer}>
+          <ScrollView>
+            <Carousel
+              ref={carouselRef}
+              data={service.photos}
+              renderItem={_renderCarouselItem}
+              sliderWidth={width}
+              itemWidth={width}
+              onSnapToItem={setActiveSlide}
+            />
+            {pagination()}
+            <View style={styles.productSection}>
+              {/* Pricing Section */}
+              <View style={styles.belowImageContainer}>
+                <View style={styles.priceContainer}>
+                  <Text style={styles.price}>
+                    {currencyFormatter(service.price)}
+                  </Text>
 
-                <View style={styles.priceDiscountContainer}>
-                  <View style={styles.priceDiscountPercentContainer}>
-                    <Text style={styles.priceDiscountPercent}>
-                      {data.discountPercent}
+                  <View style={styles.priceDiscountContainer}>
+                    <View style={styles.priceDiscountPercentContainer}>
+                      <Text style={styles.priceDiscountPercent}>
+                        {service.discountPercent}
+                      </Text>
+                    </View>
+                    <Text style={styles.priceDiscount}>
+                      {currencyFormatter(service.discount)}
                     </Text>
                   </View>
-                  <Text style={styles.priceDiscount}>
-                    {currencyFormatter(data.discount)}
-                  </Text>
                 </View>
+                <TouchableOpacity onPress={changeLiked}>
+                  <Icon
+                    name={liked ? HEART_ICON : HEART_OUTLINE_ICON}
+                    size={30}
+                    color={liked ? Colors.focusColor : Colors.gray}
+                  />
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity onPress={changeLiked}>
-                <Icon
-                  name={liked ? HEART_ICON : HEART_OUTLINE_ICON}
-                  size={30}
-                  color={liked ? Colors.focusColor : Colors.gray}
-                />
-              </TouchableOpacity>
+              <Text style={styles.title}>{service.title}</Text>
+              {/* Rating */}
+              <View style={styles.reviewStarContainer}>
+                <StarRating rating={service.rating} starSize={22} />
+                <Text style={styles.reviewCountText}>
+                  {service.reviews} {t('reviews')}
+                </Text>
+                <Text style={styles.soldCountText}>
+                  {service.sold} {t('sold')}
+                </Text>
+              </View>
             </View>
-            <Text style={styles.title}>{data.title}</Text>
-            {/* Rating */}
-            <View style={styles.reviewStarContainer}>
-              <StarRating rating={data.rating} starSize={22} />
-              <Text style={styles.reviewCountText}>
-                {data.reviews} {t('reviews')}
-              </Text>
-              <Text style={styles.soldCountText}>
-                {data.sold} {t('sold')}
-              </Text>
-            </View>
-          </View>
-          <ProductDetailCard description={data.description} />
+            <ProductDetailCard description={service.description} />
 
-          {/* Seller Information */}
-          <SellerInformationCard
-            avatar={data.avatar}
-            name={data.name}
-            location={data.location}
-            chatId={data.chatId}
-          />
-          {/* Review Section */}
-          <ReviewCard reviews={data.reviewsList} />
-        </ScrollView>
+            {/* Seller Information */}
+            <SellerInformationCard
+              avatar={service.avatar}
+              name={service.name}
+              location={service.location}
+              chatId={service.chatId}
+            />
+            {/* Review Section */}
+            <ReviewCard reviews={service.reviewsList} />
+          </ScrollView>
 
-        <View style={styles.bottomButtonsContainer}>
-          <OutlinedButton
-            color={Colors.primaryColor}
-            titleColor={Colors.white}
-            iconName={MESSAGE_ICON}
-            iconColor={Colors.primaryColor}
-            buttonStyle={styles.outlinedButton}
-          />
-          <View style={styles.shopBtnContainer}>
+          <View style={styles.bottomButtonsContainer}>
             <OutlinedButton
               color={Colors.primaryColor}
-              title={t('buy_now')}
-              buttonStyle={[
-                styles.outlinedButton,
-                {marginHorizontal: Layout.SMALL_MARGIN, flex: 1},
-              ]}
+              titleColor={Colors.white}
+              iconName={MESSAGE_ICON}
+              iconColor={Colors.primaryColor}
+              buttonStyle={styles.outlinedButton}
             />
-            <OutlinedButton
-              titleColor={Colors.onPrimaryColor}
-              title={t('add_cart')}
-              buttonStyle={[styles.filledButton, {flex: 1}]}
-            />
+            <View style={styles.shopBtnContainer}>
+              <OutlinedButton
+                color={Colors.primaryColor}
+                title={t('buy_now')}
+                buttonStyle={[
+                  styles.outlinedButton,
+                  {marginHorizontal: Layout.SMALL_MARGIN, flex: 1},
+                ]}
+              />
+              <OutlinedButton
+                titleColor={Colors.onPrimaryColor}
+                title={t('add_cart')}
+                buttonStyle={[styles.filledButton, {flex: 1}]}
+              />
+            </View>
           </View>
         </View>
-      </View>
+      )}
     </Fragment>
   );
 };
@@ -350,4 +367,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(withTranslation()(ProductDetails));
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      addService,
+    },
+    dispatch,
+  );
+
+export default memo(connect(null, mapDispatchToProps)(ProductDetails));

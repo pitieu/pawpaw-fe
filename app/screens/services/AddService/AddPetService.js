@@ -21,6 +21,8 @@ import {
 import {useIsFocused} from '@react-navigation/native';
 import {t} from 'i18next';
 import {ScrollView} from 'react-native-gesture-handler';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 // import {ScrollView} from 'react-native-virtualized-view';
 // components
 import UploadImage from '../../../components/image/uploadImage';
@@ -31,6 +33,9 @@ import CameraTaker from '../../../components/camera/cameraGallerySelector';
 import NavigationBar from '../../../components/NavigationBar';
 import TouchableItem from '../../../components/TouchableItem';
 import VirtualizedScrollView from '../../../components/scrollview/VirtualizedScrollView';
+
+// api
+import {addService} from '../../../store/actions/service';
 
 // import utility
 import {SCREEN_HEIGHT, SCREEN_WIDTH} from '../../../constants';
@@ -182,7 +187,6 @@ const AddPetService = props => {
       return setUploadError(true);
     }
     if (!name?.length) {
-      console.log('name', name);
       return setNameError(true);
     }
     // if (!description?.length) {
@@ -201,10 +205,22 @@ const AddPetService = props => {
 
     // everything's ok
     props
-      .login(phone, phoneComponent.current.getCallingCode(), password)
+      .addService({
+        photos: photos,
+        name: name,
+        price: price,
+        description: description,
+        category: route?.params?.service, // category
+        services: services,
+        addons: addons,
+        deliveryLocationStore: deliveryLocationStore,
+        deliveryLocationHome: deliveryLocationHome,
+        deliveryFee: deliveryFee,
+      })
       .then(() => {
         setIsLoading(false);
-        navigateTo('HomeNavigator');
+        console.log('navigate away');
+        // navigateTo('HomeNavigator');
       })
       .catch(() => {
         setIsLoading(false);
@@ -471,4 +487,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(AddPetService);
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      addService,
+    },
+    dispatch,
+  );
+
+export default memo(connect(null, mapDispatchToProps)(AddPetService));

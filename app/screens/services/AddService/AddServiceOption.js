@@ -46,7 +46,6 @@ const timeList = [
 
 const AddServiceOptions = props => {
   // Todo add alert when error
-
   const {t, navigation, route} = props;
 
   const [isLoading, setIsLoading] = useState(false);

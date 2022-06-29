@@ -48,7 +48,7 @@ const ConnectionItem = ({style, connection, dataType}) => {
           <View style={styles.ratingSection}>
             <StarRating rating={rating} />
             <Text style={styles.ratingText}>
-              {ratings} {t('reviews')}
+              {ratings || '0'} {t('reviews')}
             </Text>
           </View>
         </View>
