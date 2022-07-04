@@ -1,125 +1,92 @@
 import React, {memo, useState, useRef, Fragment, useEffect} from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
   StyleSheet,
   ScrollView,
-  Text,
   View,
   SafeAreaView,
-  Dimensions,
   Image,
-  Platform,
-  TouchableOpacity,
+  Text,
 } from 'react-native';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {t} from 'i18next';
+import {Skeleton} from '@rneui/themed';
+import Icon from 'react-native-vector-icons/Ionicons';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 // components
-import Icon from '../../components/icon/Icon';
-import StarRating from '../../components/starrating/StarRating';
-import Button from '../../components/buttons/Button';
 import OutlinedButton from '../../components/buttons/OutlinedButton';
-import Avatar from '../../components/avatar/Avatar';
 import SellerInformationCard from '../../components/cards/SellerInformationCard';
 import ProductDetailCard from '../../components/cards/ProductDetailCard';
+import ProductListCard from '../../components/cards/ProductListCard';
+import ProductInfoCard from '../../components/cards/ProductInfoCard';
 import ReviewCard from '../../components/cards/ReviewCard';
-import {Heading6, Title} from '../../components/text/CustomText';
+import TouchableItem from '../../components/TouchableItem';
+import NavigationBar from '../../components/NavigationBar';
 
 // api
-import {fetchService, setServices} from '../../store/actions/service';
+import {fetchService} from '../../store/actions/service';
 
 // import configs
-import {currencyFormatter} from '../../utils/currency';
 import Colors from '../../theme/colors';
 import Layout from '../../theme/layout';
 import config from '../../config';
-
-const IOS = Platform.OS === 'ios';
-const HEART_OUTLINE_ICON = IOS ? 'ios-heart-outline' : 'md-heart-outline';
-const HEART_ICON = IOS ? 'ios-heart' : 'md-heart';
-const MESSAGE_ICON = IOS ? 'ios-chatbox-outline' : 'md-chatbox-outline';
-const CART_ICON = IOS ? 'ios-cart-outline' : 'md-cart-outline';
-
-var {width, height} = Dimensions.get('window');
-
-const data = {
-  chatId: 1,
-  location: 'Jakarta Pusat',
-  price: 120000,
-  discount: 240000,
-  discountPercent: '50%',
-  rating: 3.6,
-  reviews: 11,
-  sold: 25,
-  name: 'Cho Store', //seller name
-  avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-  title: 'Dove Shampoo Perawatan Rambut Rontok - 1400ml - Free Hair Massager',
-  description:
-    'Alias id quo et sed quas voluptatem atque. Eaque cumque est tempore. Iure aut iste ipsa qui beatae perspiciatis assumenda quam. Dolorum ea molestiae dolores maxime debitis nesciunt qui ad. Neque recusandae ut adipisci doloremque omnis Alias id quo et sed quas voluptatem atque. Eaque cumque est tempore. Iure aut iste ipsa qui beatae perspiciatis assumenda quam. Dolorum ea molestiae dolores maxime debitis nesciunt qui ad. Neque recusandae ut adipisci doloremque omnis Alias id quo et sed quas voluptatem atque. Eaque cumque est tempore. Iure aut iste ipsa qui beatae perspiciatis assumenda quam. Dolorum ea molestiae dolores maxime debitis nesciunt qui ad. Neque recusandae ut adipisci doloremque omnis',
-  reviewsList: [
-    {
-      reviewer_name: 'Edgar Carinos',
-      rating: 4,
-      review:
-        "A healthy puppy's body temperature ranges from 38.5 to 39.5 degrees, and is slightly higher in the afternoon. The temperature difference between day and night is generally less than 1 degree...",
-      photos: [
-        'https://randomuser.me/api/portraits/men/5.jpg',
-        'https://randomuser.me/api/portraits/men/6.jpg',
-        'https://randomuser.me/api/portraits/men/7.jpg',
-      ],
-    },
-  ],
-};
-
-const images = [
-  {
-    title: 'Item 1',
-    text: 'Text 1',
-    photo: 'https://randomuser.me/api/portraits/men/1.jpg',
-  },
-  {
-    title: 'Item 2',
-    text: 'Text 2',
-    photo: 'https://randomuser.me/api/portraits/men/2.jpg',
-  },
-  {
-    title: 'Item 3',
-    text: 'Text 3',
-    photo: 'https://randomuser.me/api/portraits/men/3.jpg',
-  },
-  {
-    title: 'Item 4',
-    text: 'Text 4',
-    photo: 'https://randomuser.me/api/portraits/men/4.jpg',
-  },
-  {
-    title: 'Item 5',
-    text: 'Text 5',
-    photo: 'https://randomuser.me/api/portraits/men/5.jpg',
-  },
-];
+import {MESSAGE_ICON, CART_OUTLINE_ICON} from '../../constants/icons';
+import {SCREEN_WIDTH} from '../../constants';
+import {currencyFormatter} from '../../utils/currency';
 
 const ProductDetails = props => {
-  const {route} = props;
-  // TODO Add View more in Description
-  //   const {id} = route.params;
-  const id = 2;
-  const carouselRef = useRef(null);
-  const [service, setService] = useState(null);
+  const {route, navigation} = props;
+  // Todo fix seller information should come from user or store
 
-  // useEffect(() => {
-  //   props.fetchService('62bc63b1aac5ba31feec4455').then(_service => {
-  //     console.log(_service);
-  //     setServices(_service);
-  //   });
-  // }, []);
+  const carouselRef = useRef(null);
+  const [service, setService] = useState(route.params.service);
+  const [productCount, setProductCount] = useState(0);
+  const [addonCount, setAddonCount] = useState(0);
+
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [selectedProductsTotal, setSelectedProductsTotal] = useState(0);
+  const [productTotal, setProductTotal] = useState(0);
+  const [addonTotal, setAddonTotal] = useState(0);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    setTotal(productTotal + addonTotal);
+  }, [productTotal, addonTotal]);
 
   const [activeSlide, setActiveSlide] = useState(0);
-  const [liked, setLiked] = useState(0);
 
-  _renderCarouselItem = ({item, index}) => {
+  const navigateTo = (screen, options) => {
+    navigation.navigate(screen, options);
+  };
+
+  const getSum = productsTotal => {
+    const prodValues = Object.values(productsTotal);
+    const countProducts = prodValues
+      .map(prod => prod.count)
+      .reduce((prev, next) => prev + next, 0);
+    const totalSum = prodValues
+      .map(prod => prod.count * prod.product.price)
+      .reduce((prev, next) => prev + next, 0);
+    return {total: totalSum, count: countProducts};
+  };
+
+  const productsChange = productsTotal => {
+    const sum = getSum(productsTotal);
+
+    setProductCount(sum.count);
+    setProductTotal(sum.total);
+  };
+
+  const addonsChange = productsTotal => {
+    const sum = getSum(productsTotal);
+
+    setAddonCount(sum.count);
+    setAddonTotal(sum.total);
+  };
+
+  const _renderCarouselItem = ({item, index}) => {
     return (
       <View style={styles.slide}>
         <Image
@@ -127,140 +94,156 @@ const ProductDetails = props => {
           source={{
             uri: config.api_address + 'services/images/' + item.filename,
           }}
-          // defaultSource="https://randomuser.me/api/portraits/men/5.jpg"
         />
       </View>
     );
   };
 
-  const pagination = () => {
-    return (
-      <Pagination
-        dotsLength={service.photos.length}
-        activeDotIndex={activeSlide}
-        containerStyle={styles.paginationContainer}
-        dotStyle={styles.paginationDot}
-        inactiveDotStyle={styles.paginationDotInactive}
-        inactiveDotOpacity={1}
-        inactiveDotScale={1}
-      />
-    );
+  const shop = () => {
+    console.log('shop');
   };
 
-  const changeLiked = () => {
-    const val = !liked;
-    setLiked(val);
+  const edit = () => {
+    navigateTo('ServiceStackNavigator', {
+      screen: 'AddPetService',
+      params: {
+        id: service._id,
+        photos: service.photos.map((photo, index) => {
+          return {
+            uri: config.api_address + 'services/images/' + photo.filename,
+            width: 99,
+            height: 213,
+            fileSize: new Date().getTime() + index + 1,
+            fileName: photo.filename,
+            type: photo.content_type,
+            id: photo._id,
+          };
+        }),
+        name: service.name,
+        price: service.price,
+        description: service.description,
+        services: service.products,
+        addons: service.product_addons,
+        deliveryLocationStore: service.delivery.delivery_location_store,
+        deliveryLocationHome: service.delivery.delivery_location_home,
+        deliveryFee: service.delivery.price_per_km,
+      },
+    });
   };
 
   return (
     <Fragment>
       <SafeAreaView style={styles.topArea} />
+      <NavigationBar
+        title={service?.name || ' '}
+        buttonNextText={'Edit'}
+        onPressNext={edit}
+      />
+      {!service && (
+        <>
+          <Skeleton animation="wave" circle width={40} height={40} />
+          <Skeleton animation="wave" width={120} height={40} />
+        </>
+      )}
       {service && (
         <View style={styles.screenContainer}>
-          <ScrollView>
+          <KeyboardAwareScrollView
+          // contentContainerStyle={{flex: 1, width: '100%'}}
+          >
             <Carousel
               ref={carouselRef}
               data={service.photos}
               renderItem={_renderCarouselItem}
-              sliderWidth={width}
-              itemWidth={width}
+              sliderWidth={SCREEN_WIDTH}
+              itemWidth={SCREEN_WIDTH}
               onSnapToItem={setActiveSlide}
             />
-            {pagination()}
-            <View style={styles.productSection}>
-              {/* Pricing Section */}
-              <View style={styles.belowImageContainer}>
-                <View style={styles.priceContainer}>
-                  <Text style={styles.price}>
-                    {currencyFormatter(service.price)}
-                  </Text>
+            <Pagination
+              dotsLength={service.photos.length}
+              activeDotIndex={activeSlide}
+              containerStyle={styles.paginationContainer}
+              dotStyle={styles.paginationDot}
+              inactiveDotStyle={styles.paginationDotInactive}
+              inactiveDotOpacity={1}
+              inactiveDotScale={1}
+            />
+            {/* <ProductInfoCard service={service} /> */}
+            <ProductListCard
+              title={'Service Options'}
+              products={service.products}
+              onProductsChange={productsChange}
+            />
 
-                  <View style={styles.priceDiscountContainer}>
-                    <View style={styles.priceDiscountPercentContainer}>
-                      <Text style={styles.priceDiscountPercent}>
-                        {service.discountPercent}
-                      </Text>
-                    </View>
-                    <Text style={styles.priceDiscount}>
-                      {currencyFormatter(service.discount)}
-                    </Text>
-                  </View>
-                </View>
-                <TouchableOpacity onPress={changeLiked}>
-                  <Icon
-                    name={liked ? HEART_ICON : HEART_OUTLINE_ICON}
-                    size={30}
-                    color={liked ? Colors.focusColor : Colors.gray}
-                  />
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.title}>{service.title}</Text>
-              {/* Rating */}
-              <View style={styles.reviewStarContainer}>
-                <StarRating rating={service.rating} starSize={22} />
-                <Text style={styles.reviewCountText}>
-                  {service.reviews} {t('reviews')}
-                </Text>
-                <Text style={styles.soldCountText}>
-                  {service.sold} {t('sold')}
-                </Text>
-              </View>
-            </View>
-            <ProductDetailCard description={service.description} />
-
+            {service?.product_addons?.length > 0 && (
+              <ProductListCard
+                title={'Extras'}
+                products={service?.product_addons}
+                onProductsChange={addonsChange}
+              />
+            )}
+            {service?.description?.length > 0 && (
+              <ProductDetailCard description={service?.description} />
+            )}
             {/* Seller Information */}
             <SellerInformationCard
-              avatar={service.avatar}
-              name={service.name}
-              location={service.location}
-              chatId={service.chatId}
+              avatar={service.store_id.avatar}
+              name={service.store_id.name}
+              location={service.store_id.location}
+              chatId={service.store_id.chatId}
             />
             {/* Review Section */}
-            <ReviewCard reviews={service.reviewsList} />
-          </ScrollView>
-
-          <View style={styles.bottomButtonsContainer}>
-            <OutlinedButton
-              color={Colors.primaryColor}
-              titleColor={Colors.white}
-              iconName={MESSAGE_ICON}
-              iconColor={Colors.primaryColor}
-              buttonStyle={styles.outlinedButton}
-            />
-            <View style={styles.shopBtnContainer}>
+            {/* <ReviewCard reviews={service.reviewsList} /> */}
+          </KeyboardAwareScrollView>
+          {total == 0 && <View style={styles.bottomButtonsContainer}></View>}
+          {total > 0 && (
+            <View style={styles.bottomButtonsContainer}>
               <OutlinedButton
                 color={Colors.primaryColor}
-                title={t('buy_now')}
-                buttonStyle={[
-                  styles.outlinedButton,
-                  {marginHorizontal: Layout.SMALL_MARGIN, flex: 1},
-                ]}
+                titleColor={Colors.white}
+                iconName={MESSAGE_ICON}
+                iconColor={Colors.primaryColor}
+                buttonStyle={styles.outlinedButton}
               />
-              <OutlinedButton
-                titleColor={Colors.onPrimaryColor}
-                title={t('add_cart')}
-                buttonStyle={[styles.filledButton, {flex: 1}]}
-              />
+              <TouchableItem
+                style={[styles.filledButton, styles.btnShopTouchable]}
+                onPress={shop}>
+                <View style={styles.btnShopContainer}>
+                  <View style={styles.btnShopTextContainer}>
+                    {total > 0 && (
+                      <Text style={styles.btnOrderMainText}>
+                        <Text style={styles.btnOrderText}>
+                          Base Price&nbsp;
+                        </Text>
+                        {currencyFormatter(total)}
+                      </Text>
+                    )}
+                  </View>
+                  <Icon
+                    style={{paddingRight: 20}}
+                    name={CART_OUTLINE_ICON}
+                    size={24}
+                    color={Colors.onPrimaryColor}
+                  />
+                </View>
+              </TouchableItem>
             </View>
-          </View>
+          )}
         </View>
       )}
     </Fragment>
   );
 };
 const styles = StyleSheet.create({
+  topArea: {
+    backgroundColor: Colors.background,
+  },
   paginationContainer: {
     top: 240,
     width: '100%',
     position: 'absolute',
     // backgroundColor: Colors.onPrimaryColor,
   },
-  productSection: {
-    paddingHorizontal: Layout.MEDIUM_PADDING,
-    paddingVertical: Layout.MEDIUM_PADDING,
-    borderBottomColor: Colors.lightGray,
-    borderBottomWidth: 2,
-  },
+
   paginationDotInactive: {
     backgroundColor: Colors.gray,
   },
@@ -270,60 +253,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginHorizontal: -5,
     marginTop: 0,
-    backgroundColor: Colors.accentColor,
+    backgroundColor: Colors.primaryColor,
+    borderWidth: 1,
+    borderColor: 'white',
   },
   image: {
     height: 300,
   },
-  belowImageContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingBottom: Layout.SMALL_PADDING,
-  },
-  priceContainer: {
-    flexDirection: 'column',
-  },
-  price: {
-    color: Colors.primaryText,
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  priceDiscountContainer: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-  },
-  priceDiscount: {
-    color: Colors.primaryText,
-    fontSize: 16,
-    textDecorationLine: 'line-through',
-    textDecorationStyle: 'solid',
-  },
-  priceDiscountPercentContainer: {
-    backgroundColor: Colors.focusColor,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    marginTop: 6,
-    marginRight: 6,
-    borderRadius: 5,
-  },
-  priceDiscountPercent: {
-    color: Colors.onFocusColor,
-    textAlign: 'center',
-  },
 
-  reviewStarContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    marginBottom: Layout.SMALL_PADDING,
-  },
-  reviewCountText: {
-    paddingHorizontal: Layout.SMALL_PADDING,
-  },
-  soldCountText: {
-    color: Colors.gray,
-  },
   bottomButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -346,16 +283,15 @@ const styles = StyleSheet.create({
   filledButton: {
     backgroundColor: Colors.primaryColor,
   },
-  shopBtnContainer: {
-    flex: 1,
-    flexDirection: 'row',
-  },
   screenContainer: {
     flex: 1,
+    width: '100%',
     backgroundColor: Colors.background,
   },
   title: {
     paddingBottom: Layout.SMALL_PADDING,
+    fontWeight: 'bold',
+    fontSize: 20,
   },
   reviewSection: {
     paddingHorizontal: Layout.MEDIUM_PADDING,
@@ -365,12 +301,45 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderBottomWidth: 2,
   },
+  btnOrderMainText: {
+    color: Colors.onPrimaryColor,
+    fontWeight: 'bold',
+    alignContent: 'flex-end',
+    textAlign: 'center',
+    flex: 1,
+    marginLeft: 10,
+  },
+  btnOrderText: {
+    color: Colors.onPrimaryColor,
+    fontWeight: 'normal',
+    alignContent: 'flex-end',
+    textAlign: 'center',
+  },
+  btnShopContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    alignContent: 'center',
+    borderRadius: 5,
+    flex: 1,
+  },
+  btnShopTextContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flex: 1,
+  },
+  btnShopTouchable: {
+    borderRadius: 5,
+    height: '100%',
+    flex: 1,
+    marginLeft: Layout.SMALL_MARGIN,
+  },
 });
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      addService,
+      fetchService,
     },
     dispatch,
   );

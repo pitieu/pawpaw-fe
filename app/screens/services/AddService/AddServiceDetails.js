@@ -34,7 +34,9 @@ const AddServiceDetails = props => {
   // error vars
   const [nameError, setNameError] = useState(false);
   useEffect(() => {
-    if (nameComponent) nameComponent.focus();
+    if (nameComponent) {
+      nameComponent.focus();
+    }
   }, [nameComponent]);
 
   focusOn = nextField => () => {

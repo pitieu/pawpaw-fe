@@ -27,8 +27,8 @@ import Colors from '../../../theme/colors';
 import Layout from '../../../theme/layout';
 import {ADD_ICON} from '../../../constants/icons';
 
-const MIN_PRICE = 10000;
-const MIN_NAME_CHARS = 6;
+const MIN_PRICE = 1000;
+const MIN_NAME_CHARS = 3;
 
 const AddServiceOptions = props => {
   // Todo add alert when error

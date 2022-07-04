@@ -131,11 +131,9 @@ const ImageGridMenuSelector = ({
     if (multiple) {
       const position = selectedPhotos.indexOf(index);
       if (position > -1) {
-        console.log('step1');
         if (selectedPhotoIndex == index) {
           const temp = [...selectedPhotos];
           temp.splice(position, 1);
-          console.log('step1.1', temp);
 
           if (temp.length <= LIMIT_PHOTOS) {
             setSelectedPhotos(() => {
@@ -144,14 +142,11 @@ const ImageGridMenuSelector = ({
             });
           }
         } else {
-          console.log('step1.2');
-
           setSelectedPhotoIndex(index);
         }
       } else {
         const temp = [...selectedPhotos];
         temp.push(index);
-        console.log('step2');
         if (temp.length <= LIMIT_PHOTOS) {
           setSelectedPhotos(temp);
           setSelectedPhotoIndex(index);

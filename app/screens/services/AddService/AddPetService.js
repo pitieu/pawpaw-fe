@@ -1,5 +1,4 @@
 // import dependencies
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {
   useState,
   memo,
@@ -15,58 +14,59 @@ import {
   SafeAreaView,
   StyleSheet,
   Animated,
-  FlatList,
   ActivityIndicator,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import {useIsFocused} from '@react-navigation/native';
 import {t} from 'i18next';
 import {ScrollView} from 'react-native-gesture-handler';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-// import {ScrollView} from 'react-native-virtualized-view';
 // components
 import UploadImage from '../../../components/image/uploadImage';
 import ListItem from '../../../components/list/listItem';
 import Divider from '../../../components/divider/Divider';
-import OutlinedButton from '../../../components/buttons/OutlinedButton';
 import CameraTaker from '../../../components/camera/cameraGallerySelector';
 import NavigationBar from '../../../components/NavigationBar';
 import TouchableItem from '../../../components/TouchableItem';
-import VirtualizedScrollView from '../../../components/scrollview/VirtualizedScrollView';
 
 // api
 import {addService} from '../../../store/actions/service';
+import {toast} from '../../../store/actions/toast';
 
 // import utility
 import {SCREEN_HEIGHT, SCREEN_WIDTH} from '../../../constants';
 import Colors from '../../../theme/colors';
 import Layout from '../../../theme/layout';
+import {removeDuplicateObjectFromArray} from '../../../utils';
 
 const AddPetService = props => {
-  const isFocused = useIsFocused();
-
+  console.log('SCREEN_HEIGHT:', SCREEN_HEIGHT);
   const {navigation, route} = props;
   const [isLoading, setIsLoading] = useState(false);
 
   // camera and upload image
   const uploadImageComponent = useRef();
+  const [id, setId] = useState(route.params.id || null);
   const [showCamera, setShowCamera] = useState(false);
-  const [photos, setPhotos] = useState([]);
+  const [photos, setPhotos] = useState(route.params?.photos || []);
   const offsetX = useMemo(() => new Animated.Value(SCREEN_WIDTH), []);
   // service details
-  const [name, setName] = useState(route.params.name);
-  const [price, setPrice] = useState(route.params.price);
-  const [description, setDescription] = useState(route.params.description);
-  const [services, setServices] = useState(route.params.services);
-  const [addons, setAddons] = useState(route.params.addons);
+  const [name, setName] = useState(route.params?.name);
+  // description
+  const [description, setDescription] = useState(route.params?.description);
+  // products
+  const [services, setServices] = useState(route.params?.services);
+  // addons
+  const [addons, setAddons] = useState(route.params?.addons);
   //service delivery
   const [deliveryLocationStore, setDeliveryLocationStore] = useState(
-    route.params.deliveryLocationStore || false,
+    route.params?.deliveryLocationStore || false,
   );
   const [deliveryLocationHome, setDeliveryLocationHome] = useState(
-    route.params.deliveryLocationHome || false,
+    route.params?.deliveryLocationHome || false,
   );
-  const [deliveryFee, setDeliveryFee] = useState(route.params.deliveryFee);
+  const [deliveryFee, setDeliveryFee] = useState(route.params?.deliveryFee);
 
   // Error vars
   const [uploadError, setUploadError] = useState(false);
@@ -80,37 +80,47 @@ const AddPetService = props => {
     // console.log('set route', route.params);
 
     // service details
-    setName(() => route.params.name);
-    setPrice(() => route.params.price);
-    setDescription(() => route.params.description);
+    setName(() => route.params?.name);
+    setDescription(() => route.params?.description);
     //service delivery
-    setDeliveryLocationStore(() => route.params.deliveryLocationStore);
-    setDeliveryLocationHome(() => route.params.deliveryLocationHome);
-    setDeliveryFee(() => route.params.deliveryFee);
-    if (route.params.services) {
-      setServices(() => route.params.services);
+    setDeliveryLocationStore(() => route.params?.deliveryLocationStore);
+    setDeliveryLocationHome(() => route.params?.deliveryLocationHome);
+    setDeliveryFee(() => route.params?.deliveryFee);
+    if (route.params?.services) {
+      setServices(() => route.params?.services);
     }
-    if (route.params.addons) {
-      setAddons(() => route.params.addons);
+    if (route.params?.addons) {
+      setAddons(() => route.params?.addons);
+    }
+
+    if (route.params?.photos) {
+      setPhotos(_p => {
+        let res = removeDuplicateObjectFromArray(
+          [..._p, ...route.params?.photos],
+          'fileName',
+        );
+        uploadImageComponent.current.updatePhotos(res);
+        return res;
+      });
     }
   }, [route]);
+
+  const callPhoto = async _photos => {
+    toggleCamera();
+    // using seTimeout to allow camera UI to show so that updatePhotos can be called
+    setTimeout(() => {
+      setPhotos(_p => {
+        uploadImageComponent.current.updatePhotos([..._p, ..._photos]);
+        return [..._p, ..._photos];
+      });
+    }, 20);
+  };
 
   const navigateTo = (screen, options) => {
     navigation.navigate(screen, options);
   };
 
-  const callPhoto = async _photos => {
-    toggleCamera();
-    // console.log(_photos);
-    // using seTimeout to allow camera UI to show so that updatePhotos can be called
-    setTimeout(() => {
-      setPhotos(_photos);
-      uploadImageComponent.current.updatePhotos(_photos);
-    }, 20);
-  };
-
   const toggleCamera = () => {
-    console.log('toggleCamera');
     setShowCamera(showCamera => {
       const val = showCamera ? SCREEN_WIDTH : 0;
       Animated.timing(offsetX, {
@@ -172,7 +182,6 @@ const AddPetService = props => {
       if (addonsError) return 'close';
     }
     if (type == 'delivery') {
-      console.log('delivery', deliveryLocationStore, deliveryLocationHome);
       if (deliveryLocationStore || deliveryLocationHome) return 'checkmark';
       if (deliveryError) return 'close';
     }
@@ -181,26 +190,35 @@ const AddPetService = props => {
   };
 
   const done = () => {
+    Toast.hide();
+
     // Todo add some alert stating there are missing fields?
     // Todo add back button alert preventing him from going back without confirmation
     if (!photos?.length) {
-      return setUploadError(true);
+      setUploadError(true);
     }
     if (!name?.length) {
-      return setNameError(true);
+      setNameError(true);
     }
-    // if (!description?.length) {
-    //   setDescriptionError(true);
-    // }
     if (!services?.length) {
-      return setServicesError(true);
+      setServicesError(true);
     }
-    // if (!addons?.length) {
-    //   setAddonsError(true);
-    // }
     if (!deliveryLocationStore && !deliveryLocationHome) {
-      return setDeliveryError(true);
+      setDeliveryError(true);
     }
+    if (!photos?.length) {
+      return props.toast(t('error_upload_image'));
+    }
+    if (!name?.length) {
+      return props.toast(t('error_name'));
+    }
+    if (!services?.length) {
+      return props.toast(t('error_services'));
+    }
+    if (!deliveryLocationStore && !deliveryLocationHome) {
+      return props.toast(t('error_delivery'));
+    }
+    console.log('all ok');
     setIsLoading(true);
 
     // everything's ok
@@ -208,7 +226,6 @@ const AddPetService = props => {
       .addService({
         photos: photos,
         name: name,
-        price: price,
         description: description,
         category: route?.params?.service, // category
         services: services,
@@ -257,7 +274,7 @@ const AddPetService = props => {
               onPress={() =>
                 navigateTo('AddServiceDetails', {
                   name: name,
-                  service: route.params.service,
+                  service: route.params?.service,
                 })
               }
               titleColor={checkColor('service_name')}
@@ -269,10 +286,8 @@ const AddPetService = props => {
                 onPress={() =>
                   navigateTo('AddServiceDetails', {
                     name: name,
-                    price: price,
                     services: services,
-                    addons: addons,
-                    service: route.params.service,
+                    service: route.params?.service,
                   })
                 }>
                 <Text style={styles.textDisplay}>{name}</Text>
@@ -317,30 +332,17 @@ const AddPetService = props => {
               onPress={() => {
                 if (services?.length) {
                   navigateTo('AddServiceOptions', {
-                    service: route.params.service,
+                    service: route.params?.service,
                     services: services,
                   });
                 } else {
                   navigateTo('AddServiceOption', {
-                    service: route.params.service,
+                    service: route.params?.service,
                     services: services,
                   });
                 }
               }}
             />
-            {/* <View style={styles.textDisplay}>
-                {services && services.length && (
-                  <Text>
-                    {services[0].name} {services[0].price}
-                  </Text>
-                )}
-                {services && services.length > 1 && (
-                  <Text>{services[1].name}</Text>
-                )}
-                {services && services.length > 2 && (
-                  <Text>{services[2].name}</Text>
-                )}
-              </View> */}
             <Divider type="inset" />
             {/******* SERVICE ADDONS ********/}
             <ListItem
@@ -354,12 +356,12 @@ const AddPetService = props => {
               onPress={() => {
                 if (addons?.length) {
                   navigateTo('AddServiceAddons', {
-                    service: route.params.service,
+                    service: route.params?.service,
                     addons: addons,
                   });
                 } else {
                   navigateTo('AddServiceAddon', {
-                    service: route.params.service,
+                    service: route.params?.service,
                     addons: addons,
                   });
                 }
@@ -410,38 +412,37 @@ const AddPetService = props => {
             <Divider type="inset" />
           </ScrollView>
           <View style={styles.bottomButtonsContainer}>
-            {/* <OutlinedButton
-              disabled={true}
-              color={Colors.onPrimaryColor}
-              titleColor={Colors.primaryColor}
-              title={t('save_draft').toUpperCase()}
-              buttonStyle={[styles.outlinedButton, styles.firstOutlinedButton]}
-            /> */}
             <TouchableItem style={styles.btn} onPress={done}>
               {isLoading ? (
                 <ActivityIndicator size="small" color="white" />
               ) : (
-                <Text style={styles.btnText}>{t('sell').toUpperCase()}</Text>
+                <Text style={styles.btnText}>
+                  {id
+                    ? t('update_service').toUpperCase()
+                    : t('sell').toUpperCase()}
+                </Text>
               )}
             </TouchableItem>
           </View>
         </SafeAreaView>
       </Fragment>
-      <CameraTaker
-        cameraTakerStyle={{
-          transform: [
-            {
-              translateX: offsetX,
-            },
-          ],
-          position: 'absolute',
-          top: 0,
-        }}
-        openGallery={true}
-        onPressNext={callPhoto}
-        onPressBack={toggleCamera}
-        selectedPhotos={photos}
-      />
+      {showCamera && (
+        <CameraTaker
+          cameraTakerStyle={{
+            transform: [
+              {
+                translateX: offsetX,
+              },
+            ],
+            position: 'absolute',
+            top: 0,
+          }}
+          openGallery={true}
+          onPressNext={callPhoto}
+          onPressBack={toggleCamera}
+          selectedPhotos={photos}
+        />
+      )}
     </>
   );
 };
@@ -469,12 +470,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white', //Colors.background,
   },
-  firstOutlinedButton: {
-    marginRight: Layout.SMALL_PADDING,
-  },
-  outlinedButton: {
-    flex: 1,
-  },
   btn: {
     backgroundColor: Colors.primaryColor,
     flex: 1,
@@ -491,6 +486,7 @@ const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
       addService,
+      toast,
     },
     dispatch,
   );

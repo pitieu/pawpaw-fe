@@ -29,12 +29,12 @@ const ConnectionItem = ({style, connection, dataType}) => {
     if (dataType == 'pet_services') {
       page = 'PetServiceDetails';
     }
-    if (dataType == 'pet_services') {
-      page = 'SocialFeed';
+    if (dataType == 'social_feed') {
+      page = 'ProductDetails';
     }
-
     navigation.navigate(page, {
       id: id,
+      service: connection.service,
     });
   };
 

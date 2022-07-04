@@ -21,7 +21,6 @@ import GalleryChooser from '../../components/image/GalleryChooser';
 import {
   FLASH_OFF_ICON,
   FLASH_ICON,
-  SETTINGS_ICON,
   CAMERA_RETAKE_ICON,
   CHEVRON_BACK_ICON,
 } from '../../constants/icons';
@@ -43,12 +42,9 @@ const CameraTaker = props => {
     onPressNext,
     onPressClose,
     onPressBack,
-    photos,
-    hide = false,
   } = props;
   const navigation = useNavigation();
 
-  const {sendToDirect, username} = route?.params || {};
   const focused = useIsFocused();
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
   const [front, setFront] = useState(true);
@@ -98,13 +94,9 @@ const CameraTaker = props => {
       uri: photo?.uri,
       base64: photo?.base64 || '',
       extension: (photo?.uri || '').split('.').pop() || 'jpg',
+      fileSize: new Date().getTime(),
     });
     onPressNext(images);
-    // navigation.navigate('StoryProcessor', {
-    //   images,
-    //   sendToDirect,
-    //   username,
-    // });
   };
 
   const _onGestureEvent = ({nativeEvent: {translationY}}) => {
@@ -294,22 +286,6 @@ const CameraTaker = props => {
                   borderWidth: 4,
                 }}
               />
-              {sendToDirect && username && (
-                <View style={styles.sendTo}>
-                  <Text
-                    style={{
-                      color: '#fff',
-                    }}>
-                    Message{' '}
-                    <Text
-                      style={{
-                        fontWeight: 'bold',
-                      }}>
-                      {username}
-                    </Text>
-                  </Text>
-                </View>
-              )}
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.8}
@@ -318,6 +294,8 @@ const CameraTaker = props => {
             </TouchableOpacity>
           </Animated.View>
           <GalleryChooser
+            columns={5}
+            maxPhotosSelected={5}
             onPhotosChange={onPhotosChange}
             onPressCamera={hideGallery}
             onPressNext={onPressNext}

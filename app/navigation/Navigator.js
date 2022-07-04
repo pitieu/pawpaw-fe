@@ -83,9 +83,6 @@ import Orders from '../screens/orders/Orders';
 // import AboutUs screen
 import AboutUs from '../screens/about/AboutUs';
 
-import Settings from '../screens/settings/Settings';
-import Search from '../screens/search/Search';
-
 // import colors
 import Colors from '../theme/colors';
 
@@ -100,7 +97,8 @@ function MainNavigatorA() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="ProductDetails" //"SignIn"
+        //"PetServiceDetails" "ServiceStackNavigator" "SignIn"
+        initialRouteName="HomeNavigator"
         screenOptions={{
           cardOverlayEnabled: false,
           headerStyle: {
@@ -124,9 +122,21 @@ function MainNavigatorA() {
           component={SignUp}
           options={{headerShown: false}}
         />
-        <Stack.Screen name="ProductDetails" component={ProductDetails} />
-        <Stack.Screen name="PetServiceDetails" component={ServiceDetails} />
-        <Stack.Screen name="SocialFeed" component={ProductDetails} />
+        <Stack.Screen
+          name="ProductDetails"
+          component={ProductDetails}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="PetServiceDetails"
+          component={ProductDetails}
+          options={{headerShown: false}}
+        />
+        {/* <Stack.Screen
+          name="ProductDetail"
+          component={ProductDetails}
+          options={{headerShown: false}}
+        /> */}
         <Stack.Screen
           name="Profile"
           component={Profile}

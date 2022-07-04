@@ -25,7 +25,7 @@ const ViewMoreText = ({t, lines = 4, text}) => {
         onTextLayout={onTextLayout}
         numberOfLines={textShown ? undefined : lines}
         style={{lineHeight: 21}}>
-        {text}
+        {text || ' '}
       </Text>
 
       {lengthMore ? (

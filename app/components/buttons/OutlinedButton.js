@@ -129,7 +129,11 @@ const OutlinedButton = ({
               iconMoonName && styles.pl8,
               title?.length ? {} : {paddingHorizontal: 0},
             ]}>
-            {title !== undefined ? title.toUpperCase() : ''}
+            {title !== undefined
+              ? typeof title === 'string'
+                ? title.toUpperCase()
+                : title
+              : ''}
           </ButtonText>
         </View>
       </TouchableItem>

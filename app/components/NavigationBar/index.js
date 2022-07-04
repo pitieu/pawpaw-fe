@@ -31,7 +31,11 @@ const NavigationBar = ({
       <TouchableOpacity onPress={backPressed} style={styles.btnBack}>
         <Icon name={CHEVRON_BACK_ICON} size={26} />
       </TouchableOpacity>
-      {!titleCustom && <Text style={styles.title}>{title}</Text>}
+      {!titleCustom && (
+        <Text style={styles.title} numberOfLines={1}>
+          {title}
+        </Text>
+      )}
       {titleCustom}
       <View
         style={{
@@ -80,6 +84,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '500',
+    // Todo: adjust maxWidth based on what's available
+    maxWidth: '60%',
   },
   btnNext: {
     color: Colors.focusColor,

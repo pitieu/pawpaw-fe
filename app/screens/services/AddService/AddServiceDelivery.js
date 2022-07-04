@@ -184,7 +184,7 @@ const AddServiceDelivery = props => {
                   onChangeText={setDeliveryFee}
                   inputType="currency"
                   keyboardType={'number-pad'}
-                  returnKeyType="next"
+                  returnKeyType="done"
                   decoBeforeInput={'Rp.'}
                   decoAfterInput={'per km'}
                 />

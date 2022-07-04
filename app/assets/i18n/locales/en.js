@@ -76,6 +76,12 @@ export default {
   service_addons: 'Add-ons (optional)',
   service_addons_subtitle: 'Write service add-ons',
   save_draft: 'Save Draft',
+  update_service: 'Update service',
+  error_fix_required_fields: 'Complete all sections marked with red',
+  error_upload_image: 'Upload at least one image',
+  error_name: 'Add a name',
+  error_services: 'Add at least one service',
+  error_delivery: 'Add at least one delivery option',
   // components/image/uploadImage.js
   add_assets: 'Add Photos or Videos',
   set_primary_image: 'Set as primary',
@@ -142,4 +148,6 @@ export default {
   service_addon_description: 'Description (optional)',
   service_addon_description_placeholder: 'Description about addon',
   service_addon_description_subtitle: '',
+  // components/cards/ProductDetailCard.js
+  description_subtitle: 'Description',
 };

@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
 // UnderlineTextInput
 const UnderlineTextInput = ({
   onRef = () => {},
-  onChangeText,
+  onChangeText = () => {},
   onFocus = () => {},
   onSubmitEditing,
   returnKeyType, //'done' | 'go' | 'next' | 'search' | 'send',
@@ -99,9 +99,10 @@ const UnderlineTextInput = ({
     onFocus(attr);
   };
 
-  const unFocus = attr => {
+  const unFocus = () => {
     setInputFocused(false);
   };
+
   const changedText = text => {
     if (inputType == 'currency') {
       onChangeText(currencyPunctuation(text));

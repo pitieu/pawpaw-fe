@@ -29,7 +29,6 @@ const AddServiceOptions = props => {
   const [services, setServices] = useState(route?.params?.services);
 
   useEffect(() => {
-    console.log(route?.params?.services);
     setServices(() => route?.params?.services);
   }, [route]);
 

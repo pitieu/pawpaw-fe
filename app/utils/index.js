@@ -1,11 +1,20 @@
 const MAPBOX_ACCESS_TOKEN =
   'pk.eyJ1IjoidnVjbXMwMjAyIiwiYSI6ImNrYzd3YXN5YjB0bzQyeWxqaHk3cndkZWUifQ.Rrt9iMYACnqGK-rCblD0Ag';
 
+export const onlyOneComma = (str, decimals = 1) => {
+  if (!str.length || str.indexOf(',') === -1) return str;
+  const strBeforeDot = str.split(',', 1)[0];
+  const strAfterDot = str.split(',', 2)[1];
+  str = strBeforeDot + ',' + strAfterDot.substr(0, decimals);
+  return str;
+};
+
 export const removeDuplicateObjectFromArray = (array, key) => {
   var check = new Set();
-  return array.filter(obj => {
+  let res = array.filter(obj => {
     return !check.has(obj[key]) && check.add(obj[key]);
   });
+  return res;
 };
 
 export const timestampToString = (create_at, suffix) => {

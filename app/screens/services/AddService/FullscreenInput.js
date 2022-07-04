@@ -8,10 +8,8 @@ import {
   Text,
   TextInput,
   View,
-  TouchableWithoutFeedback,
   TouchableOpacity,
   Keyboard,
-  Pressable,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {connect} from 'react-redux';
@@ -19,7 +17,6 @@ import {bindActionCreators} from 'redux';
 
 // import components
 import NavigationBar from '../../../components/NavigationBar';
-import Button from '../../../components/buttons/Button';
 
 // api
 import {toast} from '../../../store/actions/toast';
@@ -32,8 +29,6 @@ const FullscreenInput = props => {
   const {navigation, maxLength = 1600, route} = props;
   const [inputText, setInputText] = useState(route.params.description || '');
   const textInput = useRef();
-
-  const [isLoading, setIsLoading] = useState(false);
 
   const navigateTo = (screen, options) => {
     navigation.navigate(screen, options);

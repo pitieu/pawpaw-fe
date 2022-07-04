@@ -139,25 +139,23 @@ const Profile = props => {
     if (tabIndex === 2) {
       //load pet services
       props.listServices().then(services => {
-        const serv = [];
+        const _services = [];
         services.forEach(service => {
           const primaryPhoto = service.photos?.find(
             photo => photo.primary === true,
           );
-          console.log(
-            config.api_address + 'services/images/' + primaryPhoto?.filename,
-          );
-          serv.push({
+
+          _services.push({
             id: service._id,
             name: service.name,
             photo: primaryPhoto?.filename
               ? config.api_address + 'services/images/' + primaryPhoto?.filename
-              : '',
+              : service.photos[0].filename,
             price: service.products[0].price,
+            service: service,
           });
         });
-        // console.log('services', JSON.stringify(services));
-        setPetServices(serv);
+        setPetServices(_services);
       });
     }
     // console.log('tabIndex', tabIndex);
@@ -301,7 +299,7 @@ const Profile = props => {
     [socialFeedRef, socialFeedScrollHandler, sharedProps],
   );
 
-  const renderPerServices = useCallback(
+  const renderPetServices = useCallback(
     () => (
       <ConnectionList
         ref={petServicesRef}
@@ -372,7 +370,7 @@ const Profile = props => {
       <Tab.Navigator tabBar={renderTabBar}>
         <Tab.Screen name="Social Feed">{renderSocialFeed}</Tab.Screen>
         <Tab.Screen name="Marketplace">{renderMarketplace}</Tab.Screen>
-        <Tab.Screen name="Pet Services">{renderPerServices}</Tab.Screen>
+        <Tab.Screen name="Pet Services">{renderPetServices}</Tab.Screen>
       </Tab.Navigator>
     </View>
   );

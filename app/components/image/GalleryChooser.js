@@ -25,12 +25,12 @@ import {SCREEN_HEIGHT, SCREEN_WIDTH, STATUS_BAR_HEIGHT} from '../../constants';
 import Colors from '../../theme/colors';
 import {CHEVRON_BACK_ICON} from '../../constants/icons';
 
-const LIMIT_PHOTOS = 4;
-const COLUMNS = 5;
 const DEFAULT_IMAGE = require('../../assets/icons/waiting.png');
 
 const GalleryChooser = props => {
   const {
+    maxPhotosSelected = 4,
+    columns = 4,
     onPressCamera,
     galleryStyle,
     onPhotosChange,
@@ -452,7 +452,7 @@ const GalleryChooser = props => {
       if (position > -1) {
         const temp = [...selectedPhotos];
         temp.splice(position, 1);
-        if (temp.length <= LIMIT_PHOTOS) {
+        if (temp.length <= maxPhotosSelected) {
           setSelectedPhotos(temp);
           const temp2 = [...selectedPhotoSpecs];
           temp2.splice(position, 1);
@@ -462,7 +462,7 @@ const GalleryChooser = props => {
       } else {
         const temp = [...selectedPhotos];
         temp.push(index);
-        if (temp.length <= LIMIT_PHOTOS) {
+        if (temp.length <= maxPhotosSelected) {
           setSelectedPhotos(temp);
           const temp2 = [...selectedPhotoSpecs];
           temp2[temp.indexOf(selectedIndex)] = {
@@ -544,7 +544,7 @@ const GalleryChooser = props => {
 
   return (
     <Animated.View style={[styles.container, galleryStyle]}>
-      {uploading && (
+      {(uploading || photos.length == 0) && (
         <Animated.View
           style={{
             zIndex: 999,
@@ -580,232 +580,242 @@ const GalleryChooser = props => {
                 fontSize: 16,
                 fontWeight: '500',
               }}>
-              {'Processing Photos...'}
+              {photos.length == 0 ? 'Loading' : 'Processing Photos...'}
             </Text>
           </View>
         </Animated.View>
       )}
 
       {/* HEADER */}
-      <View
-        style={[
-          {
-            ...styles.navigationBar,
-            borderBottomColor: '#ddd',
-            borderBottomWidth: 0,
-          },
-        ]}>
-        <TouchableOpacity onPress={goBack} style={styles.centerBtn}>
-          <Icon name={CHEVRON_BACK_ICON} size={26} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={setShowGroupSelection.bind(null, true)}
-          style={{
-            marginLeft: 15,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-          <Text style={styles.groupText}>
-            {selectedGroupIndex > -1 ? groups[selectedGroupIndex] : '--'}
-          </Text>
-          <Icon name="chevron-down" size={26} />
-        </TouchableOpacity>
-        {/* GROUP/ALBUM OPTIONS */}
-        {showGroupSelection && (
-          <ScrollView
-            bounces={false}
-            contentContainerStyle={{
-              alignItems: 'flex-end',
-            }}
-            style={styles.groupOptionsWrapper}>
-            {showGroupSelection &&
-              groups.map((group, index) => (
-                <TouchableOpacity
-                  key={index}
-                  activeOpacity={0.8}
-                  onPress={() => {
-                    setSelectedGroupIndex(index);
-                    setShowGroupSelection(false);
-                  }}>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color: index === selectedGroupIndex ? '#000' : '#999',
-                    }}>
-                    {group}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-          </ScrollView>
-        )}
-        {/* DONE BUTTON */}
-        <TouchableOpacity
-          onPress={_onDone}
-          style={{
-            ...styles.centerBtn,
-            width: 60,
-          }}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '600',
-              color: Colors.focusColor,
-            }}>
-            {'Next'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <>
-        {/* IMAGE PREVIEW */}
-        <View
-          style={{
-            height: SCREEN_WIDTH,
-            width: SCREEN_WIDTH,
-            overflow: 'hidden',
-          }}>
-          {selectedIndex > -1 && (
-            <View>
-              <Animated.View
-                style={{
-                  transform: [
-                    {
-                      translateX: _photoOffsetX,
-                    },
-                    {
-                      translateY: _photoOffsetY,
-                    },
-                  ],
-                  width: Animated.multiply(
-                    photos[selectedIndex].node.image.width,
-                    _photoRatio,
-                  ),
-                  height: Animated.multiply(
-                    photos[selectedIndex].node.image.height,
-                    _photoRatio,
-                  ),
-                }}>
-                <Image
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                  source={{uri: photos[selectedIndex].node.image.uri || ''}}
-                />
-              </Animated.View>
-            </View>
-          )}
-          <PinchGestureHandler
-            enabled={enableGesture}
-            onHandlerStateChange={_onPinchStateChange}
-            onGestureEvent={_onPinchGestureEvent}>
-            <PanGestureHandler
-              enabled={enableGesture}
-              onHandlerStateChange={_onPanStateChange}
-              onGestureEvent={_onPanGestureEvent}>
-              <View
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  position: 'absolute',
-                  zIndex: 1,
-                  left: 0,
-                  top: 0,
-                }}>
-                <View style={styles.postToolWrapper}>
-                  <TouchableOpacity
-                    onPress={_onToggleFullSize}
-                    style={styles.btnPostTool}>
-                    <Icon name="resize" size={20} color="#fff" />
-                  </TouchableOpacity>
-                  <View style={{flexDirection: 'row'}}>
-                    {onPressCamera && (
-                      <TouchableOpacity
-                        onPress={onPressCamera}
-                        style={{
-                          ...styles.btnPostTool,
-                          marginRight: 10,
-                          backgroundColor: 'rgba(0,0,0,0.5)',
-                        }}>
-                        <Icon name="camera-outline" size={24} color="#fff" />
-                      </TouchableOpacity>
-                    )}
-                    <TouchableOpacity
-                      onPress={_onToggleMultiple}
-                      style={{
-                        ...styles.btnPostTool,
-                        backgroundColor: multiple
-                          ? Colors.focusColor
-                          : 'rgba(0,0,0,0.5)',
-                      }}>
-                      <Icon name="layers-outline" size={24} color="#fff" />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            </PanGestureHandler>
-          </PinchGestureHandler>
-        </View>
-        {/* IMAGE LIST */}
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          data={photos}
-          onEndReached={_onLoadmore}
-          renderItem={({item, index}) => (
+      {photos.length > 0 && (
+        <>
+          <View
+            style={[
+              {
+                ...styles.navigationBar,
+                borderBottomColor: '#ddd',
+                borderBottomWidth: 0,
+              },
+            ]}>
+            <TouchableOpacity onPress={goBack} style={styles.centerBtn}>
+              <Icon name={CHEVRON_BACK_ICON} size={26} />
+            </TouchableOpacity>
             <TouchableOpacity
-              onPress={_onSelectImage.bind(null, index)}
-              activeOpacity={0.8}
+              onPress={setShowGroupSelection.bind(null, true)}
               style={{
-                padding: 1,
-                width: SCREEN_WIDTH / COLUMNS,
-                height: SCREEN_WIDTH / COLUMNS,
+                marginLeft: 15,
+                flexDirection: 'row',
+                alignItems: 'center',
               }}>
-              {multiple && (
-                <View
-                  style={{
-                    position: 'absolute',
-                    right: 7.5,
-                    top: 7.5,
-                    height: 24,
-                    width: 24,
-                    borderRadius: 24,
-                    borderColor: '#fff',
-                    borderWidth: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    zIndex: 1,
-                    backgroundColor:
-                      selectedPhotos.indexOf(index) > -1
-                        ? Colors.focusColor
-                        : 'rgba(0,0,0,0.3)',
-                  }}>
-                  {selectedPhotos.indexOf(index) > -1 && (
-                    <Text style={styles.selectPhotoCountText}>
-                      {selectedPhotos.indexOf(index) + 1}
-                    </Text>
-                  )}
+              <Text style={styles.groupText}>
+                {selectedGroupIndex > -1 ? groups[selectedGroupIndex] : '--'}
+              </Text>
+              <Icon name="chevron-down" size={26} />
+            </TouchableOpacity>
+            {/* GROUP/ALBUM OPTIONS */}
+            {showGroupSelection && (
+              <ScrollView
+                bounces={false}
+                contentContainerStyle={{
+                  alignItems: 'flex-end',
+                }}
+                style={styles.groupOptionsWrapper}>
+                {showGroupSelection &&
+                  groups.map((group, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      activeOpacity={0.8}
+                      onPress={() => {
+                        setSelectedGroupIndex(index);
+                        setShowGroupSelection(false);
+                      }}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          color: index === selectedGroupIndex ? '#000' : '#999',
+                        }}>
+                        {group}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+              </ScrollView>
+            )}
+            {/* DONE BUTTON */}
+            <TouchableOpacity
+              onPress={_onDone}
+              style={{
+                ...styles.centerBtn,
+                width: 60,
+              }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '600',
+                  color: Colors.focusColor,
+                }}>
+                {'Next'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <>
+            {/* IMAGE PREVIEW */}
+            <View
+              style={{
+                height: SCREEN_WIDTH,
+                width: SCREEN_WIDTH,
+                overflow: 'hidden',
+              }}>
+              {selectedIndex > -1 && (
+                <View>
+                  <Animated.View
+                    style={{
+                      transform: [
+                        {
+                          translateX: _photoOffsetX,
+                        },
+                        {
+                          translateY: _photoOffsetY,
+                        },
+                      ],
+                      width: Animated.multiply(
+                        photos[selectedIndex].node.image.width,
+                        _photoRatio,
+                      ),
+                      height: Animated.multiply(
+                        photos[selectedIndex].node.image.height,
+                        _photoRatio,
+                      ),
+                    }}>
+                    <Image
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                      }}
+                      source={{uri: photos[selectedIndex].node.image.uri || ''}}
+                    />
+                  </Animated.View>
                 </View>
               )}
-              <Image
-                style={{
-                  opacity: index === selectedIndex && !multiple ? 0.8 : 1,
-                  width: '100%',
-                  height: '100%',
-                  borderWidth: index == selectedIndex ? 3 : 0,
-                  borderColor:
-                    index == selectedIndex ? Colors.focusColor : 'transparent',
-                }}
-                source={{
-                  uri: item.node.image.uri,
-                  // priority: FastImage.priority.high
-                }}
-              />
-            </TouchableOpacity>
-          )}
-          numColumns={COLUMNS}
-          keyExtractor={(item, key) => `${key}`}
-        />
-      </>
+              <PinchGestureHandler
+                enabled={enableGesture}
+                onHandlerStateChange={_onPinchStateChange}
+                onGestureEvent={_onPinchGestureEvent}>
+                <PanGestureHandler
+                  enabled={enableGesture}
+                  onHandlerStateChange={_onPanStateChange}
+                  onGestureEvent={_onPanGestureEvent}>
+                  <View
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      position: 'absolute',
+                      zIndex: 1,
+                      left: 0,
+                      top: 0,
+                    }}>
+                    <View style={styles.postToolWrapper}>
+                      <TouchableOpacity
+                        onPress={_onToggleFullSize}
+                        style={styles.btnPostTool}>
+                        <Icon name="resize" size={20} color="#fff" />
+                      </TouchableOpacity>
+                      <View style={{flexDirection: 'row'}}>
+                        {onPressCamera && (
+                          <TouchableOpacity
+                            onPress={onPressCamera}
+                            style={{
+                              ...styles.btnPostTool,
+                              marginRight: 10,
+                              backgroundColor: 'rgba(0,0,0,0.5)',
+                            }}>
+                            <Icon
+                              name="camera-outline"
+                              size={24}
+                              color="#fff"
+                            />
+                          </TouchableOpacity>
+                        )}
+                        <TouchableOpacity
+                          onPress={_onToggleMultiple}
+                          style={{
+                            ...styles.btnPostTool,
+                            backgroundColor: multiple
+                              ? Colors.focusColor
+                              : 'rgba(0,0,0,0.5)',
+                          }}>
+                          <Icon name="layers-outline" size={24} color="#fff" />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                </PanGestureHandler>
+              </PinchGestureHandler>
+            </View>
+            {/* IMAGE LIST */}
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              data={photos}
+              onEndReached={_onLoadmore}
+              renderItem={({item, index}) => (
+                <TouchableOpacity
+                  onPress={_onSelectImage.bind(null, index)}
+                  activeOpacity={0.8}
+                  style={{
+                    padding: 1,
+                    width: SCREEN_WIDTH / columns,
+                    height: SCREEN_WIDTH / columns,
+                  }}>
+                  {multiple && (
+                    <View
+                      style={{
+                        position: 'absolute',
+                        right: 7.5,
+                        top: 7.5,
+                        height: 24,
+                        width: 24,
+                        borderRadius: 24,
+                        borderColor: '#fff',
+                        borderWidth: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1,
+                        backgroundColor:
+                          selectedPhotos.indexOf(index) > -1
+                            ? Colors.focusColor
+                            : 'rgba(0,0,0,0.3)',
+                      }}>
+                      {selectedPhotos.indexOf(index) > -1 && (
+                        <Text style={styles.selectPhotoCountText}>
+                          {selectedPhotos.indexOf(index) + 1}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                  <Image
+                    style={{
+                      opacity: index === selectedIndex && !multiple ? 0.8 : 1,
+                      width: '100%',
+                      height: '100%',
+                      borderWidth: index == selectedIndex ? 3 : 0,
+                      borderColor:
+                        index == selectedIndex
+                          ? Colors.focusColor
+                          : 'transparent',
+                    }}
+                    source={{
+                      uri: item.node.image.uri,
+                      // priority: FastImage.priority.high
+                    }}
+                  />
+                </TouchableOpacity>
+              )}
+              numColumns={columns}
+              keyExtractor={(item, key) => `${key}`}
+            />
+          </>
+        </>
+      )}
     </Animated.View>
   );
 };

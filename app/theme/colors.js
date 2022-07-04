@@ -39,6 +39,14 @@ const themes = {
     // overlay color
     overlayColor: '#b90039',
 
+    // badge
+    badgeColor: '#dee4e7', //'#fff7fa',
+    onBadgeColor: '#37474f',
+
+    // info
+    infoColor: '#dee4e7',
+    onInfoColor: '#37474f',
+
     // text color
     primaryText: '#010203', //#010203
     secondaryText: '#5d5d5d',

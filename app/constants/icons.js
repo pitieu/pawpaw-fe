@@ -13,3 +13,36 @@ export const TRASH_OUTLINE_ICON = IOS
   : 'md-trash-outline';
 
 export const RIBBON_ICON = IOS ? 'ios-ribbon' : 'md-ribbon';
+export const HEART_OUTLINE_ICON = IOS
+  ? 'ios-heart-outline'
+  : 'md-heart-outline';
+export const HEART_ICON = IOS ? 'ios-heart' : 'md-heart';
+export const MESSAGE_ICON = IOS ? 'ios-chatbox-outline' : 'md-chatbox-outline';
+
+export const RADIO_BUTTON_OFF = IOS
+  ? 'ios-radio-button-off-outline'
+  : 'md-radio-button-off-outline';
+export const RADIO_BUTTON_ON = IOS
+  ? 'ios-radio-button-on-outline'
+  : 'md-radio-button-on-outline';
+
+export const REMOVE_CIRCLE_ICON = IOS
+  ? 'ios-remove-circle'
+  : 'md-remove-circle';
+export const ADD_CIRCLE_ICON = IOS ? 'ios-add-circle' : 'md-add-circle';
+
+export const REMOVE_OUTLINE_ICON = IOS
+  ? 'ios-remove-outline'
+  : 'md-remove-outline';
+export const ADD_OUTLINE_ICON = IOS ? 'ios-add-outline' : 'md-add-outline';
+
+export const CART_ICON = IOS ? 'ios-cart' : 'md-cart';
+export const CART_OUTLINE_ICON = IOS ? 'ios-cart-outline' : 'md-cart-outline';
+
+// export const BAG_HANDLE_OUTLINE_ICON = IOS
+//   ? 'ios-bag-handle-outline'
+//   : 'md-bag-handle-outline';
+
+export const RECEIPT_OUTLINE_ICON = IOS
+  ? 'ios-receipt-outline'
+  : 'md-receipt-outline';

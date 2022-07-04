@@ -40,9 +40,14 @@ export const callAddService = async data => {
 
     data.products = data.services.map(product => {
       let _product = {...product};
+
       _product.price = parseInt(_product.price);
-      _product.weightStart = parseInt(_product.weightStart || 0);
-      _product.weightEnd = parseInt(_product.weightEnd || 0);
+      _product.weight = {
+        start: parseFloat(_product.weightStart.replaceAll(/,/g, '.') || 0),
+        end: parseFloat(_product.weightEnd.replaceAll(/,/g, '.') || 0),
+      };
+      delete _product.weightStart;
+      delete _product.weightEnd;
       delete _product.id;
       return _product;
     });

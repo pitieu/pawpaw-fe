@@ -148,7 +148,7 @@ const UploadImage = (props, ref) => {
   }, []);
 
   const handleChoosePhoto = useCallback(async () => {
-    console.log(uploadType);
+    console.log('uploadType', uploadType);
     if (uploadType == 'camera') {
       addPhoto();
     } else {
@@ -174,15 +174,13 @@ const UploadImage = (props, ref) => {
   }, [photos]);
 
   const updatePhotos = _photos => {
-    // console.log('updatePhotos', _photos);
+    console.log('updatePhotos', _photos);
 
     if (
       _photos[0]?.uri &&
-      _photos[0]?.fileName &&
       _photos[0]?.fileSize &&
       _photos[0]?.height &&
-      _photos[0]?.width &&
-      _photos[0]?.type
+      _photos[0]?.width
     ) {
       setPhotos(photos => {
         if (!photos?.length) {
@@ -190,7 +188,7 @@ const UploadImage = (props, ref) => {
         }
         let res = removeDuplicateObjectFromArray(
           [...photos, ..._photos],
-          'fileSize',
+          'fileName',
         );
         if (uploadType == 'camera') {
           res = _photos.map(_p => {
@@ -207,29 +205,10 @@ const UploadImage = (props, ref) => {
           props.toast(t('error_upload_limit', {photo_limit: photoLimit}));
           return photos;
         } else {
-          // console.log(res.map(item => item.fileSize));
-          return res;
+          return removeDuplicateObjectFromArray(res, 'fileName');
         }
       });
     }
-  };
-
-  const handleUploadPhoto = () => {
-    fetch(`${SERVER_URL}/api/upload`, {
-      headers: {
-        Accept: 'application/x-www-form-urlencoded',
-        // Authorization: `Bearer ${this.props.user.token}`,
-      },
-      method: 'POST',
-      body: createFormData(photos, {userId: '123'}),
-    })
-      .then(response => response.json())
-      .then(response => {
-        console.log('response', response);
-      })
-      .catch(error => {
-        console.log('error', error);
-      });
   };
 
   const keyExtractor = useCallback((_, index) => index.toString(), []);
@@ -262,7 +241,7 @@ const UploadImage = (props, ref) => {
         );
       }
 
-      if (item.uri && !uploadType) {
+      if (item.uri) {
         return (
           <View style={styles.imageContainer}>
             <Menu renderer={SlideInMenu} style={styles.menu}>
@@ -302,40 +281,6 @@ const UploadImage = (props, ref) => {
                   />
                   <Text style={styles.menuItemText}>
                     {t('delete').toUpperCase()}
-                  </Text>
-                </MenuOption>
-              </MenuOptions>
-            </Menu>
-          </View>
-        );
-      }
-
-      if (item.uri && uploadType === 'camera') {
-        return (
-          <View style={styles.imageContainer}>
-            <Menu renderer={SlideInMenu} style={styles.menu}>
-              <MenuTrigger>
-                <View
-                  style={[
-                    styles.imageGroup,
-                    item.default ? styles.imageGroupDefault : {},
-                  ]}>
-                  <Image source={{uri: item.uri}} style={styles.image} />
-                </View>
-              </MenuTrigger>
-              <MenuOptions customStyles={styles.menuOptions}>
-                <MenuOption
-                  value={item.fileName}
-                  onSelect={setPrimaryImage}
-                  style={styles.menuOption}>
-                  <Icon
-                    style={styles.menuOptionIcon}
-                    name={RIBBON_ICON}
-                    size={IOS ? 26 : 24}
-                    color={Colors.primaryText}
-                  />
-                  <Text style={styles.menuItemText}>
-                    {t('set_primary_image').toUpperCase()}
                   </Text>
                 </MenuOption>
               </MenuOptions>

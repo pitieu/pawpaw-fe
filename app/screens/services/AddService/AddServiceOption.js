@@ -1,16 +1,7 @@
 // import dependencies
 import React, {Fragment, memo, useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  SafeAreaView,
-  StyleSheet,
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-} from 'react-native';
+import {SafeAreaView, StyleSheet, View, Text, Alert} from 'react-native';
 import {ButtonGroup} from '@rneui/themed';
 import {withTranslation} from 'react-i18next';
 // import {FlatList} from 'react-native-gesture-handler';
@@ -29,9 +20,10 @@ import Button from '../../../components/buttons/Button';
 import Colors from '../../../theme/colors';
 import Layout from '../../../theme/layout';
 import {ADD_ICON} from '../../../constants/icons';
+import {onlyOneComma} from '../../../utils';
 
 const MIN_PRICE = 10000;
-const MIN_NAME_CHARS = 6;
+const MIN_NAME_CHARS = 3;
 
 const timeList = [
   {label: '15 minutes', value: '15'},
@@ -135,10 +127,11 @@ const AddServiceOptions = props => {
   };
 
   const checkWeightStart = currWeight => {
-    setWeightStart(currWeight);
+    currWeight = onlyOneComma(currWeight, 1);
 
-    const _weightStart = parseInt(currWeight);
-    const _weightEnd = parseInt(weightEnd);
+    setWeightStart(currWeight);
+    const _weightStart = parseFloat(currWeight);
+    const _weightEnd = parseFloat(weightEnd);
     if (
       (!currWeight.length || _weightStart >= _weightEnd) &&
       selectedIndexes.indexOf(0) > -1
@@ -156,10 +149,11 @@ const AddServiceOptions = props => {
   };
 
   const checkWeightEnd = currWeight => {
+    currWeight = onlyOneComma(currWeight, 1);
     setWeightEnd(currWeight);
 
-    const _weightStart = parseInt(weightStart);
-    const _weightEnd = parseInt(currWeight);
+    const _weightStart = parseFloat(weightStart);
+    const _weightEnd = parseFloat(currWeight);
     if (!currWeight.length && selectedIndexes.indexOf(0) > -1) {
       setWeightEndError(t('error_weight_end_min'));
       return true;
@@ -202,7 +196,6 @@ const AddServiceOptions = props => {
     let services = [];
     if (route?.params?.services?.length) {
       services = route?.params?.services?.map(addon => {
-        console.log('addon', addon);
         if (addon.id === route?.params?.id) {
           addon.name = name;
           addon.description = description;
@@ -216,7 +209,6 @@ const AddServiceOptions = props => {
         }
         return addon;
       });
-      console.log('Services', services);
     }
     if (!found) {
       // todo add service with API and get returned id
