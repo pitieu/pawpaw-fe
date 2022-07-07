@@ -39,7 +39,6 @@ const timeList = [
 const AddServiceOptions = props => {
   // Todo add alert when error
   const {t, navigation, route} = props;
-
   const [isLoading, setIsLoading] = useState(false);
 
   const [priceComponent, setPriceComponent] = useState();
@@ -52,12 +51,18 @@ const AddServiceOptions = props => {
   const [description, setDescription] = useState(
     route?.params?.description || '',
   );
-  const [price, setPrice] = useState(route?.params?.price || '');
-  const [time, setTime] = useState(route?.params?.time || '');
+  const [price, setPrice] = useState(route?.params?.price?.toString() || '');
+  const [time, setTime] = useState(route?.params?.time?.toString() || '');
   const [weightStart, setWeightStart] = useState(
-    route?.params?.weightStart || '',
+    route?.params?.weightStart?.toString() ||
+      route?.params?.weight?.start?.toString().replaceAll(/\./g, ',') ||
+      '',
   );
-  const [weightEnd, setWeightEnd] = useState(route?.params?.weightEnd || '');
+  const [weightEnd, setWeightEnd] = useState(
+    route?.params?.weightEnd?.toString() ||
+      route?.params?.weight?.end?.toString().replaceAll(/\./g, ',') ||
+      '',
+  );
   const [selectedIndexes, setSelectedIndexes] = useState([]);
   // error vars
   const [nameError, setNameError] = useState(false);
@@ -188,6 +193,7 @@ const AddServiceOptions = props => {
   };
 
   const addServiceOption = () => {
+    console.log('route?.params?.id', route?.params?.id);
     let found = false;
     // Toast.hide();
 
@@ -195,25 +201,25 @@ const AddServiceOptions = props => {
 
     let services = [];
     if (route?.params?.services?.length) {
-      services = route?.params?.services?.map(addon => {
-        if (addon.id === route?.params?.id) {
-          addon.name = name;
-          addon.description = description;
-          addon.price = price.replaceAll(/\./g, '');
-          addon.weightStart = weightStart;
-          addon.weightEnd = weightEnd;
-          addon.weightSelected = selectedIndexes.indexOf(0) > -1;
-          addon.time = time;
-          addon.timeSelected = selectedIndexes.indexOf(1) > -1;
+      services = route?.params?.services?.map(service => {
+        if (service._id === route?.params?._id) {
+          service.name = name;
+          service.description = description;
+          service.price = price.replaceAll(/\./g, '');
+          service.weightStart = weightStart;
+          service.weightEnd = weightEnd;
+          service.weightSelected = selectedIndexes.indexOf(0) > -1;
+          service.time = time;
+          service.timeSelected = selectedIndexes.indexOf(1) > -1;
           found = true;
         }
-        return addon;
+        return service;
       });
     }
+
     if (!found) {
-      // todo add service with API and get returned id
       services.push({
-        id: new Date().getTime(),
+        _id: new Date().getTime(),
         name,
         description,
         price: price.replaceAll(/\./g, ''),
@@ -224,6 +230,7 @@ const AddServiceOptions = props => {
         timeSelected: selectedIndexes.indexOf(1) > -1,
       });
     }
+    console.log(services);
 
     if (!route?.params?.services?.length) {
       navigation.pop();

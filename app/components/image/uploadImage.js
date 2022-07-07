@@ -35,7 +35,7 @@ import {t} from 'i18next';
 
 // components
 import OutlinedButton from '../../components/buttons/OutlinedButton';
-import {Subtitle2} from '../text/CustomText';
+import {Subtitle1} from '../text/CustomText';
 
 // api
 import {toast} from '../../store/actions/toast';
@@ -272,7 +272,7 @@ const UploadImage = (props, ref) => {
                 <MenuOption
                   value={item.fileName}
                   onSelect={deletePhoto}
-                  style={styles.menuOption}>
+                  style={[styles.menuOption, {paddingBottom: 45}]}>
                   <Icon
                     style={styles.menuOptionIcon}
                     name={TRASH_OUTLINE_ICON}
@@ -298,12 +298,20 @@ const UploadImage = (props, ref) => {
   return (
     <View ref={ref} style={styles.container}>
       <View style={styles.subtitleContainer}>
-        <Subtitle2 style={{color: titleColor || Colors.secondaryText}}>
+        <Subtitle1
+          style={{
+            fontWeight: '500',
+            color: titleColor || Colors.secondaryText,
+          }}>
           {t('upload_image')}
-        </Subtitle2>
-        <Subtitle2 style={{color: titleColor || Colors.secondaryText}}>
+        </Subtitle1>
+        <Subtitle1
+          style={{
+            fontWeight: '500',
+            color: titleColor || Colors.secondaryText,
+          }}>
           &nbsp;({photos.length}/{photoLimit})
-        </Subtitle2>
+        </Subtitle1>
       </View>
 
       <AnimatedFlatList
@@ -321,6 +329,7 @@ const UploadImage = (props, ref) => {
 const styles = StyleSheet.create({
   container: {
     padding: CONTAINER_PADDING,
+    backgroundColor: '#F5F5F5',
   },
   subtitleContainer: {
     flexDirection: 'row',
@@ -346,6 +355,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 2,
     borderColor: Colors.lightGray,
+    backgroundColor: Colors.white,
     width: PHOTO_WIDTH,
     height: PHOTO_HEIGHT,
     alignItems: 'center',

@@ -31,7 +31,7 @@ import NavigationBar from '../../../components/NavigationBar';
 import TouchableItem from '../../../components/TouchableItem';
 
 // api
-import {addService} from '../../../store/actions/service';
+import {addService, updateService} from '../../../store/actions/service';
 import {toast} from '../../../store/actions/toast';
 
 // import utility
@@ -41,7 +41,6 @@ import Layout from '../../../theme/layout';
 import {removeDuplicateObjectFromArray} from '../../../utils';
 
 const AddPetService = props => {
-  console.log('SCREEN_HEIGHT:', SCREEN_HEIGHT);
   const {navigation, route} = props;
   const [isLoading, setIsLoading] = useState(false);
 
@@ -218,36 +217,59 @@ const AddPetService = props => {
     if (!deliveryLocationStore && !deliveryLocationHome) {
       return props.toast(t('error_delivery'));
     }
-    console.log('all ok');
+    // everything's ok
     setIsLoading(true);
 
-    // everything's ok
-    props
-      .addService({
-        photos: photos,
-        name: name,
-        description: description,
-        category: route?.params?.service, // category
-        services: services,
-        addons: addons,
-        deliveryLocationStore: deliveryLocationStore,
-        deliveryLocationHome: deliveryLocationHome,
-        deliveryFee: deliveryFee,
-      })
-      .then(() => {
-        setIsLoading(false);
-        console.log('navigate away');
-        // navigateTo('HomeNavigator');
-      })
-      .catch(() => {
-        setIsLoading(false);
-      });
+    if (id) {
+      // update service
+      props
+        .updateService({
+          id: id,
+          photos: photos,
+          name: name,
+          description: description,
+          category: route?.params?.service, // category
+          services: services,
+          addons: addons,
+          deliveryLocationStore: deliveryLocationStore,
+          deliveryLocationHome: deliveryLocationHome,
+          deliveryFee: deliveryFee,
+        })
+        .then(() => {
+          setIsLoading(false);
+          // navigateTo('HomeNavigator');
+        })
+        .catch(() => {
+          setIsLoading(false);
+        });
+    } else {
+      // create new service
+      props
+        .addService({
+          photos: photos,
+          name: name,
+          description: description,
+          category: route?.params?.service, // category
+          services: services,
+          addons: addons,
+          deliveryLocationStore: deliveryLocationStore,
+          deliveryLocationHome: deliveryLocationHome,
+          deliveryFee: deliveryFee,
+        })
+        .then(() => {
+          setIsLoading(false);
+          // navigateTo('HomeNavigator');
+        })
+        .catch(() => {
+          setIsLoading(false);
+        });
+    }
   };
 
   return (
     <>
       <Fragment>
-        <SafeAreaView style={{height: SCREEN_HEIGHT, backgroundColor: '#fff'}}>
+        <View style={styles.safeAreaView}>
           <NavigationBar
             title={t('service_add_pet_service')} //"Sell Pet Service"
             // onPressBack={navigation.goBack}
@@ -424,7 +446,7 @@ const AddPetService = props => {
               )}
             </TouchableItem>
           </View>
-        </SafeAreaView>
+        </View>
       </Fragment>
       {showCamera && (
         <CameraTaker
@@ -448,6 +470,12 @@ const AddPetService = props => {
 };
 
 const styles = StyleSheet.create({
+  safeAreaView: {
+    paddingTop: 46,
+    height: '100%',
+    backgroundColor: Colors.background,
+    flex: 1,
+  },
   textDisplay: {
     paddingLeft: 20,
     paddingRight: 50,
@@ -461,10 +489,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     padding: 16,
-    paddingBottom: 0,
-    backgroundColor: '#fff',
+    paddingBottom: 25,
+    backgroundColor: Colors.background, //'red',
     borderTopColor: Colors.lightGray,
     borderTopWidth: 1,
+    // bottom: 0,
+    // position: 'absolute',
   },
   container: {
     flex: 1,
@@ -486,6 +516,7 @@ const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
       addService,
+      updateService,
       toast,
     },
     dispatch,

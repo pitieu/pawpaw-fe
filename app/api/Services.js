@@ -29,6 +29,108 @@ export const createFormData = (photos, body = {}) => {
   return data;
 };
 
+export const callUpdateService = async data => {
+  try {
+    data.photos = data.photos.map(photo => {
+      const _photo = {...photo};
+      _photo.uri =
+        Platform.OS === 'ios' ? _photo.uri.replace('file://', '') : _photo.uri;
+      return _photo;
+    });
+    data.products = data.services.map(product => {
+      let _product = {...product};
+      _product.price = parseInt(_product.price);
+      _product.weight = {
+        start: _product?.weightStart
+          ? parseFloat(_product?.weightStart.replaceAll(/,/g, '.') || 0)
+          : _product.weight.start,
+        end: _product?.weightEnd
+          ? parseFloat(_product?.weightEnd.replaceAll(/,/g, '.') || 0)
+          : _product.weight.end,
+      };
+      if (String(_product._id).length < 24) {
+        // invalid _id was created with time as placeholder
+        delete _product._id;
+      }
+      delete _product.weightStart;
+      delete _product.weightEnd;
+      delete _product.id;
+      return _product;
+    });
+
+    data.products = JSON.stringify(data.products);
+    delete data.services;
+
+    if (data.addons?.length > 0) {
+      data.product_addons = data.addons.map(product => {
+        let _product = {...product};
+        _product.price = parseInt(_product.price);
+        if (String(_product._id).length < 24) {
+          // invalid _id was created with time as placeholder
+          delete _product._id;
+        }
+        delete _product.id;
+        return _product;
+      });
+      data.product_addons = JSON.stringify(data.product_addons);
+    }
+
+    delete data.addons;
+
+    const photos = data.photos;
+    data.stored_photos = data.photos
+      .filter(
+        photo =>
+          photo.uri.indexOf('http://') > -1 ||
+          photo.uri.indexOf('https://') > -1,
+      )
+      .map(photo => {
+        return {
+          primary: photo.default,
+          filename: photo.fileName,
+          content_type: photo.type,
+          _id: photo.id,
+        };
+      });
+    delete data.photos;
+
+    delete data.price;
+    data.delivery_location_home = !!data.deliveryLocationHome;
+    delete data.deliveryLocationHome;
+    data.delivery_location_store = !!data.deliveryLocationStore;
+    delete data.deliveryLocationStore;
+
+    if (data.deliveryFee) {
+      data.price_per_km = parseInt(data.deliveryFee);
+    } else {
+      data.price_per_km = 0;
+    }
+    delete data.deliveryFee;
+
+    if (!data.description) {
+      data.description = '';
+    }
+    delete data.category;
+    data.stored_photos = JSON.stringify(data.stored_photos);
+    const result = createFormData(photos, data);
+
+    const token = await getToken();
+    return await axios({
+      url: `${config.api_address}services/${data.id}`,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Accept-Language': I18n.language,
+        'auth-token': token,
+      },
+      method: 'put',
+      data: result,
+    });
+  } catch (error) {
+    console.log(error);
+    return Promise.reject(error);
+  }
+};
+
 export const callAddService = async data => {
   try {
     data.photos = data.photos.map(photo => {
@@ -91,7 +193,6 @@ export const callAddService = async data => {
       url: `${config.api_address}services/`,
       headers: {
         'Content-Type': 'multipart/form-data',
-        // 'Content-Type': 'application/json',
         'Accept-Language': I18n.language,
         'auth-token': token,
       },

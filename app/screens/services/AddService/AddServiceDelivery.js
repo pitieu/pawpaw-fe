@@ -32,13 +32,14 @@ const BG_CHECKBOX = '#F8F8F8';
 
 const AddServiceDelivery = props => {
   const {navigation, route} = props;
-
   const [isLoading, setIsLoading] = useState(false);
 
   const [deliveryLocation, setDeliveryLocation] = useState(
     route.params.deliveryLocation,
   );
-  const [deliveryFee, setDeliveryFee] = useState(route.params.deliveryFee);
+  const [deliveryFee, setDeliveryFee] = useState(
+    route.params.deliveryFee?.toString(),
+  );
   const [deliveryFeeComponent, setDeliveryFeeComponent] = useState();
   const [deliveryLocationStore, setDeliveryLocationStore] = useState(
     route.params.deliveryLocationStore,
@@ -67,9 +68,10 @@ const AddServiceDelivery = props => {
     } else {
       setLocationError(false);
       navigateTo('AddPetService', {
-        deliveryFee: deliveryFee
-          ? deliveryFee.replaceAll(/\./g, '')
-          : deliveryFee,
+        deliveryFee:
+          deliveryFee && deliveryFee.length > 2 // requires at least 3 digits to have valid number with decimal
+            ? deliveryFee.replaceAll(/\./g, '')
+            : deliveryFee,
         deliveryLocationStore,
         deliveryLocationHome,
       });

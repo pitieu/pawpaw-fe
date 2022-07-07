@@ -45,7 +45,7 @@ const AddServiceOptions = props => {
   const [description, setDescription] = useState(
     route?.params?.description || '',
   );
-  const [price, setPrice] = useState(route?.params?.price || '');
+  const [price, setPrice] = useState(route?.params?.price?.toString() || '');
 
   // error vars
   const [nameError, setNameError] = useState(false);
@@ -119,7 +119,7 @@ const AddServiceOptions = props => {
     let addons = [];
     if (route?.params?.addons?.length) {
       addons = route?.params?.addons?.map(addon => {
-        if (addon.id === route?.params?.id) {
+        if (addon._id === route?.params?._id) {
           addon.name = name;
           addon.description = description;
           addon.price = price.replaceAll(/\./g, '');
@@ -131,7 +131,7 @@ const AddServiceOptions = props => {
     if (!found) {
       // todo add addon with API and get returned id
       addons.push({
-        id: new Date().getTime(),
+        _id: new Date().getTime(),
         name,
         description,
         price: price.replaceAll(/\./g, ''),
