@@ -58,11 +58,13 @@ const themes = {
     surface: '#fff',
     onSurface: '#757575',
     error: '#cd040b',
+    success: '#4BB543',
     onError: '#fff',
     black: '#010203',
     white: '#fff',
     lightGray: '#eee',
     gray: '#aaa',
+    darkGray: '#666',
 
     // focus color
     focusColor: '#E02954',

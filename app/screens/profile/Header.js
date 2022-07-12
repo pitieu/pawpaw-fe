@@ -1,6 +1,7 @@
 import React, {memo, useMemo} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {withTranslation} from 'react-i18next';
+import {useNavigation} from '@react-navigation/native';
 
 // components
 import {Subtitle1, Subtitle2} from '../../components/text/CustomText';
@@ -27,28 +28,16 @@ const Header = ({
   followings = 0,
   t,
 }) => {
+  const navigation = useNavigation();
+
   const containerStyle = useMemo(() => [styles.container, style], []);
-
-  // const getProfile = async () => {
-  //   let user = await getUser();
-  //   if (!user) {
-  //     const response = await fetchUser();
-  //     console.log('user res', response.data);
-
-  //     if (response.data) {
-  //       await AsyncStorage.setItem('@user', JSON.stringify(response.data));
-  //     }
-  //     user = response.data;
-  //   }
-  //   // console.log('user', user);
-
-  //   setUsername(user.selected_account.username);
-  //   setPhone(`+${user.phone_ext} ${user.phone}`);
-  //   setEmail(user.email);
-  //   setAvatar(user.selected_account.avatar);
-  //   return user;
-  // };
-
+  const navigateTo = screen => {
+    navigation.navigate(screen);
+  };
+  const edit = () => {
+    console.log('editProfile');
+    navigateTo('EditProfile');
+  };
   return (
     <View style={containerStyle}>
       <View style={styles.firstSection}>
@@ -77,10 +66,14 @@ const Header = ({
 
       <View style={styles.userInfoSection}>
         <Subtitle1 style={styles.username}>{username}</Subtitle1>
-        <Text>{description}</Text>
+        {description && <Text>{description}</Text>}
       </View>
 
-      <OutlinedButton iconName="person-outline" title={t('edit_profile')} />
+      <OutlinedButton
+        iconName="person-outline"
+        title={t('edit_profile')}
+        onPress={edit}
+      />
     </View>
   );
 };

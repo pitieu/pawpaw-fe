@@ -5,6 +5,7 @@ import I18n from '../../assets/i18n/i18n';
 // action & types
 import {messageActionTypes} from '../reducers/message';
 import {authActionTypes} from '../reducers/auth';
+import {userActionTypes} from '../reducers/user';
 
 import {callLogin, callRegister} from '../../api/Auth';
 
@@ -76,6 +77,10 @@ export const login = (phone, phoneExt, password) => dispatch => {
       dispatch({
         type: authActionTypes.LOGIN_SUCCESS,
         payload: {user: response.data.user},
+      });
+      dispatch({
+        type: userActionTypes.USER_UPDATE,
+        payload: response.data.user,
       });
       dispatch({
         type: messageActionTypes.CLEAR_MESSAGE,

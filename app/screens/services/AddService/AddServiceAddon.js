@@ -62,7 +62,7 @@ const AddServiceOptions = props => {
   };
   const deleteAddon = () => {
     let addons = route?.params?.addons?.filter(
-      addon => addon.id !== route.params.id,
+      addon => addon._id !== route.params._id,
     );
     Alert.alert(t('confirm_delete'), t('deleting_addon_alert'), [
       {text: t('cancel').toUpperCase(), onPress: () => {}, style: 'cancel'},
@@ -159,9 +159,9 @@ const AddServiceOptions = props => {
         <NavigationBar
           title={t('add_service_addon_title')}
           onPressBack={goBack}
-          buttonNextText={route?.params?.id ? t('Delete') : null}
+          buttonNextText={route?.params?._id ? t('Delete') : null}
           onPressNext={
-            route?.params?.id ? () => deleteAddon(route?.params?.id) : null
+            route?.params?._id ? () => deleteAddon(route?.params?._id) : null
           }
         />
         <View style={styles.container}>

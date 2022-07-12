@@ -89,7 +89,7 @@ const AddServiceOptions = props => {
   };
   const deleteServiceOption = () => {
     let services = route?.params?.services?.filter(
-      service => service.id !== route.params.id,
+      service => service._id !== route.params._id,
     );
     Alert.alert(t('confirm_delete'), t('deleting_service_alert'), [
       {text: t('cancel').toUpperCase(), onPress: () => {}, style: 'cancel'},
@@ -193,7 +193,7 @@ const AddServiceOptions = props => {
   };
 
   const addServiceOption = () => {
-    console.log('route?.params?.id', route?.params?.id);
+    console.log('route?.params?._id', route?.params?._id);
     let found = false;
     // Toast.hide();
 
@@ -256,10 +256,10 @@ const AddServiceOptions = props => {
         <NavigationBar
           title={t('add_service_options_title')}
           onPressBack={goBack}
-          buttonNextText={route?.params?.id ? t('Delete') : null}
+          buttonNextText={route?.params?._id ? t('Delete') : null}
           onPressNext={
-            route?.params?.id
-              ? () => deleteServiceOption(route?.params?.id)
+            route?.params?._id
+              ? () => deleteServiceOption(route?.params?._id)
               : null
           }
         />

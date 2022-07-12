@@ -12,6 +12,9 @@ import {
 } from 'react-native';
 import {withTranslation} from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {t} from 'i18next';
 
 // import components
 import Avatar from '../../components/avatar/Avatar';
@@ -21,7 +24,7 @@ import TouchableItem from '../../components/TouchableItem';
 import OutlinedButton from '../../components/buttons/OutlinedButton';
 
 // api
-import {fetchUser} from '../../api/Account';
+import {getUser} from '../../store/actions/user';
 import {auth, logout} from '../../api/Auth';
 
 // import colors
@@ -69,6 +72,157 @@ const Setting = ({icon, title, onPress, extraData}) => (
     </View>
   </TouchableItem>
 );
+
+const Profile = props => {
+  const {
+    route,
+    // from state
+    user,
+    account,
+    getUser,
+  } = props;
+
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [avatar, setAvatar] = useState('');
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    async function fetchData() {
+      auth(navigation);
+      try {
+        await getProfile();
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    fetchData();
+  }, [route]);
+
+  const navigateTo = screen => {
+    navigation.navigate(screen);
+  };
+
+  const getProfile = async () => {
+    await getUser();
+
+    setUsername(account.username);
+    setAvatar(account.avatar);
+    // todo: format phone number using util function
+    setPhone(`+${user.phone_ext} ${user.phone}`);
+    setEmail(user.email);
+  };
+
+  const doLogout = () => {
+    Alert.alert(
+      t('logout'),
+      t('logout_confirm'),
+      [
+        {
+          text: t('cancel'),
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: t('logout'),
+          onPress: async () => {
+            await logout();
+            navigation.navigate('SignIn');
+          },
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
+  const edit = () => {
+    navigateTo('EditProfile');
+  };
+
+  const manageStore = () => {};
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar
+        backgroundColor={Colors.statusBarColor}
+        barStyle="dark-content"
+      />
+
+      <ScrollView enableOnAndroid>
+        <View style={styles.avatarSection}>
+          <View style={styles.avatar}>
+            <Avatar
+              imageUri={avatar || require('../../assets/img/profile.jpg')}
+              rounded
+              size={AVATAR_SIZE}
+            />
+          </View>
+          <View style={styles.userInfo}>
+            <Subtitle1 style={styles.username}>{username}</Subtitle1>
+            <Subtitle1>{phone}</Subtitle1>
+            <Subtitle1>{email}</Subtitle1>
+          </View>
+        </View>
+        <View style={styles.buttonContainer}>
+          <OutlinedButton
+            iconName="person-outline"
+            buttonStyle={styles.btnOutline}
+            title={t('edit_profile')}
+            onPress={edit}
+            // titleColor={Colors.onPrimaryColor}
+            // iconColor={Colors.onPrimaryColor}
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <OutlinedButton
+            iconMoonName="vet"
+            buttonStyle={styles.btnOutline}
+            title={t('manage_store')}
+            onPress={manageStore}
+
+            // titleColor={Colors.onPrimaryColor}
+            // iconColor={Colors.onPrimaryColor}
+          />
+        </View>
+
+        <View style={styles.listLinks}>
+          <Setting
+            onPress={() => navigateTo('Orders')}
+            icon={SETTINGS_ICON}
+            title="Account Settings & Privacy"
+          />
+          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+
+          <Setting
+            onPress={() => navigateTo('Orders')}
+            icon={CLIPBOARD_ICON}
+            title="Transaction List"
+          />
+          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+
+          <Setting
+            onPress={() => navigateTo('Orders')}
+            icon={HEART_ICON}
+            title="Wishlist"
+          />
+          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+
+          <Setting
+            onPress={() => navigateTo('Orders')}
+            icon={HELP_CENTER_ICON}
+            title="Help Center"
+          />
+          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+
+          <Setting onPress={doLogout} icon={EXIT_ICON} title="Logout" />
+          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
 
 // EditProfile Styles
 const styles = StyleSheet.create({
@@ -157,158 +311,17 @@ const styles = StyleSheet.create({
   },
 });
 
-const Profile = props => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [avatar, setAvatar] = useState('');
-
-  const navigation = useNavigation();
-
-  const {t} = props;
-  useFocusEffect(() => {
-    async function fetchData() {
-      auth(navigation);
-      try {
-        await getProfile();
-      } catch (e) {
-        console.log(e);
-      }
-    }
-    fetchData();
-  });
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     console.log('fetchData');
-  //     auth(navigation);
-  //     try {
-  //       await getProfile();
-  //     } catch (e) {
-  //       console.log(e);
-  //     }
-  //   }
-  //   fetchData();
-  // }, []);
-
-  const navigateTo = screen => () => {
-    navigation.navigate(screen);
-  };
-
-  const getProfile = async () => {
-    let user = await AsyncStorage.getItem('@user');
-    if (!user) {
-      const response = await fetchUser();
-      if (response.data) {
-        await AsyncStorage.setItem('@user', JSON.stringify(response.data));
-      }
-      user = response.data;
-    }
-
-    setUsername(user.selected_account.username);
-    setPhone(`+${user.phone_ext} ${user.phone}`);
-    setEmail(user.email);
-    setAvatar(user.selected_account.avatar);
-    return user;
-  };
-
-  const doLogout = () => {
-    Alert.alert(
-      t('logout'),
-      t('logout_confirm'),
-      [
-        {
-          text: t('cancel'),
-          onPress: () => {},
-          style: 'cancel',
-        },
-        {
-          text: t('logout'),
-          onPress: async () => {
-            await logout();
-            navigation.navigate('SignIn');
-          },
-        },
-      ],
-      {cancelable: false},
-    );
-  };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar
-        backgroundColor={Colors.statusBarColor}
-        barStyle="dark-content"
-      />
-
-      <ScrollView enableOnAndroid>
-        <View style={styles.avatarSection}>
-          <View style={styles.avatar}>
-            <Avatar
-              imageUri={avatar || require('../../assets/img/profile.jpg')}
-              rounded
-              size={AVATAR_SIZE}
-            />
-          </View>
-          <View style={styles.userInfo}>
-            <Subtitle1 style={styles.username}>{username}</Subtitle1>
-            <Subtitle1>{phone}</Subtitle1>
-            <Subtitle1>{email}</Subtitle1>
-          </View>
-        </View>
-        <View style={styles.buttonContainer}>
-          <OutlinedButton
-            iconName="person-outline"
-            buttonStyle={styles.btnOutline}
-            title={t('edit_profile')}
-            // titleColor={Colors.onPrimaryColor}
-            // iconColor={Colors.onPrimaryColor}
-          />
-        </View>
-        <View style={styles.buttonContainer}>
-          <OutlinedButton
-            iconMoonName="vet"
-            buttonStyle={styles.btnOutline}
-            title={t('manage_store')}
-            // titleColor={Colors.onPrimaryColor}
-            // iconColor={Colors.onPrimaryColor}
-          />
-        </View>
-
-        <View style={styles.listLinks}>
-          <Setting
-            onPress={navigateTo('Orders')}
-            icon={SETTINGS_ICON}
-            title="Account Settings & Privacy"
-          />
-          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
-
-          <Setting
-            onPress={navigateTo('Orders')}
-            icon={CLIPBOARD_ICON}
-            title="Transaction List"
-          />
-          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
-
-          <Setting
-            onPress={navigateTo('Orders')}
-            icon={HEART_ICON}
-            title="Wishlist"
-          />
-          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
-
-          <Setting
-            onPress={navigateTo('Orders')}
-            icon={HELP_CENTER_ICON}
-            title="Help Center"
-          />
-          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
-
-          <Setting onPress={doLogout} icon={EXIT_ICON} title="Logout" />
-          {/* <Divider type="inset" marginLeft={DIVIDER_MARGIN_LEFT} /> */}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      getUser,
+    },
+    dispatch,
   );
-};
 
-export default memo(withTranslation()(Profile));
+const mapStateToProps = (state, ownProps) => ({
+  user: state.user.user,
+  account: state.user.account,
+});
+
+export default memo(connect(mapStateToProps, mapDispatchToProps)(Profile));

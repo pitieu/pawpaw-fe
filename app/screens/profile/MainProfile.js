@@ -1,48 +1,374 @@
 // import dependencies
-import React from 'react';
-import {Text} from 'react-native-elements';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
-
-import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
-
-import {withTranslation} from 'react-i18next';
-
-// import components
-import CollapsingHeaderTab from '../../components/tabs/CollapsingHeaderTab';
-import HeaderComponent from './Header';
+import React, {
+  memo,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useEffect,
+} from 'react';
+import {useNavigation, useIsFocused} from '@react-navigation/native';
+import {
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from 'react-native';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import Animated, {
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+} from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 
 // api
-import {auth} from '../../api/Auth';
+import {listServices} from '../../store/actions/service';
+
+// import components
+import TabBar from '../../components/tabs/TabBar';
+import ConnectionList from '../../components/tabs/ConnectionList';
+import HeaderComponent from './Header';
 
 // import colors
 import Colors from '../../theme/colors';
+import config from '../../config';
 
-// EditProfile Styles
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
+const SOCIAL_FEED = [
+  {
+    id: 1,
+    photo: '',
   },
-});
+  {
+    id: 2,
+    photo: 'https://randomuser.me/api/portraits/men/2.jpg',
+  },
+  {
+    id: 3,
+    photo: 'https://randomuser.me/api/portraits/women/3.jpg',
+  },
+  {
+    id: 4,
+    photo: 'https://randomuser.me/api/portraits/men/3.jpg',
+  },
+  {
+    id: 5,
+    photo: 'https://randomuser.me/api/portraits/women/4.jpg',
+  },
+  {
+    id: 6,
+    photo: 'https://randomuser.me/api/portraits/men/4.jpg',
+  },
+  {
+    id: 7,
+    photo: 'https://randomuser.me/api/portraits/women/5.jpg',
+  },
+  {
+    id: 8,
+    photo: 'https://randomuser.me/api/portraits/men/5.jpg',
+  },
+  {
+    id: 9,
+    photo: 'https://randomuser.me/api/portraits/women/6.jpg',
+  },
+  {
+    id: 10,
+    photo: 'https://randomuser.me/api/portraits/men/6.jpg',
+  },
+  {
+    id: 11,
+    photo: 'https://randomuser.me/api/portraits/women/7.jpg',
+  },
+  {
+    id: 12,
+    photo: 'https://randomuser.me/api/portraits/men/7.jpg',
+  },
+  {
+    id: 13,
+    photo: 'https://randomuser.me/api/portraits/women/8.jpg',
+  },
+  {
+    id: 14,
+    photo: 'https://randomuser.me/api/portraits/men/8.jpg',
+  },
+  {
+    id: 15,
+    photo: 'https://randomuser.me/api/portraits/women/5.jpg',
+  },
+  {
+    id: 16,
+    photo: 'https://randomuser.me/api/portraits/men/5.jpg',
+  },
+  {
+    id: 17,
+    photo: 'https://randomuser.me/api/portraits/women/6.jpg',
+  },
+];
 
-const Profile = () => {
-  const navigation = useNavigation();
+const TAB_BAR_HEIGHT = 48;
+const HEADER_HEIGHT = 0;
 
-  useFocusEffect(() => {
-    async function fetchData() {
-      auth(navigation);
+const OVERLAY_VISIBILITY_OFFSET = 0;
+
+const Tab = createMaterialTopTabNavigator();
+
+const Profile = props => {
+  const isFocused = useIsFocused();
+  const {Overlay, route, navigation, account} = props;
+
+  const {bottom} = useSafeAreaInsets();
+  const top = 0;
+
+  const {height: screenHeight} = useWindowDimensions();
+
+  const marketplaceRef = useRef(null);
+  const petServicesRef = useRef(null);
+  const socialFeedRef = useRef(null);
+
+  const [petServices, setPetServices] = useState([]);
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const [headerHeight, setHeaderHeight] = useState(0);
+
+  const defaultHeaderHeight = top + HEADER_HEIGHT;
+
+  const headerConfig = useMemo(
+    () => ({
+      heightCollapsed: 0, // defaultHeaderHeight,
+      heightExpanded: headerHeight,
+    }),
+    [defaultHeaderHeight, headerHeight],
+  );
+
+  useEffect(() => {
+    if (tabIndex === 2) {
+      //load pet services
+      props.listServices().then(services => {
+        const _services = [];
+        services.forEach(service => {
+          const primaryPhoto = service.photos?.find(
+            photo => photo.primary === true,
+          );
+
+          _services.push({
+            id: service._id,
+            name: service.name,
+            photo: primaryPhoto?.filename
+              ? config.api_address + 'services/images/' + primaryPhoto?.filename
+              : service.photos[0].filename,
+            price: service.products[0].price,
+            service: service,
+          });
+        });
+        setPetServices(_services);
+      });
     }
-  });
+  }, [tabIndex, route]);
 
-  const Header = (
-    <HeaderComponent
-      username="Cho"
-      description="Let's get started 🚀"
-      avatar={'https://picsum.photos/id/1027/300/300'}
-      posts="100"
-      followers="101"
-      followings="102"
-    />
+  const {heightCollapsed, heightExpanded} = headerConfig;
+
+  const headerDiff = heightExpanded - heightCollapsed;
+
+  const rendered = headerHeight > 0;
+
+  const useScrollSync = (scrollPairs, headerConfig) => {
+    const sync = event => {
+      const {y} = event.nativeEvent.contentOffset;
+
+      const {heightCollapsed, heightExpanded} = headerConfig;
+
+      const headerDiff = heightExpanded - heightCollapsed;
+
+      for (const {list, position} of scrollPairs) {
+        const scrollPosition = position.value ?? 0;
+
+        if (scrollPosition > headerDiff && y > headerDiff) {
+          continue;
+        }
+
+        list.current?.scrollToOffset({
+          offset: Math.min(y, headerDiff),
+          animated: true,
+        });
+      }
+    };
+
+    return {sync};
+  };
+
+  const handleHeaderLayout = useCallback(
+    event => setHeaderHeight(event.nativeEvent.layout.height),
+    [],
+  );
+
+  const socialFeedScrollValue = useSharedValue(0);
+  const socialFeedScrollHandler = useAnimatedScrollHandler(
+    event => (socialFeedScrollValue.value = event.contentOffset.y),
+  );
+
+  const marketplaceScrollValue = useSharedValue(0);
+  const marketplaceScrollHandler = useAnimatedScrollHandler(
+    event => (marketplaceScrollValue.value = event.contentOffset.y),
+  );
+
+  const petServicesScrollValue = useSharedValue(0);
+  const petServicesScrollHandler = useAnimatedScrollHandler(
+    event => (petServicesScrollValue.value = event.contentOffset.y),
+  );
+
+  const scrollPairs = useMemo(
+    () => [
+      {list: socialFeedRef, position: socialFeedScrollValue},
+      {list: marketplaceRef, position: marketplaceScrollValue},
+      {list: petServicesRef, position: petServicesScrollValue},
+    ],
+    [
+      marketplaceRef,
+      marketplaceScrollValue,
+      socialFeedRef,
+      socialFeedScrollValue,
+      petServicesRef,
+      petServicesScrollValue,
+    ],
+  );
+
+  const {sync} = useScrollSync(scrollPairs, headerConfig);
+
+  const currentScrollValue = useDerivedValue(
+    () =>
+      tabIndex === 0
+        ? marketplaceScrollValue.value
+        : petServicesScrollValue.value,
+    [tabIndex, marketplaceScrollValue, petServicesScrollValue],
+  );
+
+  const translateY = useDerivedValue(
+    () => -Math.min(currentScrollValue.value, headerDiff),
+  );
+
+  const tabBarAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{translateY: translateY.value}],
+  }));
+
+  const headerAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{translateY: translateY.value}],
+    // opacity: interpolate(translateY.value, [-headerDiff, 0], [0, 1]),
+  }));
+
+  const contentContainerStyle = useMemo(
+    () => ({
+      paddingTop: rendered ? headerHeight + TAB_BAR_HEIGHT : 0,
+      paddingBottom: bottom,
+      flexDirection: 'column',
+      width: '100%',
+      minHeight: screenHeight + headerDiff,
+    }),
+    [rendered, headerHeight, bottom, screenHeight, headerDiff],
+  );
+
+  const sharedProps = useMemo(
+    () => ({
+      contentContainerStyle,
+      onMomentumScrollEnd: sync,
+      onScrollEndDrag: sync,
+      scrollEventThrottle: 16,
+      scrollIndicatorInsets: {top: heightExpanded},
+    }),
+    [contentContainerStyle, sync, heightExpanded],
+  );
+
+  const renderMarketplace = useCallback(
+    () => (
+      <ConnectionList
+        ref={marketplaceRef}
+        data={petServices}
+        dataType="marketplace"
+        onScroll={marketplaceScrollHandler}
+        {...sharedProps}
+      />
+    ),
+    [marketplaceRef, marketplaceScrollHandler, sharedProps],
+  );
+
+  const renderSocialFeed = useCallback(
+    () => (
+      <ConnectionList
+        ref={socialFeedRef}
+        data={SOCIAL_FEED}
+        typeList="image_grid"
+        dataType="social_feed"
+        onScroll={socialFeedScrollHandler}
+        {...sharedProps}
+      />
+    ),
+    [socialFeedRef, socialFeedScrollHandler, sharedProps],
+  );
+
+  const renderPetServices = useCallback(
+    () => (
+      <ConnectionList
+        ref={petServicesRef}
+        data={petServices}
+        dataType="pet_services"
+        onScroll={petServicesScrollHandler}
+        {...sharedProps}
+      />
+    ),
+    [petServicesRef, petServicesScrollHandler, sharedProps],
+  );
+
+  const tabBarStyle = useMemo(
+    () => [
+      rendered ? styles.tabBarContainer : undefined,
+      {top: rendered ? headerHeight : undefined},
+      tabBarAnimatedStyle,
+    ],
+    [rendered, headerHeight, tabBarAnimatedStyle],
+  );
+
+  const renderTabBar = useCallback(
+    props => (
+      <Animated.View style={tabBarStyle}>
+        <TabBar onIndexChange={setTabIndex} {...props} />
+      </Animated.View>
+    ),
+    [tabBarStyle],
+  );
+
+  const headerContainerStyle = useMemo(
+    () => [
+      rendered ? styles.headerContainer : undefined,
+      {
+        paddingTop: top,
+        borderBottomWidth: 1,
+        borderBottomColor: Colors.lightGray,
+      },
+      headerAnimatedStyle,
+    ],
+
+    [rendered, top, headerAnimatedStyle],
+  );
+
+  const collapsedOverlayAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      translateY.value,
+      [-headerDiff, OVERLAY_VISIBILITY_OFFSET - headerDiff, 0],
+      [1, 0, 0],
+    ),
+  }));
+
+  const collapsedOverlayStyle = useMemo(
+    () => [
+      styles.collapsedOverlay,
+      collapsedOverlayAnimatedStyle,
+      {height: heightCollapsed, paddingTop: top},
+    ],
+    [collapsedOverlayAnimatedStyle, heightCollapsed, top],
   );
 
   return (
@@ -51,9 +377,77 @@ const Profile = () => {
         backgroundColor={Colors.statusBarColor}
         barStyle="dark-content"
       />
-      <CollapsingHeaderTab Header={Header} />
+      <View style={styles.container}>
+        <Animated.View
+          onLayout={handleHeaderLayout}
+          style={headerContainerStyle}>
+          <HeaderComponent
+            username={account?.username || ' '}
+            description={account?.description}
+            avatar={account?.avatar || 'https://picsum.photos/id/1027/300/300'}
+            posts={account?.posts || '0'}
+            followers={account?.followers || '0'}
+            followings={account?.followings || '0'}
+          />
+        </Animated.View>
+        <Animated.View style={collapsedOverlayStyle}>{Overlay}</Animated.View>
+        <Tab.Navigator tabBar={renderTabBar}>
+          <Tab.Screen name="Social Feed">{renderSocialFeed}</Tab.Screen>
+          <Tab.Screen name="Marketplace">{renderMarketplace}</Tab.Screen>
+          <Tab.Screen name="Pet Services">{renderPetServices}</Tab.Screen>
+        </Tab.Navigator>
+      </View>
     </SafeAreaView>
   );
 };
 
-export default withTranslation()(Profile);
+// EditProfile Styles
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+    justifyContent: 'center',
+  },
+  tabBarContainer: {
+    top: 0,
+    left: 0,
+    right: 0,
+    position: 'absolute',
+    zIndex: 1,
+  },
+  overlayName: {
+    fontSize: 24,
+  },
+  collapsedOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    zIndex: 2,
+  },
+  headerContainer: {
+    top: 0,
+    left: 0,
+    right: 0,
+    position: 'absolute',
+    backgroundColor: 'white',
+    zIndex: 1,
+  },
+});
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      listServices,
+    },
+    dispatch,
+  );
+
+const mapStateToProps = (state, ownProps) => ({
+  user: state.user.user,
+  account: state.user.account,
+});
+
+export default memo(connect(mapStateToProps, mapDispatchToProps)(Profile));

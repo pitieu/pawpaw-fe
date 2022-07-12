@@ -1,5 +1,5 @@
 // import dependencies
-import React, {useState} from 'react';
+import React, {useState, memo} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useNavigation} from '@react-navigation/native';
 
@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/dist/MaterialCommunityIcons';
 import {LongPressGestureHandler, State} from 'react-native-gesture-handler';
 import {StyleSheet, Image, Text, Platform} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {connect} from 'react-redux';
 
 // import components
 import RNBottomActionSheet from 'react-native-bottom-action-sheet';
@@ -33,7 +34,8 @@ import {
 const Tab = createBottomTabNavigator();
 
 // HomeNavigator
-function HomeNavigator() {
+function HomeNavigator(props) {
+  const {user, account} = props;
   const [showMenu, setShowMenu] = useState(false);
   let loaded = false;
   let accountData;
@@ -129,7 +131,11 @@ function HomeNavigator() {
                 onHandlerStateChange={onLongPress}
                 minDurationMs={1000}>
                 <Image
-                  source={require('../assets/img/profile.jpg')}
+                  source={
+                    account?.avatar
+                      ? account?.avatar
+                      : require('../assets/img/profile.jpg')
+                  }
                   style={{
                     borderRadius: 28,
                     borderWidth: 1,
@@ -171,4 +177,11 @@ function HomeNavigator() {
 
 const styles = StyleSheet.create({});
 
-export default HomeNavigator;
+const mapStateToProps = (state, ownProps) => () => {
+  return {
+    user: state.user.user,
+    account: state.user.account,
+  };
+};
+
+export default memo(connect(mapStateToProps, null)(HomeNavigator));

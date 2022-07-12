@@ -1,6 +1,9 @@
 import {IOS} from '../constants/';
 
 export const CHEVRON_BACK_ICON = IOS ? 'ios-chevron-back' : 'md-chevron-back';
+export const CHEVRON_NEXT_ICON = IOS
+  ? 'ios-chevron-forward'
+  : 'md-chevron-forward';
 export const SETTINGS_ICON = IOS ? 'ios-options' : 'md-options';
 export const FLASH_ICON = IOS ? 'ios-flash' : 'md-flash';
 export const FLASH_OFF_ICON = IOS ? 'ios-flash-off' : 'md-flash-off';

@@ -29,8 +29,6 @@ import Colors from '../../theme/colors';
 import Layout from '../../theme/layout';
 import config from '../../config';
 
-var {width, height} = Dimensions.get('window');
-
 const SOCIAL_FEED = [
   {
     id: 1,
@@ -158,7 +156,6 @@ const Profile = props => {
         setPetServices(_services);
       });
     }
-    // console.log('tabIndex', tabIndex);
   }, [tabIndex, route]);
 
   const {heightCollapsed, heightExpanded} = headerConfig;

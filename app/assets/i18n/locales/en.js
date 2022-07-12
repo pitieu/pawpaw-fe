@@ -115,7 +115,8 @@ export default {
   error_location_required: 'Select at least one location',
   // screens/services/AddService/FullscreenInput.js
   service_description_title: 'Service Description',
-  description_min_required: 'You need to use at least {{chars}} characters.',
+  description_min_required: 'You need to use at least {{chars}} characters',
+  description_max_exceeded: 'You can only use {{chars}} characters',
   // screens/services/AddService/AddServiceOptions.js
   add_service_options_title: 'Service Options',
   service_option_name: 'Option title',
@@ -150,4 +151,25 @@ export default {
   service_addon_description_subtitle: '',
   // components/cards/ProductDetailCard.js
   description_subtitle: 'Description',
+  // screens/profile/EditProfile.js
+  edit_profile_title: 'Edit Profile',
+  btn_edit_photo: 'Edit Photo',
+  account_information_title: 'Account Information',
+  profile_information_title: 'Profile Information',
+  input_name_field: 'Name',
+  input_name_placeholder: 'Enter your name here',
+  input_bio_field: 'Bio',
+  input_bio_placeholder: 'Enter your biography here',
+  user_id_field: 'User ID',
+  username: 'Username',
+  input_email_field: 'Email',
+  input_email_placeholder: 'Enter your email here',
+  verify_email: 'Verify',
+  birthday_placeholder: 'Enter your birth date',
+  user_id_copied: 'User Id copied successfully!',
+  address_field: 'Address',
+  address_field_placeholder: 'Enter Address information',
+
+  confirm_discard_changes: 'Changes',
+  discard_changes_alert: 'Discard changes',
 };

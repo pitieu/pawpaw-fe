@@ -16,6 +16,7 @@ const NavigationBar = ({
   navigationStyle = {},
   buttonRightIcon,
   onPressButtonRight,
+  border,
 }) => {
   const navigation = useNavigation();
 
@@ -27,7 +28,14 @@ const NavigationBar = ({
     }
   };
   return (
-    <View style={[styles.navigationBar, navigationStyle]}>
+    <View
+      style={[
+        styles.navigationBar,
+        navigationStyle,
+        border
+          ? {borderBottomWidth: 1, borderBottomColor: Colors.lightGray}
+          : null,
+      ]}>
       <TouchableOpacity onPress={backPressed} style={styles.btnBack}>
         <Icon name={CHEVRON_BACK_ICON} size={26} />
       </TouchableOpacity>

@@ -6,7 +6,7 @@ import {MenuProvider} from 'react-native-popup-menu';
 import {Provider} from 'react-redux';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {enableScreens} from 'react-native-screens';
-import Toast, {ErrorToast} from 'react-native-toast-message';
+import Toast, {ErrorToast, BaseToast} from 'react-native-toast-message';
 
 import configureStore from './app/store/configureStore.js';
 import './app/assets/i18n/i18n';
@@ -39,6 +39,25 @@ const toastConfig = {
       text2NumberOfLines={3}
       text2Style={{
         color: Colors.onError,
+      }}
+    />
+  ),
+  default: props => (
+    <BaseToast
+      {...props}
+      style={{borderLeftWidth: 0}}
+      contentContainerStyle={{
+        paddingTop: 0,
+        paddingBottom: 0,
+        backgroundColor: Colors.onBackground,
+        borderRadius: 5,
+      }}
+      text1Style={{
+        padding: 0,
+        margin: 0,
+        color: Colors.white,
+        fontSize: 12,
+        fontWeight: '400',
       }}
     />
   ),

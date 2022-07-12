@@ -7,6 +7,7 @@ import React, {
   useRef,
   useEffect,
   useCallback,
+  Component,
 } from 'react';
 import {
   View,
@@ -17,7 +18,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
-import {useIsFocused} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {t} from 'i18next';
 import {ScrollView} from 'react-native-gesture-handler';
 import {connect} from 'react-redux';
@@ -41,8 +42,9 @@ import Layout from '../../../theme/layout';
 import {removeDuplicateObjectFromArray} from '../../../utils';
 
 const AddPetService = props => {
-  const {navigation, route} = props;
+  const {route} = props;
   const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigation();
 
   // camera and upload image
   const uploadImageComponent = useRef();
@@ -76,8 +78,6 @@ const AddPetService = props => {
   const [deliveryError, setDeliveryError] = useState(false);
 
   useEffect(() => {
-    // console.log('set route', route.params);
-
     // service details
     setName(() => route.params?.name);
     setDescription(() => route.params?.description);
@@ -98,7 +98,11 @@ const AddPetService = props => {
           [..._p, ...route.params?.photos],
           'fileName',
         );
-        uploadImageComponent.current.updatePhotos(res);
+        // timeout so setPhotos can happen and upload component shows so we can set it's photos
+        setTimeout(() => {
+          uploadImageComponent.current.updatePhotos(res);
+        }, 20);
+
         return res;
       });
     }
@@ -237,7 +241,15 @@ const AddPetService = props => {
         })
         .then(() => {
           setIsLoading(false);
-          // navigateTo('HomeNavigator');
+          navigation.navigate('HomeNavigator', {
+            screen: 'ProfileTab',
+            params: {
+              screen: 'MainProfile',
+              params: {
+                reload: true,
+              },
+            },
+          });
         })
         .catch(() => {
           setIsLoading(false);
@@ -258,7 +270,15 @@ const AddPetService = props => {
         })
         .then(() => {
           setIsLoading(false);
-          // navigateTo('HomeNavigator');
+          navigation.navigate('HomeNavigator', {
+            screen: 'ProfileTab',
+            params: {
+              screen: 'MainProfile',
+              params: {
+                reload: true,
+              },
+            },
+          });
         })
         .catch(() => {
           setIsLoading(false);
@@ -276,14 +296,16 @@ const AddPetService = props => {
             // buttonNextText={'Next'}
           />
           {/******* UPLOAD IMAGES ********/}
-          <UploadImage
-            ref={uploadImageComponent}
-            titleColor={checkColor('upload')}
-            onChange={setPhotos}
-            uploadType="camera"
-            addPhoto={toggleCamera}
-            photosList={photos}
-          />
+          {photos.length > 0 && (
+            <UploadImage
+              ref={uploadImageComponent}
+              titleColor={checkColor('upload')}
+              onChange={setPhotos}
+              uploadType="camera"
+              addPhoto={toggleCamera}
+              photosList={photos}
+            />
+          )}
           <ScrollView style={styles.container}>
             <Divider type="inset" />
             {/******* SERVICE NAME ********/}

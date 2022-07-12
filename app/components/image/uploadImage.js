@@ -174,7 +174,7 @@ const UploadImage = (props, ref) => {
   }, [photos]);
 
   const updatePhotos = _photos => {
-    console.log('updatePhotos', _photos);
+    // console.log('updatePhotos', _photos);
 
     if (
       _photos[0]?.uri &&

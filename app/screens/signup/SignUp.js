@@ -163,12 +163,6 @@ const SignUp = props => {
     setPasswordFocused(false);
   };
 
-  const phoneFocus = () => {
-    setUsernameFocused(false);
-    setPhoneFocused(true);
-    setPasswordFocused(false);
-  };
-
   const passwordFocus = () => {
     setUsernameFocused(false);
     setPhoneFocused(false);

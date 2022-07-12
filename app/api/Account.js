@@ -48,7 +48,6 @@ export const fetchUser = async () => {
     return response;
   } catch (error) {
     console.log(error);
-    // console.log(error.response.data);
     return error.response.data;
   }
 };
@@ -69,7 +68,6 @@ export const fetchAccounts = async () => {
     return response;
   } catch (error) {
     console.log(error);
-    // console.log(error.response.data);
     return error.response.data;
   }
 };
@@ -90,7 +88,6 @@ export const selectAccount = async accountId => {
     return response;
   } catch (error) {
     console.log(error);
-    // console.log(error.response.data);
     return error.response.data;
   }
 };
