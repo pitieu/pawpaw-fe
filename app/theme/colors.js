@@ -63,6 +63,7 @@ const themes = {
     black: '#010203',
     white: '#fff',
     lightGray: '#eee',
+    lighterGray: '#f3f3f3',
     gray: '#aaa',
     darkGray: '#666',
 

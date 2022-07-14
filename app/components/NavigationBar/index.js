@@ -8,7 +8,7 @@ import {CHEVRON_BACK_ICON} from '../../constants/icons';
 
 const NavigationBar = ({
   onPressBack,
-  title,
+  title = ' ',
   buttonNextText,
   onPressNext,
   buttonCustom,
@@ -31,10 +31,10 @@ const NavigationBar = ({
     <View
       style={[
         styles.navigationBar,
-        navigationStyle,
         border
           ? {borderBottomWidth: 1, borderBottomColor: Colors.lightGray}
           : null,
+        navigationStyle,
       ]}>
       <TouchableOpacity onPress={backPressed} style={styles.btnBack}>
         <Icon name={CHEVRON_BACK_ICON} size={26} />

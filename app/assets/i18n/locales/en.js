@@ -172,4 +172,8 @@ export default {
 
   confirm_discard_changes: 'Changes',
   discard_changes_alert: 'Discard changes',
+  // screens/profile/Address.js
+  select_location: 'Save Location',
+  current_location: 'Current Location',
+  autocomplete_placeholder: 'Enter location',
 };

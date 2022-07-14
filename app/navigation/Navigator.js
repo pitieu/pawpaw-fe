@@ -57,6 +57,8 @@ import Checkout from '../screens/checkout/Checkout';
 
 // import EditProfile screen
 import Profile from '../screens/profile/Profile';
+import LongLatMap from '../screens/profile/LongLatMap';
+import Address from '../screens/profile/Address';
 import EditProfile from '../screens/profile/EditProfile';
 
 // import DeliveryAddress screen
@@ -98,7 +100,7 @@ function MainNavigatorA() {
     <NavigationContainer>
       <Stack.Navigator
         //"PetServiceDetails" "ServiceStackNavigator" "SignIn"
-        initialRouteName="HomeNavigator"
+        initialRouteName="Address" //HomeNavigator
         screenOptions={{
           cardOverlayEnabled: false,
           headerStyle: {
@@ -130,6 +132,17 @@ function MainNavigatorA() {
         <Stack.Screen
           name="PetServiceDetails"
           component={ProductDetails}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="Address"
+          component={Address}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="LongLatMap"
+          component={LongLatMap}
           options={{headerShown: false}}
         />
         {/* <Stack.Screen

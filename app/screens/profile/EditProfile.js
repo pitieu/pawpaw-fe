@@ -180,8 +180,8 @@ const EditProfile = props => {
 
             <Title style={styles.title}>{t('account_information_title')}</Title>
             <ListItemEdit
-              disabledContent
               field={t('user_id_field')}
+              disabledContent
               value={account?._id}
               onPress={() => {
                 Clipboard.setString(account?._id);
@@ -298,7 +298,7 @@ const EditProfile = props => {
               field={t('address_field')}
               placeholder={t('address_field_placeholder')}
               borderBottom
-              // onPress={}
+              onPress={() => navigateTo('Address')}
             />
           </View>
         </KeyboardAwareScrollView>
@@ -349,9 +349,12 @@ const EditProfile = props => {
               value={bio}
               minLength={20}
               maxLength={200}
-              onPressBack={() => {
-                confirmDiscard('bio');
-                // closeBottomSheet('bio');
+              onPressBack={desc => {
+                if (bio != desc) {
+                  confirmDiscard('bio');
+                } else {
+                  closeBottomSheet('bio');
+                }
               }}
               onSavePressed={_bio => {
                 setBio(_bio);
@@ -367,9 +370,7 @@ const EditProfile = props => {
           ref={addressComponent}
           snapPoints={snapPointsAddress}
           index={0}>
-          <BottomSheetView>
-            <FullScreenInput title={'Address'} />
-          </BottomSheetView>
+          <BottomSheetView></BottomSheetView>
         </BottomSheet>
       </SafeAreaView>
     </>

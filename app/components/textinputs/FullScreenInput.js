@@ -81,7 +81,7 @@ const FullScreenInput = (props, ref) => {
     <SafeAreaView style={[styles.container, containerStyle]}>
       <NavigationBar
         title={title}
-        onPressBack={onPressBack}
+        onPressBack={() => onPressBack(inputText)}
         buttonNextText={t('save').toUpperCase()}
         onPressNext={save}
       />
