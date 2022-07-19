@@ -172,8 +172,27 @@ export default {
 
   confirm_discard_changes: 'Changes',
   discard_changes_alert: 'Discard changes',
-  // screens/profile/Address.js
+  // screens/profile/AddressList.js
+  address_list_title: 'Address List',
   select_location: 'Save Location',
   current_location: 'Current Location',
   autocomplete_placeholder: 'Enter location',
+  // screens/profile/Address.js
+  add_address_title: 'Address details',
+  recipient_information_title: 'Recipient information',
+  address_information_title: 'Address information',
+  input_address_name_field: 'Address Label',
+  input_address_name_placeholder: 'Home, Apartment, Villa, Office',
+  input_delivery_name_field: "Recipient's name",
+  input_delivery_name_placeholder: 'Name',
+  input_phone_field: 'Phone',
+  input_phone_placeholder: 'Phone Number',
+  input_city_field: 'City',
+  input_city_placeholder: 'City',
+  input_postal_code_field: 'Postal Code',
+  input_postal_code_placeholder: 'Postal Code',
+  input_address_field: 'Address',
+  input_address_placeholder: 'Full Address',
+  pin_location_field: 'Pin Location',
+  pin_location_placeholder: 'Select a location',
 };

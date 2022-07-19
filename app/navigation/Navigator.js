@@ -59,16 +59,8 @@ import Checkout from '../screens/checkout/Checkout';
 import Profile from '../screens/profile/Profile';
 import LongLatMap from '../screens/profile/LongLatMap';
 import Address from '../screens/profile/Address';
+import AddressList from '../screens/profile/AddressList';
 import EditProfile from '../screens/profile/EditProfile';
-
-// import DeliveryAddress screen
-import DeliveryAddress from '../screens/address/DeliveryAddress';
-
-// import AddAddress screen
-import AddAddress from '../screens/address/AddAddress';
-
-// import EditAddress screen
-import EditAddress from '../screens/address/EditAddress';
 
 // import Payment screen
 import PaymentMethod from '../screens/payment/PaymentMethod';
@@ -100,7 +92,7 @@ function MainNavigatorA() {
     <NavigationContainer>
       <Stack.Navigator
         //"PetServiceDetails" "ServiceStackNavigator" "SignIn"
-        initialRouteName="Address" //HomeNavigator
+        initialRouteName="EditProfile" //HomeNavigator
         screenOptions={{
           cardOverlayEnabled: false,
           headerStyle: {
@@ -134,10 +126,14 @@ function MainNavigatorA() {
           component={ProductDetails}
           options={{headerShown: false}}
         />
-
         <Stack.Screen
           name="Address"
           component={Address}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="AddressList"
+          component={AddressList}
           options={{headerShown: false}}
         />
         <Stack.Screen
@@ -218,6 +214,7 @@ function MainNavigatorA() {
           component={HomeNavigator}
           options={{headerShown: false}}
         />
+
         <Stack.Screen
           name="Categories"
           component={Categories}
@@ -252,34 +249,6 @@ function MainNavigatorA() {
           }}
         />
 
-        <Stack.Screen
-          name="DeliveryAddress"
-          component={DeliveryAddress}
-          options={({navigation}) => ({
-            title: 'Delivery Address',
-            headerRight: () => (
-              <HeaderIconButton
-                onPress={() => navigation.goBack()}
-                name={SAVE_ICON}
-                color={Colors.primaryColor}
-              />
-            ),
-          })}
-        />
-        <Stack.Screen
-          name="AddAddress"
-          component={AddAddress}
-          options={{
-            title: 'Add New Address',
-          }}
-        />
-        <Stack.Screen
-          name="EditAddress"
-          component={EditAddress}
-          options={{
-            title: 'Edit Address',
-          }}
-        />
         <Stack.Screen
           name="PaymentMethod"
           component={PaymentMethod}

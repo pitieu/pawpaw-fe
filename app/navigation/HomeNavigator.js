@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
 
 // import components
-import RNBottomActionSheet from 'react-native-bottom-action-sheet';
+// import RNBottomActionSheet from 'react-native-bottom-action-sheet';
 import ProfileStackNavigator from './ProfileStackNavigator';
 
 // screens

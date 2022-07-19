@@ -12,20 +12,15 @@ const styles = StyleSheet.create({
   },
 });
 
-// Divider Props
-type Props = {
-  marginLeft: number,
-  type: 'full-bleed' | 'inset' | 'middle',
-};
-
 // Divider
-const Divider = ({marginLeft, type, color}: Props) => (
+const Divider = ({containerStyle, marginLeft, type, color}) => (
   <View
     style={[
       styles.container,
       type === 'inset' && {marginLeft},
       type === 'middle' && styles.mh16,
       {backgroundColor: color ? color : '#eeeeee'},
+      containerStyle,
     ]}
   />
 );

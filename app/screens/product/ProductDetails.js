@@ -7,7 +7,7 @@ import {
   Image,
   Text,
 } from 'react-native';
-import Carousel, {Pagination} from 'react-native-snap-carousel';
+// import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {t} from 'i18next';
@@ -150,7 +150,7 @@ const ProductDetails = props => {
           <KeyboardAwareScrollView
           // contentContainerStyle={{flex: 1, width: '100%'}}
           >
-            <Carousel
+            {/* <Carousel
               ref={carouselRef}
               data={service.photos}
               renderItem={_renderCarouselItem}
@@ -166,7 +166,7 @@ const ProductDetails = props => {
               inactiveDotStyle={styles.paginationDotInactive}
               inactiveDotOpacity={1}
               inactiveDotScale={1}
-            />
+            /> */}
             {/* <ProductInfoCard service={service} /> */}
             <ProductListCard
               title={'Service Options'}

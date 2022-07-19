@@ -49,15 +49,16 @@ const EditProfile = props => {
   const emailComponent = useRef(null);
   const phoneComponent = useRef(null);
   const fullScreenInputComponent = useRef(null);
-  const [name, setName] = useState(account.username || '');
-  const [bio, setBio] = useState(account.description || '');
-  const [email, setEmail] = useState(user.email || '');
+  const [name, setName] = useState(account?.username || '');
+  const [bio, setBio] = useState(account?.description || '');
+  const [email, setEmail] = useState(user?.email || '');
   const [birthday, setBirthday] = useState(new Date());
-  const [birthdayFormatted, setBirthdayFormatted] = useState(account.birthday);
-  const [phone, setPhone] = useState(user.phone || '');
-  const [phoneExt, setPhoneExt] = useState(user.phone_ext || '');
+  const [birthdayFormatted, setBirthdayFormatted] = useState(account?.birthday);
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [phoneExt, setPhoneExt] = useState(user?.phone_ext || '');
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [gender, setGender] = useState(user.gender || '');
+  const [gender, setGender] = useState(user?.gender || '');
+  const [addressList, setAddressList] = useState(user?.addressList || []);
 
   const [key, setKey] = useState(0);
 
@@ -204,7 +205,7 @@ const EditProfile = props => {
             <ListItemEdit
               field={t('input_email_field')}
               iconBtn={
-                user.email_verified ? null : t('verify_email').toUpperCase()
+                user?.email_verified ? null : t('verify_email').toUpperCase()
               }
               valueComponent={
                 <TextInput
@@ -298,7 +299,13 @@ const EditProfile = props => {
               field={t('address_field')}
               placeholder={t('address_field_placeholder')}
               borderBottom
-              onPress={() => navigateTo('Address')}
+              onPress={() => {
+                if (addressList.length) {
+                  navigateTo('AddressList', {address_list: addressList});
+                } else {
+                  navigateTo('Address', {address_list: addressList});
+                }
+              }}
             />
           </View>
         </KeyboardAwareScrollView>
@@ -450,8 +457,8 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state, ownProps) => ({
-  user: state.user.user,
-  account: state.user.account,
+  user: state.user?.user,
+  account: state.user?.account,
 });
 
 export default memo(connect(mapStateToProps, null)(EditProfile));

@@ -7,9 +7,10 @@ import Colors from '../../theme/colors';
 import {CHEVRON_BACK_ICON} from '../../constants/icons';
 
 const NavigationBar = ({
-  onPressBack,
   title = ' ',
+  buttonBackText,
   buttonNextText,
+  onPressBack,
   onPressNext,
   buttonCustom,
   titleCustom,
@@ -37,7 +38,8 @@ const NavigationBar = ({
         navigationStyle,
       ]}>
       <TouchableOpacity onPress={backPressed} style={styles.btnBack}>
-        <Icon name={CHEVRON_BACK_ICON} size={26} />
+        {buttonBackText && <Text style={styles.btn}>{buttonBackText}</Text>}
+        {!buttonBackText && <Icon name={CHEVRON_BACK_ICON} size={26} />}
       </TouchableOpacity>
       {!titleCustom && (
         <Text style={styles.title} numberOfLines={1}>
@@ -58,7 +60,7 @@ const NavigationBar = ({
         )}
         {!buttonCustom && buttonNextText && (
           <TouchableOpacity onPress={onPressNext}>
-            <Text style={styles.btnNext}>{buttonNextText}</Text>
+            <Text style={[styles.btn, styles.btnNext]}>{buttonNextText}</Text>
           </TouchableOpacity>
         )}
         {!buttonCustom && !buttonNextText && !buttonRightIcon && (
@@ -95,11 +97,13 @@ const styles = StyleSheet.create({
     // Todo: adjust maxWidth based on what's available
     maxWidth: '60%',
   },
+  btn: {
+    fontSize: 16,
+  },
   btnNext: {
+    marginRight: 16,
     color: Colors.focusColor,
     fontWeight: 'bold',
-    fontSize: 16,
-    marginRight: 16,
   },
   placeholderView: {
     width: 44,

@@ -1,6 +1,5 @@
 import {useIsFocused} from '@react-navigation/native';
 import React, {memo, useRef, useState, useMemo, useEffect} from 'react';
-import {LogBox} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
 import {
@@ -11,7 +10,7 @@ import {
   View,
   Animated,
 } from 'react-native';
-import {RNCamera} from 'react-native-camera';
+// import {RNCamera} from 'react-native-camera';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {PanGestureHandler, State} from 'react-native-gesture-handler';
 
@@ -24,12 +23,6 @@ import {
   CAMERA_RETAKE_ICON,
   CHEVRON_BACK_ICON,
 } from '../../constants/icons';
-
-LogBox.ignoreLogs([
-  'ViewPropTypes will be removed',
-  'ColorPropType will be removed',
-  "exported from 'deprecated-react-native-prop-types'.",
-]);
 
 const WAITING_IMAGE = require('../../assets/icons/waiting.png');
 
@@ -178,7 +171,7 @@ const CameraTaker = props => {
         onGestureEvent={_onGestureEvent}
         onHandlerStateChange={_onStateChange}>
         <View style={styles.container}>
-          {focused && (
+          {/* {focused && (
             <RNCamera
               ratio="16:9"
               pictureSize="3840x2160"
@@ -188,7 +181,7 @@ const CameraTaker = props => {
               type={front ? 'front' : 'back'}
               flashMode={flash ? 'on' : 'off'}
             />
-          )}
+          )} */}
 
           <View style={styles.topOptions}>
             {onPressBack && (
