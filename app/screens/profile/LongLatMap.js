@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import {StyleSheet, View, Keyboard} from 'react-native';
+import {StyleSheet, View, Keyboard, Text} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
@@ -14,6 +14,8 @@ import Geolocation from 'react-native-geolocation-service';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {t} from 'i18next';
 import {Skeleton} from '@rneui/themed';
+import Icon from 'react-native-vector-icons/dist/Ionicons';
+// import Geocoder from 'react-native-geocoding';
 
 // components
 import Button from '../../components/buttons/Button';
@@ -29,6 +31,7 @@ const LongLatMap = props => {
   const navigation = useNavigation();
 
   const addressComponent = useRef(null);
+  const autocompleteComponent = useRef(null);
   const mapComponent = useRef(null);
   const snapPointsAddress = useMemo(() => ['30%', '90%'], []);
 
@@ -43,25 +46,24 @@ const LongLatMap = props => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Geocoder.init('AIzaSyAfmNOp-Rdw9v6y_1jaoGXwlVDuP3yyXY0');
+
     Geolocation.getCurrentPosition(
       async position => {
         setIsLoading(false);
-        setMarker({
-          longitude: position.coords.longitude,
-          latitude: position.coords.latitude,
-        });
-        // let camera = await mapComponent.current.getCamera();
-        // camera.center.latitude = position.coords.latitude;
-        // camera.center.longitude = position.coords.longitude;
-        // camera.center.zoom = 14;
-        // await mapComponent.current.animateCamera(camera);
-        setTimeout(() => {
-          mapComponent.current.animateToRegion({
+
+        setTimeout(async () => {
+          regionChange({
             longitude: position.coords.longitude,
             latitude: position.coords.latitude,
-            longitudeDelta: '0.0121',
-            latitudeDelta: '0.015',
           });
+          // not really good because there are many different places in a specific location
+          // const loc = await Geocoder.from(position.coords);
+          // if (autocompleteComponent.current.getAddressText().length == 0) {
+          //   autocompleteComponent.current.setAddressText(
+          //     loc.results[0].formatted_address,
+          //   );
+          // }
         }, 10);
       },
       error => {
@@ -76,15 +78,24 @@ const LongLatMap = props => {
     addressComponent.current?.snapToIndex(index);
   }, []);
 
-  const regionChange = useCallback(async region => {
+  const regionChange = useCallback(async (region, type) => {
     setMarker(() => ({
       latitude: region.latitude,
       longitude: region.longitude,
     }));
-    let camera = await mapComponent.current.getCamera();
-    camera.center.latitude = region.latitude;
-    camera.center.longitude = region.longitude;
-    await mapComponent.current.animateCamera(camera);
+    if (type === 'camera') {
+      let camera = await mapComponent.current.getCamera();
+      camera.center.latitude = region.latitude;
+      camera.center.longitude = region.longitude;
+      await mapComponent.current.animateCamera(camera);
+    } else {
+      mapComponent.current.animateToRegion({
+        longitude: region.longitude,
+        latitude: region.latitude,
+        longitudeDelta: '0.0121',
+        latitudeDelta: '0.015',
+      });
+    }
   }, []);
 
   const handleSheetChanges = useCallback(index => {
@@ -95,22 +106,21 @@ const LongLatMap = props => {
 
   const autocompletePressed = (data, details = null) => {
     showBottomSheet(0);
-    if (details.geometry.location.lat && details.geometry.location.lng)
+    if (details.geometry.location.lat && details.geometry.location.lng) {
       regionChange({
         latitude: details.geometry.location.lat,
         longitude: details.geometry.location.lng,
-        longitudeDelta: '0.0121',
-        latitudeDelta: '0.015',
       });
+    }
   };
 
   const setLocation = useCallback(() => {
+    const auto = autocompleteComponent.current.getAddressText();
     // set location
-    navigation.navigate(props.params.parentScreen, {
-      params: {
-        longitude: marker.longitude,
-        latitude: marker.latitude,
-      },
+    navigation.navigate(route.params.parentScreen, {
+      longitude: marker.longitude,
+      latitude: marker.latitude,
+      locationText: auto,
     });
   }, []);
 
@@ -128,16 +138,19 @@ const LongLatMap = props => {
             latitudeDelta: '0.015',
           }}
           onPress={(coordinate, point) => {
-            regionChange(coordinate.nativeEvent.coordinate);
+            autocompleteComponent.current.setAddressText('');
+            regionChange(coordinate.nativeEvent.coordinate, 'camera');
           }}
           onPoiClick={(coordinate, point) => {
-            regionChange(coordinate.nativeEvent.coordinate);
+            autocompleteComponent.current.setAddressText('');
+            regionChange(coordinate.nativeEvent.coordinate, 'camera');
           }}
           loadingEnabled>
           <Marker coordinate={marker} />
         </MapView>
       )}
       <NavigationBar navigationStyle={{backgroundColor: 'transparent'}} />
+
       <BottomSheet
         style={styles.bottomSheet}
         ref={addressComponent}
@@ -169,7 +182,9 @@ const LongLatMap = props => {
           {!isLoading && (
             <View style={styles.autocompleteContainer}>
               <GooglePlacesAutocomplete
+                ref={autocompleteComponent}
                 placeholder={t('autocomplete_placeholder')}
+                minLength={3}
                 textInputProps={{
                   onFocus: () => {
                     setInputFocused(true);
@@ -183,6 +198,8 @@ const LongLatMap = props => {
                 }}
                 fetchDetails={true}
                 onPress={autocompletePressed}
+                currentLocation={true}
+                currentLocationLabel={t('current_location')}
                 GooglePlacesSearchQuery={{
                   rankby: 'distance',
                 }}
@@ -197,10 +214,14 @@ const LongLatMap = props => {
                 renderDescription={row =>
                   row.description || row.structured_formatting || row.name
                 }
-                currentLocation={true}
-                currentLocationLabel={t('current_location')}
                 styles={styles.autocomplete}
                 debounce={300}
+              />
+              <Icon
+                name={'search'}
+                size={20}
+                color={Colors.gray}
+                style={{position: 'absolute', top: 26, left: 25, zIndex: 2}}
               />
               {!inputFocused && (
                 <Button
@@ -267,6 +288,7 @@ const styles = StyleSheet.create({
       zIndex: 1,
     },
     textInput: {
+      paddingLeft: 40,
       backgroundColor: Colors.lightGray,
     },
   },

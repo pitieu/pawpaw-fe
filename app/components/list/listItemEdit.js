@@ -24,6 +24,7 @@ const ListItemEdit = ({
   borderBottom,
   border = true,
   inputContainerStyle,
+  inputStyle,
   numberOfLines,
 }) => {
   return (
@@ -58,6 +59,7 @@ const ListItemEdit = ({
                 styles.fieldValue,
                 value ? {color: Colors.primaryText} : {color: Colors.gray},
                 disabledContent ? {color: Colors.darkGray} : null,
+                inputStyle,
               ]}>
               {value || placeholder}
             </Text>

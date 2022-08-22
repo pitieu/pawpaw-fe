@@ -91,3 +91,21 @@ export const selectAccount = async accountId => {
     return error.response.data;
   }
 };
+
+export const searchAddressList = async search => {
+  try {
+    const token = await getToken();
+    const response = await axios({
+      url: `${config.api_address}accounts/address?search=${search}`,
+      headers: {
+        'Accept-Language': I18n.language,
+        'auth-token': token,
+      },
+      method: 'get',
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+    return error.response.data;
+  }
+};

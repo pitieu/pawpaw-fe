@@ -1,5 +1,12 @@
 // import dependencies
-import React, {memo, useState, useRef, useMemo, useCallback} from 'react';
+import React, {
+  memo,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+  useEffect,
+} from 'react';
 import {
   SafeAreaView,
   Image,
@@ -10,6 +17,7 @@ import {
   Button,
   Dimensions,
   Alert,
+  Keyboard,
 } from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {t} from 'i18next';
@@ -62,19 +70,20 @@ const EditProfile = props => {
 
   const [key, setKey] = useState(0);
 
-  const snapPointsGender = useMemo(() => [1, 170], []);
-  const snapPointsAddress = useMemo(() => [1, '100%'], []);
-  const snapPointsBio = useMemo(() => [1, '100%'], []);
+  const snapPointsGender = useMemo(() => [170], []);
+  const snapPointsAddress = useMemo(() => ['99.99%'], []);
+  const snapPointsBio = useMemo(() => ['99.99%'], []);
 
   const showBottomSheet = useCallback((type, index) => {
     if (type === 'gender') {
-      genderComponent.current?.snapToIndex(index);
+      genderComponent.current?.expand();
     }
     if (type === 'address') {
-      addressComponent.current?.snapToIndex(index);
+      addressComponent.current?.expand();
     }
     if (type === 'bio') {
-      bioComponent.current?.snapToIndex(index);
+      bioComponent.current?.expand();
+      fullScreenInputComponent?.current.focus();
     }
   }, []);
 
@@ -99,10 +108,9 @@ const EditProfile = props => {
     navigation.navigate(screen, options);
   };
 
-  const focusOn = nextFiled => () => {
-    console.log(nextFiled);
-    if (nextFiled?.current) {
-      nextFiled.current.focus();
+  const focusOn = nextField => () => {
+    if (nextField?.current) {
+      nextField.current.focus();
     }
   };
 
@@ -204,9 +212,6 @@ const EditProfile = props => {
             />
             <ListItemEdit
               field={t('input_email_field')}
-              iconBtn={
-                user?.email_verified ? null : t('verify_email').toUpperCase()
-              }
               valueComponent={
                 <TextInput
                   ref={emailComponent}
@@ -315,7 +320,7 @@ const EditProfile = props => {
           style={styles.bottomSheet}
           ref={genderComponent}
           snapPoints={snapPointsGender}
-          index={0}>
+          index={-1}>
           <BottomSheetView>
             <Button
               onPress={() => {
@@ -348,7 +353,7 @@ const EditProfile = props => {
           snapPoints={snapPointsBio}
           enableContentPanningGesture={false}
           enableHandlePanningGesture={false}
-          index={0}>
+          index={-1}>
           <BottomSheetView style={{flex: 1, paddingTop: 21}}>
             <FullScreenInput
               ref={fullScreenInputComponent}
@@ -376,7 +381,7 @@ const EditProfile = props => {
           style={styles.bottomSheet}
           ref={addressComponent}
           snapPoints={snapPointsAddress}
-          index={0}>
+          index={-1}>
           <BottomSheetView></BottomSheetView>
         </BottomSheet>
       </SafeAreaView>

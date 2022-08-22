@@ -6,7 +6,7 @@ import {messageActionTypes} from '../reducers/message';
 import {userActionTypes} from '../reducers/user';
 
 // api
-import {fetchUser} from '../../api/Account';
+import {fetchUser, searchAddressList} from '../../api/Account';
 
 const errorPromise = error => {
   const message = getErrorString(error);
@@ -40,6 +40,17 @@ export const getUser = () => async (dispatch, getState) => {
     }
     dispatch({type: userActionTypes.USER_UPDATE, payload: user});
     return Promise.resolve(user);
+  } catch (e) {
+    errorPromise(e);
+    return Promise.reject();
+  }
+};
+
+export const searchAddress = search => async (dispatch, getState) => {
+  try {
+    return searchAddressList(search).then(response => {
+      return response.data;
+    });
   } catch (e) {
     errorPromise(e);
     return Promise.reject();

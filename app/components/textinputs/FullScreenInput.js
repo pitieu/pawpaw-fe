@@ -57,6 +57,9 @@ const FullScreenInput = (props, ref) => {
     setText: newText => {
       setInputText(newText);
     },
+    focus: () => {
+      textInput.current.focus();
+    },
   }));
 
   const save = useCallback(() => {
@@ -66,6 +69,8 @@ const FullScreenInput = (props, ref) => {
     } else if (inputText.length < minLength) {
       props.toast(t('description_min_required', {chars: minLength}));
     } else {
+      Keyboard.dismiss();
+
       if (onSavePressed) {
         onSavePressed(inputText);
       }
@@ -81,7 +86,10 @@ const FullScreenInput = (props, ref) => {
     <SafeAreaView style={[styles.container, containerStyle]}>
       <NavigationBar
         title={title}
-        onPressBack={() => onPressBack(inputText)}
+        onPressBack={() => {
+          Keyboard.dismiss();
+          onPressBack(inputText);
+        }}
         buttonNextText={t('save').toUpperCase()}
         onPressNext={save}
       />
@@ -109,7 +117,7 @@ const FullScreenInput = (props, ref) => {
             onChangeText={setInputText}
             value={inputText}
             numberOfLines={99}
-            autoFocus={true}
+            // autoFocus={true}
             style={styles.input}
             keyboardType={'default'}
             returnKeyType="done"

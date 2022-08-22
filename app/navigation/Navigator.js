@@ -1,10 +1,3 @@
-/**
- * Foodvila - React Native Template
- *
- * @format
- * @flow
- */
-
 // import dependencies
 import React from 'react';
 import {Platform} from 'react-native';
@@ -92,7 +85,7 @@ function MainNavigatorA() {
     <NavigationContainer>
       <Stack.Navigator
         //"PetServiceDetails" "ServiceStackNavigator" "SignIn"
-        initialRouteName="EditProfile" //HomeNavigator
+        initialRouteName="HomeNavigator" //HomeNavigator
         screenOptions={{
           cardOverlayEnabled: false,
           headerStyle: {

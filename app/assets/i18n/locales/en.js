@@ -174,9 +174,9 @@ export default {
   discard_changes_alert: 'Discard changes',
   // screens/profile/AddressList.js
   address_list_title: 'Address List',
-  select_location: 'Save Location',
+  select_location: 'Pick this location',
   current_location: 'Current Location',
-  autocomplete_placeholder: 'Enter location',
+  autocomplete_placeholder: 'Search location',
   // screens/profile/Address.js
   add_address_title: 'Address details',
   recipient_information_title: 'Recipient information',
@@ -195,4 +195,8 @@ export default {
   input_address_placeholder: 'Full Address',
   pin_location_field: 'Pin Location',
   pin_location_placeholder: 'Select a location',
+  // screens/profile/SelectCity.js
+  select_city_title: 'Select City',
+  input_search_city_placeholder: 'Enter at least {{chars}} characters',
+  cities_not_found: 'No cities found',
 };

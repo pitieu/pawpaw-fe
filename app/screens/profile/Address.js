@@ -1,19 +1,27 @@
 // import dependencies
-import React, {memo, useState, useRef, useMemo} from 'react';
+import React, {
+  memo,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+  useEffect,
+} from 'react';
 
 import {SafeAreaView, StyleSheet, View, Text, TextInput} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {t} from 'i18next';
 import PhoneInput from 'react-native-phone-number-input';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-// import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
+import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
+import Icon from 'react-native-vector-icons/dist/Ionicons';
 
 // import components
 import NavigationBar from '../../components/NavigationBar';
 import ListItemEdit from '../../components/list/listItemEdit';
 import {Title} from '../../components/text/CustomText';
 import Divider from '../../components/divider/Divider';
-// import SelectCity from './SelectCity';
+import SelectCity from './SelectCity';
 
 // import colors
 import Colors from '../../theme/colors';
@@ -23,7 +31,7 @@ const AddServiceOptions = props => {
   const {route} = props;
   const navigation = useNavigation();
 
-  const snapPointsCity = useMemo(() => [1, '100%'], []);
+  const snapPointsCity = useMemo(() => ['99.99%'], []);
 
   const deliveryNameComponent = useRef(null);
   const phoneComponent = useRef(null);
@@ -43,24 +51,49 @@ const AddServiceOptions = props => {
   const [city, setCity] = useState(route?.params?.city || '');
   const [postalCode, setPostalCode] = useState(route?.params?.postalCode || '');
   const [address, setAddress] = useState(route?.params?.address || '');
-  const [pinLocation, setPinLocation] = useState(
-    route?.params?.pinLocation || null,
+  const [latitude, setLatitude] = useState(route?.params?.latitude || null);
+  const [longitude, setLongitude] = useState(route?.params?.longitude || null);
+  const [locationText, setLocationText] = useState(
+    route?.params?.locationText || null,
   );
+
+  useEffect(() => {
+    if (route?.params?.city) {
+      setCity(route?.params?.city);
+    }
+    if (route?.params?.longitude) {
+      setLatitude(route?.params?.longitude);
+    }
+    if (route?.params?.latitude) {
+      setLongitude(route?.params?.latitude);
+    }
+    if (
+      route?.params?.locationText != null &&
+      route?.params?.locationText != undefined
+    ) {
+      setLocationText(route?.params?.locationText);
+    }
+  }, [route, navigation]);
 
   const navigateTo = (screen, options) => {
     navigation.navigate(screen, options);
   };
 
   const focusOn = nextFiled => () => {
-    console.log(nextFiled);
     if (nextFiled?.current) {
       nextFiled.current.focus();
     }
   };
 
-  const showBottomSheet = useCallback((type, index) => {
+  const showBottomSheet = useCallback(type => {
     if (type === 'city') {
-      cityComponent.current?.snapToIndex(index);
+      cityComponent.current?.expand();
+    }
+  }, []);
+
+  const closeBottomSheet = useCallback(type => {
+    if (type === 'city') {
+      cityComponent.current?.close();
     }
   }, []);
 
@@ -73,7 +106,10 @@ const AddServiceOptions = props => {
       city: city,
       postal_code: postalCode,
       address: address,
-      pin_location: pinLocation,
+      geolocation: {
+        longitude: longitude,
+        latitude: latitude,
+      },
     });
     navigateTo('AddressList', {
       addressList: addressList,
@@ -157,11 +193,18 @@ const AddServiceOptions = props => {
             }
           />
           <ListItemEdit
+            inputStyle={[
+              city
+                ? {
+                    color: Colors.primaryColor,
+                  }
+                : null,
+            ]}
             field={t('input_city_field')}
             placeholder={t('input_city_placeholder')}
             icon
             value={city}
-            onPress={() => showBottomSheet('city', 1)}
+            onPress={() => showBottomSheet('city')}
           />
           <ListItemEdit
             field={t('input_postal_code_field')}
@@ -173,7 +216,7 @@ const AddServiceOptions = props => {
                 placeholder={t('input_postal_code_placeholder')}
                 keyboardType="number-pad"
                 onChangeText={setPostalCode}
-                returnKeyType={'next'}
+                returnKeyType={'done'}
                 style={styles.inputField}
               />
             }
@@ -194,24 +237,58 @@ const AddServiceOptions = props => {
           />
           <ListItemEdit
             field={t('pin_location_field')}
-            placeholder={t('pin_location_placeholder')}
             borderBottom
             icon
-            onPress={() => navigateTo('Address')}
+            valueComponent={
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Icon
+                  name={'location'}
+                  size={20}
+                  color={
+                    latitude && longitude ? Colors.focusColor : Colors.gray
+                  }
+                  style={{marginRight: 5}}
+                />
+                <Text
+                  style={{
+                    flex: 1,
+                    paddingVertical: 10,
+                    color: Colors.primaryColor,
+                  }}>
+                  {locationText?.length > 0
+                    ? locationText
+                    : locationText != null
+                    ? 'Location already set'
+                    : t('pin_location_placeholder')}
+                </Text>
+              </View>
+            }
+            onPress={() => {
+              navigateTo('LongLatMap', {parentScreen: 'Address'});
+            }}
           />
           <Divider
             color={Colors.lightGray}
             containerStyle={[styles.divider, {marginTop: 20}]}
           />
         </View>
-        {/* <BottomSheet
-          style={styles.bottomSheet}
-          ref={cityComponent}
-          snapPoints={snapPointsCity}
-          index={0}>
-          <BottomSheetView><SelectCity /></BottomSheetView>
-        </BottomSheet> */}
       </KeyboardAwareScrollView>
+      <BottomSheet
+        ref={cityComponent}
+        style={styles.bottomSheet}
+        enableContentPanningGesture={false}
+        enableHandlePanningGesture={false}
+        snapPoints={snapPointsCity}
+        index={-1}>
+        <BottomSheetView style={{flex: 1, paddingTop: 21}}>
+          <SelectCity onClose={closeBottomSheet('city')} onSelect={setCity} />
+        </BottomSheetView>
+      </BottomSheet>
     </SafeAreaView>
   );
 };

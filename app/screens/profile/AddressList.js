@@ -1,5 +1,5 @@
 // import dependencies
-import React, {memo, useState} from 'react';
+import React, {memo, useState, useCallback} from 'react';
 import {SafeAreaView, StyleSheet, View, Text} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {t} from 'i18next';
